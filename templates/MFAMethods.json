@@ -1,11 +1,11 @@
 {Header}
 
-Hello {UserFirstName},
+Hello {UserFirstName},<p />
 
-We recently detected the following changes on your personal security information:
+We recently detected the following changes on your personal security information:<p />
 
 {MFAChanges}
-
-If you did not do this, please contact {SupportEmail}, or call {SupportPhoneNumber}.
+<p />
+If you did not do this, please contact {SupportEmail}, or call {SupportPhoneNumber}.<p />
 
 {Footer}
