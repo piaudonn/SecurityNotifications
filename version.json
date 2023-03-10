@@ -1,0 +1,10 @@
+{
+  "configFile":"1",
+  "notificationLA":"0.1",
+  "configLA":"0.1",
+  "modules" : {
+    "mfa":"0.1",
+    "tap":"0",
+    "password":"0"
+  }
+}
