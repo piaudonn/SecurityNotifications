@@ -1,0 +1,169 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "PlaybookName": {
+            "defaultValue": "SEEN-SendNotification",
+            "type": "String"
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.Logic/workflows",
+            "apiVersion": "2017-07-01",
+            "name": "[parameters('PlaybookName')]",
+            "location": "[resourceGroup().location]",
+            "identity": {
+                "type": "SystemAssigned"
+            },
+            "properties": {
+                "state": "Enabled",
+                "accessControl": {
+                    "triggers": {
+                        "allowedCallerIpAddresses": []
+                    }
+                },
+                "definition": {
+                    "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+                    "contentVersion": "1.0.0.0",
+                    "parameters": {},
+                    "triggers": {
+                        "manual": {
+                            "type": "Request",
+                            "kind": "Http",
+                            "inputs": {
+                                "schema": {
+                                    "properties": {
+                                        "bcc": {
+                                            "type": "string"
+                                        },
+                                        "body": {
+                                            "type": "string"
+                                        },
+                                        "cc": {
+                                            "type": "string"
+                                        },
+                                        "importance": {
+                                            "type": "string"
+                                        },
+                                        "mailFrom": {
+                                            "type": "string"
+                                        },
+                                        "replyTo": {
+                                            "type": "string"
+                                        },
+                                        "saveToSentItems": {
+                                            "type": "boolean"
+                                        },
+                                        "subject": {
+                                            "type": "string"
+                                        },
+                                        "to": {
+                                            "type": "string"
+                                        },
+                                        "tracking": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "actions": {
+                        "Compose": {
+                            "runAfter": {},
+                            "type": "Compose",
+                            "inputs": {
+                                "message": {
+                                    "bccRecipients": "@json(if(or(equals(triggerBody()?['bcc'],''),equals(triggerBody()?['bcc'],null)),'[]',concat('[{\"emailAddress\":{\"address\":\"',triggerBody()?['bcc'],'\"}}],')))",
+                                    "body": {
+                                        "content": "@{triggerBody()?['body']}",
+                                        "contentType": "HTML"
+                                    },
+                                    "ccRecipients": "@json(if(or(equals(triggerBody()?['cc'],''),equals(triggerBody()?['bcc'],null)),'[]',concat('[{\"emailAddress\":{\"address\":\"',triggerBody()?['cc'],'\"}}],')))",
+                                    "replyTo": [
+                                        {
+                                            "emailAddress": {
+                                                "address": "@{triggerBody()?['replyTo']}"
+                                            }
+                                        }
+                                    ],
+                                    "subject": "@{triggerBody()?['subject']}",
+                                    "toRecipients": [
+                                        {
+                                            "emailAddress": {
+                                                "address": "@{triggerBody()?['to']}"
+                                            }
+                                        }
+                                    ]
+                                },
+                                "saveToSentItems": "@{triggerBody()?['saveToSentItems']}"
+                            }
+                        },
+                        "HTTP_sendMail": {
+                            "runAfter": {
+                                "Compose": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "Http",
+                            "inputs": {
+                                "authentication": {
+                                    "audience": "https://graph.microsoft.com/",
+                                    "type": "ManagedServiceIdentity"
+                                },
+                                "body": "@outputs('Compose')",
+                                "headers": {
+                                    "Content-type": "application/json"
+                                },
+                                "method": "POST",
+                                "uri": "https://graph.microsoft.com/v1.0/users/@{triggerBody()?['mailFrom']}/sendMail"
+                            }
+                        },
+                        "Response": {
+                            "runAfter": {
+                                "HTTP_sendMail": [
+                                    "Succeeded",
+                                    "Failed"
+                                ]
+                            },
+                            "trackedProperties": {
+                                "EmailBcc": "@action()['inputs']['body']['emailBcc']",
+                                "EmailCc": "@action()['inputs']['body']['emailCc']",
+                                "EmailRecipient": "@action()['inputs']['body']['emailRecipient']",
+                                "EmailStatus": "@action()['inputs']['body']['emailStatus']",
+                                "EmailSubject": "@action()['inputs']['body']['emailSubject']",
+                                "Tracking": "@action()['inputs']['body']['tracking']",
+                                "emailFrom": "@action()['inputs']['body']['mailFrom']"
+                            },
+                            "type": "Response",
+                            "kind": "Http",
+                            "inputs": {
+                                "body": {
+                                    "emailBcc": "@{triggerBody()?['bcc']}",
+                                    "emailCc": "@{triggerBody()?['cc']}",
+                                    "emailFrom": "@{triggerBody()?['mailFrom']}",
+                                    "emailRecipient": "@{triggerBody()?['to']}",
+                                    "emailStatus": "@outputs('HTTP_sendMail')['statusCode']",
+                                    "emailSubject": "@{triggerBody()?['subject']}",
+                                    "tracking": "@triggerBody()?['tracking']"
+                                },
+                                "statusCode": "@coalesce(outputs('HTTP_sendMail')['statusCode'],500)"
+                            }
+                        }
+                    },
+                    "outputs": {}
+                },
+                "parameters": {}
+            }
+        }
+    ],
+    "outputs": {
+        "resourceID": {
+            "type": "string",
+            "value": "[resourceId('Microsoft.Logic/workflows', parameters('PlaybookName'))]"
+        }
+    }
+}

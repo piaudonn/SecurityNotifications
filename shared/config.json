@@ -1,0 +1,282 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "PlaybookName": {
+            "defaultValue": "SEEN-Config",
+            "type": "String"
+        },
+        "BlobConnectionResourceID": {
+            "defaultValue": "/subscriptions/<subscriptionid>/resourceGroups/<rgname>/providers/Microsoft.Web/connections/azureblob",
+            "type": "String"
+        },
+        "StorageAccountName": {
+            "defaultValue": "",
+            "type": "String"
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.Logic/workflows",
+            "apiVersion": "2017-07-01",
+            "name": "[parameters('PlaybookName')]",
+            "location": "[resourceGroup().location]",
+            "identity": {
+                "type": "SystemAssigned"
+            },
+            "properties": {
+                "state": "Enabled",
+                "accessControl": {
+                    "triggers": {
+                        "allowedCallerIpAddresses": []
+                    }
+                },
+                "definition": {
+                    "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+                    "contentVersion": "1.0.0.0",
+                    "parameters": {
+                        "$connections": {
+                            "defaultValue": {},
+                            "type": "Object"
+                        }
+                    },
+                    "triggers": {
+                        "manual": {
+                            "type": "Request",
+                            "kind": "Http",
+                            "inputs": {
+                                "schema": {
+                                    "properties": {
+                                        "mode": {
+                                            "type": "string"
+                                        },
+                                        "module": {
+                                            "type": "string"
+                                        },
+                                        "testEmail": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "actions": {
+                        "Decoded_Config": {
+                            "runAfter": {
+                                "Get_Config": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "Compose",
+                            "inputs": "@json(base64ToString(body('Get_Config')['$content']))"
+                        },
+                        "Decoded_Footer": {
+                            "runAfter": {
+                                "Get_Footer": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "Compose",
+                            "inputs": "@base64ToString(body('Get_Footer')['$content'])"
+                        },
+                        "Decoded_Header": {
+                            "runAfter": {
+                                "Get_Header": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "Compose",
+                            "inputs": "@base64ToString(body('Get_Header')['$content'])"
+                        },
+                        "GET_Version_Redirect": {
+                            "runAfter": {},
+                            "type": "Http",
+                            "inputs": {
+                                "method": "GET",
+                                "uri": "https://aka.ms/seenversion"
+                            }
+                        },
+                        "Get_Config": {
+                            "runAfter": {},
+                            "metadata": {
+                                "JTJmc2VlbiUyZnNlZW4uY29uZmln": "/seen/seen.config"
+                            },
+                            "type": "ApiConnection",
+                            "inputs": {
+                                "host": {
+                                    "connection": {
+                                        "name": "@parameters('$connections')['azureblob']['connectionId']"
+                                    }
+                                },
+                                "method": "get",
+                                "path": "[concat('/v2/datasets/@{encodeURIComponent(encodeURIComponent(''', parameters('StorageAccountName'), '''))}/files/@{encodeURIComponent(encodeURIComponent(''JTJmc2VlbiUyZnNlZW4uY29uZmln''))}/content')]",
+                                "queries": {
+                                    "inferContentType": false
+                                }
+                            }
+                        },
+                        "Get_Footer": {
+                            "runAfter": {},
+                            "metadata": {
+                                "JTJmc2VlbiUyZnRlbXBsYXRlcyUyZmZvb3Rlci5odG1s": "/seen/templates/footer.html"
+                            },
+                            "type": "ApiConnection",
+                            "inputs": {
+                                "host": {
+                                    "connection": {
+                                        "name": "@parameters('$connections')['azureblob']['connectionId']"
+                                    }
+                                },
+                                "method": "get",
+                                "path": "[concat('/v2/datasets/@{encodeURIComponent(encodeURIComponent(''', parameters('StorageAccountName'), '''))}/files/@{encodeURIComponent(encodeURIComponent(''JTJmc2VlbiUyZnRlbXBsYXRlcyUyZmZvb3Rlci5odG1s''))}/content')]",
+                                "queries": {
+                                    "inferContentType": false
+                                }
+                            }
+                        },
+                        "Get_Header": {
+                            "runAfter": {},
+                            "metadata": {
+                                "JTJmc2VlbiUyZnRlbXBsYXRlcyUyZmhlYWRlci5odG1s": "/seen/templates/header.html"
+                            },
+                            "type": "ApiConnection",
+                            "inputs": {
+                                "host": {
+                                    "connection": {
+                                        "name": "@parameters('$connections')['azureblob']['connectionId']"
+                                    }
+                                },
+                                "method": "get",
+                                "path": "[concat('/v2/datasets/@{encodeURIComponent(encodeURIComponent(''', parameters('StorageAccountName'), '''))}/files/@{encodeURIComponent(encodeURIComponent(''JTJmc2VlbiUyZnRlbXBsYXRlcyUyZmhlYWRlci5odG1s''))}/content')]",
+                                "queries": {
+                                    "inferContentType": false
+                                }
+                            }
+                        },
+                        "Get_Version": {
+                            "runAfter": {
+                                "GET_Version_Redirect": [
+                                    "Failed"
+                                ]
+                            },
+                            "type": "Http",
+                            "inputs": {
+                                "method": "GET",
+                                "uri": "@{outputs('GET_Version_Redirect')['headers']?['Location']}"
+                            }
+                        },
+                        "Switch": {
+                            "runAfter": {
+                                "Decoded_Config": [
+                                    "Succeeded"
+                                ],
+                                "Decoded_Footer": [
+                                    "Succeeded"
+                                ],
+                                "Decoded_Header": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "cases": {
+                                "Case": {
+                                    "case": "mfa",
+                                    "actions": {
+                                        "Decode_MFA_template": {
+                                            "runAfter": {
+                                                "Get_MFA_template": [
+                                                    "Succeeded"
+                                                ]
+                                            },
+                                            "type": "Compose",
+                                            "inputs": "@replace(replace(replace(replace(base64ToString(body('Get_MFA_template')['$content']),'{SupportEmail}',outputs('Decoded_Config')['contact']['supportEmail']),'{SupportPhoneNumber}',outputs('Decoded_Config')['contact']['supportPhone']),'{Header}',outputs('Decoded_Header')),'{Footer}',outputs('Decoded_Footer'))"
+                                        },
+                                        "Get_MFA_template": {
+                                            "runAfter": {},
+                                            "type": "ApiConnection",
+                                            "inputs": {
+                                                "host": {
+                                                    "connection": {
+                                                        "name": "@parameters('$connections')['azureblob']['connectionId']"
+                                                    }
+                                                },
+                                                "method": "get",
+                                                "path": "[concat('/v2/datasets/@{encodeURIComponent(encodeURIComponent(''', parameters('StorageAccountName'), '''))}/files/@{encodeURIComponent(encodeURIComponent(''/seen/templates/mfa.html''))}/content')]",
+                                                "queries": {
+                                                    "inferContentType": false
+                                                }
+                                            }
+                                        },
+                                        "MFA_Config": {
+                                            "runAfter": {
+                                                "Decode_MFA_template": [
+                                                    "Succeeded"
+                                                ]
+                                            },
+                                            "type": "Compose",
+                                            "inputs": {
+                                                "bcc": "@{ outputs('Decoded_Config')['modules']['mfa']['bcc']}",
+                                                "ccManager": "@outputs('Decoded_Config')?['modules']['mfa']['ccManager']",
+                                                "includeGuests": "@outputs('Decoded_Config')['modules']['mfa']['includeGuests']",
+                                                "mailFrom": "@{outputs('Decoded_Config')['mailFrom']}",
+                                                "recipient": "@{triggerBody()?['testEmail']}",
+                                                "replyTo": "@{outputs('Decoded_Config')['replyTo']}",
+                                                "saveToSentItems": "@{outputs('Decoded_Config')['saveToSentItems']}",
+                                                "subject": "@{outputs('Decoded_Config')['modules']['mfa']['subject']}",
+                                                "template": "@{outputs('Decode_MFA_template')}",
+                                                "timeZone": "@{outputs('Decoded_Config')['timeZone']}"
+                                            }
+                                        },
+                                        "Response": {
+                                            "runAfter": {
+                                                "MFA_Config": [
+                                                    "Succeeded"
+                                                ]
+                                            },
+                                            "type": "Response",
+                                            "kind": "Http",
+                                            "inputs": {
+                                                "body": "@outputs('MFA_Config')",
+                                                "statusCode": 200
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            "default": {
+                                "actions": {}
+                            },
+                            "expression": "@triggerBody()?['module']",
+                            "type": "Switch"
+                        }
+                    },
+                    "outputs": {}
+                },
+                "parameters": {
+                    "$connections": {
+                        "value": {
+                            "azureblob": {
+                                "connectionId": "[parameters('BlobConnectionResourceID')]",
+                                "connectionName": "azureblob",
+                                "connectionProperties": {
+                                    "authentication": {
+                                        "type": "ManagedServiceIdentity"
+                                    }
+                                },
+                                "id": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/azureblob')]"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    ],
+    "outputs": {
+        "resourceID": {
+            "type": "string",
+            "value": "[resourceId('Microsoft.Logic/workflows', parameters('PlaybookName'))]"
+        }
+    }
+}
