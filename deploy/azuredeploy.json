@@ -1,0 +1,143 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "StorageAccountPrefix": {
+            "defaultValue": "seen",
+            "type": "String"
+        },
+        "ConfigPlaybookName": {
+            "defaultValue": "SEEN-Config",
+            "type": "String"
+        },
+        "EmailPlaybookName": {
+            "defaultValue": "SEEN-SendNotification",
+            "type": "String"
+        },
+        "MFAPlaybookName": {
+            "defaultValue": "SEEN-MFAMethods",
+            "type": "String"
+        }
+    },
+    "variables": {
+        "storageTemplate": "https://raw.githubusercontent.com/piaudonn/SecurityNotifications/shared/storage.json",
+        "webConnectionTemplate": "https://raw.githubusercontent.com/piaudonn/SecurityNotifications/shared/webconnections.json",
+        "configTemplate": "https://raw.githubusercontent.com/piaudonn/SecurityNotifications/shared/config.json",
+        "emailTemplate": "https://raw.githubusercontent.com/piaudonn/SecurityNotifications/shared/emailnotification.json",
+        "mfaTemplate": "https://raw.githubusercontent.com/piaudonn/SecurityNotifications/modules/MFAMethods/mfamethods.json"
+    },
+    "resources": [
+        {
+            "apiVersion": "2019-10-01",
+            "name": "StorageTemplate",
+            "type": "Microsoft.Resources/deployments",
+            "dependsOn": [],
+            "properties": {
+                "mode": "incremental",
+                "templateLink": {
+                    "uri": "[variables('storageTemplate')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "StorageAccountPrefix": {
+                        "value": "[parameters('StorageAccountPrefix')]"
+                    }
+                }
+            }
+        },
+        {
+            "apiVersion": "2019-10-01",
+            "name": "WebConnectionTemplate",
+            "type": "Microsoft.Resources/deployments",
+            "dependsOn": [],
+            "properties": {
+                "mode": "incremental",
+                "templateLink": {
+                    "uri": "[variables('webConnectionTemplate')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {}
+            }
+        },
+        {
+            "apiVersion": "2019-10-01",
+            "name": "ConfigTemplate",
+            "type": "Microsoft.Resources/deployments",
+            "dependsOn": [
+                "[resourceId('Microsoft.Resources/deployments', 'StorageTemplate')]",
+                "[resourceId('Microsoft.Resources/deployments', 'WebConnectionTemplate')]"
+            ],
+            "properties": {
+                "mode": "incremental",
+                "templateLink": {
+                    "uri": "[variables('configTemplate')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "PlaybookName": {
+                        "value": "[parameters('ConfigPlaybookName')]"
+                    },
+                    "BlobConnectionResourceID": {
+                        "value": "[reference('WebConnectionTemplate').outputs.BlobConnectionResourceID.value]"
+                    },
+                    "StorageAccountName": {
+                        "value": "[reference('StorageTemplate').outputs.storageAccountName.value]"
+                    }
+                }
+            }
+        },
+        {
+            "apiVersion": "2019-10-01",
+            "name": "EmailTemplate",
+            "type": "Microsoft.Resources/deployments",
+            "dependsOn": [],
+            "properties": {
+                "mode": "incremental",
+                "templateLink": {
+                    "uri": "[variables('emailTemplate')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "PlaybookName": {
+                        "value": "[parameters('EmailPlaybookName')]"
+                    }
+                }
+            }
+        },
+        {
+            "apiVersion": "2019-10-01",
+            "name": "MFATemplate",
+            "type": "Microsoft.Resources/deployments",
+            "dependsOn": [
+                "[resourceId('Microsoft.Resources/deployments', 'StorageTemplate')]",
+                "[resourceId('Microsoft.Resources/deployments', 'WebConnectionTemplate')]",
+                "[resourceId('Microsoft.Resources/deployments', 'ConfigTemplate')]",
+                "[resourceId('Microsoft.Resources/deployments', 'StorageTemplate')]"
+            ],
+            "properties": {
+                "mode": "incremental",
+                "templateLink": {
+                    "uri": "[variables('mfaTemplate')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "PlaybookName": {
+                        "value": "[parameters('MFAPlaybookName')]"
+                    },
+                    "TablesConnectionResourceId": {
+                        "value": "[reference('WebConnectionTemplate').outputs.TableConnectionResourceID.value]"
+                    },
+                    "ConfigResourceId": {
+                        "value": "[reference('ConfigTemplate').outputs.resourceID.value]"
+                    },
+                    "EmailNotificationResourceId": {
+                        "value": "[reference('EmailTemplate').outputs.resourceID.value]"
+                    },
+                    "StorageAccountName": {
+                        "value": "[reference('StorageTemplate').outputs.storageAccountName.value]"
+                    }
+                }
+            }
+        }
+    ]
+}
