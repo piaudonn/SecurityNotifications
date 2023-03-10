@@ -1,0 +1,16 @@
+name: JSON check
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: json-lint
+        uses: ocular-d/json-linter@0.0.2
+        with:
+          pattern: "\\.json$"
