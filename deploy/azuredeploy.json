@@ -17,14 +17,26 @@
         "MFAPlaybookName": {
             "defaultValue": "SEEN-MFAMethods",
             "type": "String"
+        },
+        "DeployFromBranch": {
+            "defaultValue": "main",
+            "type": "String"
+        },
+        "LogAnalyticsResourceId": {
+            "defaultValue": "/subscriptions/<subid>/resourcegroups/<rgname>/providers/microsoft.operationalinsights/workspaces/<workspacename>",
+            "type": "String"
         }
     },
     "variables": {
-        "storageTemplate": "https://raw.githubusercontent.com/piaudonn/SecurityNotifications/shared/storage.json",
-        "webConnectionTemplate": "https://raw.githubusercontent.com/piaudonn/SecurityNotifications/shared/webconnections.json",
-        "configTemplate": "https://raw.githubusercontent.com/piaudonn/SecurityNotifications/shared/config.json",
-        "emailTemplate": "https://raw.githubusercontent.com/piaudonn/SecurityNotifications/shared/emailnotification.json",
-        "mfaTemplate": "https://raw.githubusercontent.com/piaudonn/SecurityNotifications/modules/MFAMethods/mfamethods.json"
+        "storageTemplate": "[concat('https://raw.githubusercontent.com/piaudonn/SecurityNotifications/', parameters('DeployFromBranch'), '/shared/storage.json')]",
+        "webConnectionTemplate": "[concat('https://raw.githubusercontent.com/piaudonn/SecurityNotifications/', parameters('DeployFromBranch'), '/shared/webconnections.json')]",
+        "configTemplate": "[concat('https://raw.githubusercontent.com/piaudonn/SecurityNotifications/', parameters('DeployFromBranch'), '/shared/config.json')]",
+        "emailTemplate": "[concat('https://raw.githubusercontent.com/piaudonn/SecurityNotifications/', parameters('DeployFromBranch'), '/shared/emailnotification.json')]",
+        "mfaTemplate": "[concat('https://raw.githubusercontent.com/piaudonn/SecurityNotifications/', parameters('DeployFromBranch'), '/modules/MFAMethods/mfamethods.json')]",
+        "storageRbacTemplate": "[concat('https://raw.githubusercontent.com/piaudonn/SecurityNotifications/', parameters('DeployFromBranch'), '/shared/rbacstorage.json')]",
+        "laRbacTemplate": "[concat('https://raw.githubusercontent.com/piaudonn/SecurityNotifications/', parameters('DeployFromBranch'), '/shared/rbacloganalytics.json')]",
+        "logAnalyticsSubscription": "[string(split(parameters('LogAnalyticsResourceId'),'/')[2])]",
+        "logAnalyticsResourceGroup": "[string(split(parameters('LogAnalyticsResourceId'),'/')[4])]"
     },
     "resources": [
         {
@@ -135,6 +147,61 @@
                     },
                     "StorageAccountName": {
                         "value": "[reference('StorageTemplate').outputs.storageAccountName.value]"
+                    }
+                }
+            }
+        },
+        {
+            "apiVersion": "2019-10-01",
+            "name": "RBACStorageTemplate",
+            "type": "Microsoft.Resources/deployments",
+            "dependsOn": [
+                "[resourceId('Microsoft.Resources/deployments', 'MFATemplate')]",
+                "[resourceId('Microsoft.Resources/deployments', 'StorageTemplate')]",
+                "[resourceId('Microsoft.Resources/deployments', 'ConfigTemplate')]"
+            ],
+            "properties": {
+                "mode": "incremental",
+                "templateLink": {
+                    "uri": "[variables('storageRbacTemplate')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "ConfigPrincipalId": {
+                        "value": "[reference('ConfigTemplate').outputs.resourcePrincipalID.value]"
+                    },
+                    "MfaPrincipalId": {
+                        "value": "[reference('MFATemplate').outputs.resourcePrincipalID.value]"
+                    },
+                    "StorageResourceId": {
+                        "value": "[reference('StorageTemplate').outputs.resourceID.value]"
+                    }
+                }
+            }
+        },
+        {
+            "apiVersion": "2019-10-01",
+            "name": "RBACLATemplate",
+            "subscriptionId": "[variables('logAnalyticsSubscription')]",
+            "resourceGroup": "[variables('logAnalyticsResourceGroup')]",
+            "type": "Microsoft.Resources/deployments",
+            "dependsOn": [
+                "[resourceId('Microsoft.Resources/deployments', 'MFATemplate')]",
+                "[resourceId('Microsoft.Resources/deployments', 'StorageTemplate')]",
+                "[resourceId('Microsoft.Resources/deployments', 'ConfigTemplate')]"
+            ],
+            "properties": {
+                "mode": "incremental",
+                "templateLink": {
+                    "uri": "[variables('laRbacTemplate')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "MfaPrincipalId": {
+                        "value": "[reference('MFATemplate').outputs.resourcePrincipalID.value]"
+                    },
+                    "LogAnalyticsResourceId": {
+                        "value": "[parameters('LogAnalyticsResourceId')]"
                     }
                 }
             }
