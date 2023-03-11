@@ -1,0 +1,57 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "ConfigPrincipalId": {
+            "defaultValue": "",
+            "type": "String"
+        },
+        "MfaPrincipalId": {
+            "defaultValue": "",
+            "type": "String"
+        },
+        "StorageResourceId": {
+            "defaultValue": "",
+            "type": "String"
+        }
+    },
+    "variables": {
+        "blobRoleId": "ba92f5b4-2d11-453d-a403-e96b0029c9fe",
+        "tableRoleId": "0a9a7e1f-b9d0-4cc4-a60d-0319b160aaa3",
+        "configBlobGuid": "d0165cc2-88d0-4f39-bc95-93f179bd8f8c",
+        "configTableGuid": "021146ef-89d0-4004-a284-f453cc5f0ff5",
+        "mfaTableGuid": "c9e50ba0-819a-4233-bcf8-e0a636d9139e"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Authorization/roleAssignments",
+            "apiVersion": "2022-04-01",
+            "name": "[variables('configBlobGuid')]",
+            "scope": "[parameters('StorageResourceId')]",
+            "properties": {
+                "roleDefinitionId": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', variables('blobRoleId'))]",
+                "principalId": "[parameters('ConfigPrincipalId')]"
+            }
+        },
+        {
+            "type": "Microsoft.Authorization/roleAssignments",
+            "apiVersion": "2022-04-01",
+            "name": "[variables('configTableGuid')]",
+            "scope": "[parameters('StorageResourceId')]",
+            "properties": {
+                "roleDefinitionId": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', variables('tableRoleId'))]",
+                "principalId": "[parameters('ConfigPrincipalId')]"
+            }
+        },
+        {
+            "type": "Microsoft.Authorization/roleAssignments",
+            "apiVersion": "2022-04-01",
+            "name": "[variables('mfaTableGuid')]",
+            "scope": "[parameters('StorageResourceId')]",
+            "properties": {
+                "roleDefinitionId": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', variables('tableRoleId'))]",
+                "principalId": "[parameters('MfaPrincipalId')]"
+            }
+        }
+    ]
+}
