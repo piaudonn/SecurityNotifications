@@ -2,7 +2,7 @@
 
 ### Project description
 
-Consumer identity platforms are notifying their users when their password has changes, a suspicious logon is detected, or a new MFA method was added. It is also a common practice in the insurance and financial industries. Yet, our enterprise solution Azure AD does not have these capabilities.
+Consumer identity platforms are notifying their users when their password has changed, a suspicious logon is detected, or a new MFA method was added. It is also a common practice in the insurance and financial industries. Yet, our enterprise solution Azure AD does not have these capabilities.
 
 This project is leveraging a combination of Logic Apps to enable customers to quickly set up those notifications using ready to go (and customizable) email templates. 
 
