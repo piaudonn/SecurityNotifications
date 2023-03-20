@@ -246,7 +246,6 @@
             "EmailPlaybookName": "[coalesce(steps('seenModules').advancedSetup.EmailPlaybookName,'SEEN-SendEmail')]",
             "MFAPlaybookName": "[coalesce(steps('seenModules').advancedSetup.MFAPlaybookName,'SEEN-MFAMethods')]",
             "TAPPlaybookName": "[coalesce(steps('seenModules').advancedSetup.TAPPlaybookName,'SEEN-TemporaryAccessPass')]",
-            "LogAnalyticsWorkspaceId": "[coalesce(steps('seenModules').advancedSetup.LogAnalyticsWorkspaceId,steps('seenModules').standardSetup.LogAnalyticsWorkspaceId)]",
             "DeployFromBranch": "[coalesce(steps('seenModules').advancedSetup.DeploymentBranch,'main')]",
             "location": "[location()]"
         }
