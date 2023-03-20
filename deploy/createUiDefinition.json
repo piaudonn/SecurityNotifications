@@ -1,0 +1,228 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/0.1.2-preview/CreateUIDefinition.MultiVm.json#",
+    "handler": "Microsoft.Azure.CreateUIDef",
+    "version": "0.1.2-preview",
+    "parameters": {
+        "config": {
+            "isWizard": true,
+            "basics": {
+                "description": "## Security End User Notifications (SEEN) Deployment\n### Post Deployment \nAfter deploying this template, ensure to run the [setup.ps1](https://github.com/piaudonn/SecurityNotifications/blob/main/deploy/setup.ps1) script to grant permissions to the SEEN modules.  It may take up to 1 hour for the permissions to become effective.",
+                "resourceGroup": {
+                    "constraints": {
+                        "validations": [
+                            {
+                                "permission": "Microsoft.Logic/workflows/write",
+                                "message": "You must have permission to create and update Logic Apps"
+                            },
+                            {
+                                "permission": "Microsoft.Storage/storageAccounts/write",
+                                "message": "You must have permission to create and update Storage Accounts"
+                            }
+                        ]
+                    }
+                },
+                "location": {
+                    "label": "Location",
+                    "toolTip": "Location for all resources",
+                    "resourceTypes": [
+                        "Microsoft.Logic",
+                        "Microsoft.Storage"
+                    ]
+                }
+            }
+        },
+        "basics": [],
+        "steps": [
+            {
+                "name": "deploymentTypeStep",
+                "label": "Deployment Type",
+                "elements": [
+                    {
+                        "name": "deployTextBlock2",
+                        "type": "Microsoft.Common.TextBlock",
+                        "visible": true,
+                        "options": {
+                            "text": "Select the type of deployment you want for SEEN"
+                        }
+                    },
+                    {
+                        "name": "deployTextBlock3",
+                        "type": "Microsoft.Common.TextBlock",
+                        "visible": true,
+                        "options": {
+                            "text": "A standard deployment allows you to deploy or update the entire SEEN solution with minimal input.  An advanced deployment allows for additional configuration such as providing customized names to the Logic Apps.",
+                            "link": {
+                                "label": "Learn more",
+                                "uri": "https://github.com/piaudonn/SecurityNotifications/tree/main/deploy"
+                            }
+                        }
+                    },
+                    {
+                        "name": "deploymentType",
+                        "type": "Microsoft.Common.OptionsGroup",
+                        "label": "Select the deployment type",
+                        "defaultValue": "Standard (recommended)",
+                        "toolTip": "",
+                        "constraints": {
+                            "allowedValues": [
+                                {
+                                    "label": "Standard (recommended)",
+                                    "value": "standard"
+                                },
+                                {
+                                    "label": "Advanced",
+                                    "value": "advanced"
+                                }
+                            ],
+                            "required": true
+                        },
+                        "visible": true
+                    }
+                ]
+            },
+            {
+                "name": "seenModules",
+                "label": "SEEN Setup",
+                "elements": [
+                    {
+                        "name": "standardSetup",
+                        "type": "Microsoft.Common.Section",
+                        "label": "Standard Setup - STAT",
+                        "elements": [
+                            {
+                                "name": "textBlock1",
+                                "type": "Microsoft.Common.TextBlock",
+                                "visible": true,
+                                "options": {
+                                    "text": "The standard setup mode will deploy SEEN with default names and configuration",
+                                    "link": {
+                                        "label": "Learn more",
+                                        "uri": "https://github.com/piaudonn/SecurityNotifications"
+                                    }
+                                }
+                            },
+                            {
+                                "name": "LogAnalyticsWorkspaceId",
+                                "type": "Microsoft.Common.TextBox",
+                                "label": "Log Analytics Workspace Id",
+                                "placeholder": "",
+                                "defaultValue": "",
+                                "toolTip": "",
+                                "constraints": {},
+                                "visible": true
+                            }
+                        ],
+                        "visible": "[if(equals(steps('deploymentTypeStep').deploymentType, 'standard'), true, false)]"
+                    },
+                    {
+                        "name": "advancedSetup",
+                        "type": "Microsoft.Common.Section",
+                        "label": "Advanced Setup - STAT",
+                        "elements": [
+                            {
+                                "name": "textBlock1",
+                                "type": "Microsoft.Common.TextBlock",
+                                "visible": true,
+                                "options": {
+                                    "text": "The Advanced Setup allows you to configure your own names for the resources created by this deployment.  When updating the SEEN solution you must use the same names or new copies of the Logic Apps will be deployed.",
+                                    "link": {
+                                        "label": "Learn more",
+                                        "uri": "https://github.com/piaudonn/SecurityNotifications"
+                                    }
+                                }
+                            },
+                            {
+                                "name": "StorageAccountPrefix",
+                                "type": "Microsoft.Common.TextBox",
+                                "label": "Storage Account Prefix",
+                                "placeholder": "",
+                                "defaultValue": "seen",
+                                "toolTip": "",
+                                "constraints": {
+                                    "required": true,
+                                    "validations": [
+                                        {
+                                            "regex": "^[a-z0-9]{1,11}$",
+                                            "message": "Only lowercase characters and numbers are allowed, and the value must be 1-11 characters long."
+                                        }
+                                    ]
+                                }
+                            },
+                            {
+                                "name": "ConfigPlaybookName",
+                                "type": "Microsoft.Common.TextBox",
+                                "label": "Configuration Playbook Name",
+                                "placeholder": "",
+                                "defaultValue": "SEEN-Config",
+                                "toolTip": "",
+                                "constraints": {},
+                                "visible": true
+                            },
+                            {
+                                "name": "EmailPlaybookName",
+                                "type": "Microsoft.Common.TextBox",
+                                "label": "Email Notification Playbook Name",
+                                "placeholder": "",
+                                "defaultValue": "SEEN-SendEmail",
+                                "toolTip": "",
+                                "constraints": {},
+                                "visible": true
+                            },
+                            {
+                                "name": "MFAPlaybookName",
+                                "type": "Microsoft.Common.TextBox",
+                                "label": "MFA Playbook Name",
+                                "placeholder": "",
+                                "defaultValue": "SEEN-MFAMethods",
+                                "toolTip": "",
+                                "constraints": {},
+                                "visible": true
+                            },
+                            {
+                                "name": "TAPPlaybookName",
+                                "type": "Microsoft.Common.TextBox",
+                                "label": "Temporary Access Pass Playbook Name",
+                                "placeholder": "",
+                                "defaultValue": "SEEN-TemporaryAccessPass",
+                                "toolTip": "",
+                                "constraints": {},
+                                "visible": true
+                            },
+                            {
+                                "name": "LogAnalyticsWorkspaceId",
+                                "type": "Microsoft.Common.TextBox",
+                                "label": "Log Analytics Workspace Id",
+                                "placeholder": "",
+                                "defaultValue": "",
+                                "toolTip": "",
+                                "constraints": {},
+                                "visible": true
+                            },
+                            {
+                                "name": "DeploymentBranch",
+                                "type": "Microsoft.Common.TextBox",
+                                "label": "Deploy from a specific GitHub Branch",
+                                "placeholder": "",
+                                "defaultValue": "main",
+                                "toolTip": "",
+                                "constraints": {},
+                                "visible": true
+                            }
+                        ],
+                        "visible": "[if(equals(steps('deploymentTypeStep').deploymentType, 'advanced'), true, false)]"
+                    }
+                ]
+            }
+        ],
+        "outputs": {
+            "StorageAccountPrefix": "[coalesce(steps('seenModules').advancedSetup.StorageAccountPrefix,'seen')]",
+            "ConfigPlaybookName": "[coalesce(steps('seenModules').advancedSetup.ConfigPlaybookName,'SEEN-Config')]",
+            "EmailPlaybookName": "[coalesce(steps('seenModules').advancedSetup.EmailPlaybookName,'SEEN-SendEmail')]",
+            "MFAPlaybookName": "[coalesce(steps('seenModules').advancedSetup.MFAPlaybookName,'SEEN-MFAMethods')]",
+            "TAPPlaybookName": "[coalesce(steps('seenModules').advancedSetup.TAPPlaybookName,'SEEN-TemporaryAccessPass')]",
+            "LogAnalyticsWorkspaceId": "[coalesce(steps('seenModules').advancedSetup.LogAnalyticsWorkspaceId,'Run-KQLQuery')]",
+            "DeployFromBranch": "[coalesce(steps('seenModules').advancedSetup.DeploymentBranch,'main')]",
+            "location": "[location()]"
+        }
+    }
+}
