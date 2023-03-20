@@ -7,15 +7,15 @@
             "type": "String"
         },
         "StorageAccountKind": {
-            "defaultValue": "seen",
+            "defaultValue": "StorageV2",
             "type": "String"
         },
         "StorageAccountType": {
-            "defaultValue": "seen",
+            "defaultValue": "Standard_LRS",
             "type": "String"
         },
         "LogAnalyticsResourceId": {
-            "defaultValue": "seen",
+            "defaultValue": "",
             "type": "String"
         },
         "ConfigPlaybookName": {
