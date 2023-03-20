@@ -100,16 +100,6 @@
                                         "uri": "https://github.com/piaudonn/SecurityNotifications"
                                     }
                                 }
-                            },
-                            {
-                                "name": "LogAnalyticsWorkspaceId",
-                                "type": "Microsoft.Common.TextBox",
-                                "label": "Log Analytics Workspace Id",
-                                "placeholder": "",
-                                "defaultValue": "",
-                                "toolTip": "",
-                                "constraints": {},
-                                "visible": true
                             }
                         ],
                         "visible": "[if(equals(steps('deploymentTypeStep').deploymentType, 'standard'), true, false)]"
@@ -189,16 +179,6 @@
                                 "visible": true
                             },
                             {
-                                "name": "LogAnalyticsWorkspaceId",
-                                "type": "Microsoft.Common.TextBox",
-                                "label": "Log Analytics Workspace Id",
-                                "placeholder": "",
-                                "defaultValue": "",
-                                "toolTip": "",
-                                "constraints": {},
-                                "visible": true
-                            },
-                            {
                                 "name": "DeploymentBranch",
                                 "type": "Microsoft.Common.TextBox",
                                 "label": "Deploy from a specific GitHub Branch",
@@ -237,6 +217,14 @@
                         "visible": true
                     },
                     {
+                        "name": "laTextBlock1",
+                        "type": "Microsoft.Common.TextBlock",
+                        "visible": true,
+                        "options": {
+                            "text": "Log Analytics Workspace"
+                        }
+                    },
+                    {
                         "name": "logAnalyticsSelector",
                         "type": "Microsoft.Solutions.ResourceSelector",
                         "label": "Select Log Analytics Workspace",
@@ -250,9 +238,9 @@
             }
         ],
         "outputs": {
-            "StorageAccountName": "[steps('seenModules').storageAccount.prefix]",
-            "StorageAccountType": "[steps('seenModules').storageAccount.type]",
-            "StorageAccountKind": "[steps('seenModules').storageAccount.kind]",
+            "StorageAccountName": "[steps('seenModules').storageAccount.singleStorage.name]",
+            "StorageAccountType": "[steps('seenModules').storageAccount.singleStorage.type]",
+            "StorageAccountKind": "[steps('seenModules').storageAccount.singleStorage.kind]",
             "LogAnalyticsResourceId": "[steps('seenModules').logAnalyticsSelector.id]",
             "ConfigPlaybookName": "[coalesce(steps('seenModules').advancedSetup.ConfigPlaybookName,'SEEN-Config')]",
             "EmailPlaybookName": "[coalesce(steps('seenModules').advancedSetup.EmailPlaybookName,'SEEN-SendEmail')]",
