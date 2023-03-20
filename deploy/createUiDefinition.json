@@ -210,17 +210,55 @@
                             }
                         ],
                         "visible": "[if(equals(steps('deploymentTypeStep').deploymentType, 'advanced'), true, false)]"
-                    }
+                    },
+                    {
+                        "name": "storageAccount",
+                        "type": "Microsoft.Common.Section",
+                        "label": "Storage Account Name",
+                        "elements": [
+                            {
+                                "name": "singleStorage",
+                                "type": "Microsoft.Storage.StorageAccountSelector",
+                                "label": "Storage account",
+                                "toolTip": "",
+                                "defaultValue": {
+                                    "name": "",
+                                    "type": "Standard_LRS"
+                                },
+                                "constraints": {
+                                    "allowedTypes": []
+                                },
+                                "options": {
+                                    "hideExisting": false
+                                },
+                                "visible": true
+                            }
+                        ],
+                        "visible": true
+                    },
+                    {
+                        "name": "logAnalyticsSelector",
+                        "type": "Microsoft.Solutions.ResourceSelector",
+                        "label": "Select Log Analytics Workspace",
+                        "resourceType": "microsoft.operationalinsights/workspaces",
+                        "options": {
+                          "filter": {
+                          }
+                        }
+                      }
                 ]
             }
         ],
         "outputs": {
-            "StorageAccountPrefix": "[coalesce(steps('seenModules').advancedSetup.StorageAccountPrefix,'seen')]",
+            "StorageAccountName": "[steps('seenModules').storageAccount.name]",
+            "StorageAccountType": "[steps('seenModules').storageAccount.type]",
+            "StorageAccountKind": "[steps('seenModules').storageAccount.kind]",
+            "LogAnalyticsResourceId": "[steps('seenModules').logAnalyticsSelector.id]",
             "ConfigPlaybookName": "[coalesce(steps('seenModules').advancedSetup.ConfigPlaybookName,'SEEN-Config')]",
             "EmailPlaybookName": "[coalesce(steps('seenModules').advancedSetup.EmailPlaybookName,'SEEN-SendEmail')]",
             "MFAPlaybookName": "[coalesce(steps('seenModules').advancedSetup.MFAPlaybookName,'SEEN-MFAMethods')]",
             "TAPPlaybookName": "[coalesce(steps('seenModules').advancedSetup.TAPPlaybookName,'SEEN-TemporaryAccessPass')]",
-            "LogAnalyticsWorkspaceId": "[coalesce(steps('seenModules').advancedSetup.LogAnalyticsWorkspaceId,'Run-KQLQuery')]",
+            "LogAnalyticsWorkspaceId": "[coalesce(steps('seenModules').advancedSetup.LogAnalyticsWorkspaceId,steps('seenModules').standardSetup.LogAnalyticsWorkspaceId)]",
             "DeployFromBranch": "[coalesce(steps('seenModules').advancedSetup.DeploymentBranch,'main')]",
             "location": "[location()]"
         }
