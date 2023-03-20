@@ -7,12 +7,12 @@
 
 # Required Permissions
 #  - Azure AD Global Administrator or an Azure AD Privileged Role Administrator to execute the Set-APIPermissions function
-#  - Resource Group Owner or User Access Administrator on the Microsoft Sentinel resource group to execute the Set-RBACPermissions function
+#  - Resource Group Owner or User Access Administrator on the Log Analytics resource group to execute the Set-RBACPermissions function
 
 # Enter your tenant and subscrition details below:
 $TenantId = ""
 $AzureSubscriptionId = ""
-$SentinelResourceGroupName = "" # Resource Group Name where the Sentinel workspace is
+$LogAnalyticsGroupName = "" # Resource Group Name where the Log Analytics workspace is
 $SEENResourceGroupName = "" # Resource Group Name where the SEEN solution is deployed
 
 # If you have changed the default name of the logic apps, update the names below:
@@ -104,11 +104,11 @@ Set-APIPermissions -MSIName $LogicAppPrefix$SendEmailLogicAppName -AppId "000000
 #MFA Methods Logic APp
 Set-APIPermissions -MSIName $LogicAppPrefix$MFAMethodsLogicAppName -AppId "00000003-0000-0000-c000-000000000000" -PermissionName "User.Read.All"
 Set-RBACPermissions -MSIName $LogicAppPrefix$MFAMethodsLogicAppName -Role "Storage Table Data Contributor" -ResourceGroup $SEENResourceGroupName
-Set-RBACPermissions -MSIName $LogicAppPrefix$MFAMethodsLogicAppName -Role "Log Analytics Reader" -ResourceGroup $SentinelResourceGroupName
+Set-RBACPermissions -MSIName $LogicAppPrefix$MFAMethodsLogicAppName -Role "Log Analytics Reader" -ResourceGroup $LogAnalyticsGroupName
 
 #TAP Logic APp
 Set-APIPermissions -MSIName $LogicAppPrefix$TAPLogicAppName -AppId "00000003-0000-0000-c000-000000000000" -PermissionName "User.Read.All"
 Set-RBACPermissions -MSIName $LogicAppPrefix$TAPLogicAppName -Role "Storage Table Data Contributor" -ResourceGroup $SEENResourceGroupName
-Set-RBACPermissions -MSIName $LogicAppPrefix$TAPLogicAppName -Role "Log Analytics Reader" -ResourceGroup $SentinelResourceGroupName
+Set-RBACPermissions -MSIName $LogicAppPrefix$TAPLogicAppName -Role "Log Analytics Reader" -ResourceGroup $LogAnalyticsGroupName
 
 Write-Host "⚙️ End of the script. Please review the output and check for potential failures."
