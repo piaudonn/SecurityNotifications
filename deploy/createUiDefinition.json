@@ -250,7 +250,7 @@
             }
         ],
         "outputs": {
-            "StorageAccountName": "[steps('seenModules').storageAccount.name]",
+            "StorageAccountName": "[steps('seenModules').storageAccount.prefix]",
             "StorageAccountType": "[steps('seenModules').storageAccount.type]",
             "StorageAccountKind": "[steps('seenModules').storageAccount.kind]",
             "LogAnalyticsResourceId": "[steps('seenModules').logAnalyticsSelector.id]",
