@@ -18,6 +18,10 @@
             "defaultValue": "SEEN-MFAMethods",
             "type": "String"
         },
+        "TAPPlaybookName": {
+            "defaultValue": "SEEN-TemporaryAccessPass",
+            "type": "String"
+        },
         "DeployFromBranch": {
             "defaultValue": "main",
             "type": "String"
@@ -32,7 +36,8 @@
         "webConnectionTemplate": "[concat('https://raw.githubusercontent.com/piaudonn/SecurityNotifications/', parameters('DeployFromBranch'), '/shared/webconnections.json')]",
         "configTemplate": "[concat('https://raw.githubusercontent.com/piaudonn/SecurityNotifications/', parameters('DeployFromBranch'), '/shared/config.json')]",
         "emailTemplate": "[concat('https://raw.githubusercontent.com/piaudonn/SecurityNotifications/', parameters('DeployFromBranch'), '/shared/emailnotification.json')]",
-        "mfaTemplate": "[concat('https://raw.githubusercontent.com/piaudonn/SecurityNotifications/', parameters('DeployFromBranch'), '/modules/MFAMethods/mfamethods.json')]"
+        "mfaTemplate": "[concat('https://raw.githubusercontent.com/piaudonn/SecurityNotifications/', parameters('DeployFromBranch'), '/modules/MFAMethods/mfamethods.json')]",
+        "tapTemplate": "[concat('https://raw.githubusercontent.com/piaudonn/SecurityNotifications/', parameters('DeployFromBranch'), '/modules/TAP/tap.json')]"
     },
     "resources": [
         {
@@ -131,6 +136,44 @@
                 "parameters": {
                     "PlaybookName": {
                         "value": "[parameters('MFAPlaybookName')]"
+                    },
+                    "TablesConnectionResourceId": {
+                        "value": "[reference('WebConnectionTemplate').outputs.TableConnectionResourceID.value]"
+                    },
+                    "ConfigResourceId": {
+                        "value": "[reference('ConfigTemplate').outputs.resourceID.value]"
+                    },
+                    "EmailNotificationResourceId": {
+                        "value": "[reference('EmailTemplate').outputs.resourceID.value]"
+                    },
+                    "StorageAccountName": {
+                        "value": "[reference('StorageTemplate').outputs.storageAccountName.value]"
+                    },
+                    "LogAnalyticsWorkspaceId": {
+                        "value": "[parameters('LogAnalyticsWorkspaceId')]"
+                    }
+                }
+            }
+        },
+        {
+            "apiVersion": "2019-10-01",
+            "name": "TAPTemplate",
+            "type": "Microsoft.Resources/deployments",
+            "dependsOn": [
+                "[resourceId('Microsoft.Resources/deployments', 'StorageTemplate')]",
+                "[resourceId('Microsoft.Resources/deployments', 'WebConnectionTemplate')]",
+                "[resourceId('Microsoft.Resources/deployments', 'ConfigTemplate')]",
+                "[resourceId('Microsoft.Resources/deployments', 'StorageTemplate')]"
+            ],
+            "properties": {
+                "mode": "incremental",
+                "templateLink": {
+                    "uri": "[variables('tapTemplate')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "PlaybookName": {
+                        "value": "[parameters('TAPPlaybookName')]"
                     },
                     "TablesConnectionResourceId": {
                         "value": "[reference('WebConnectionTemplate').outputs.TableConnectionResourceID.value]"
