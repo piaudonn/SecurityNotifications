@@ -1,8 +1,4 @@
-## SEcurity End-user Notification 👀
-
-Public repository for **SEEN** development.
-
-🔗 [Hackathon project](https://hackbox.microsoft.com/hackathons/security-hackathon-2023/project/23249)    
+# SEcurity End-user Notification 👀
 
 ### Project description
 
@@ -17,7 +13,6 @@ These notifications encourage end-users to contact their support if the action w
 Here is the list of activities which SEEN can use to trigger end-user notifications:
 - Multi Factor Authentication methods updates
 - Temporary Access Pass creations and usage
-- Password reset and password change operations
 
 Scenarios are implemented through modules (Logic Apps with a Recurrence trigger).
 
@@ -25,5 +20,6 @@ The operators of the solution can customize the email templates that will be use
 
 ### Deployment
 
-* Permissions
-* Script
+* Deploy ARM Template
+* Run Setup Script
+
