@@ -22,3 +22,4 @@ The operators of the solution can customize the email templates that will be use
 
 * Deploy ARM Template
 * Run Setup Script
+
