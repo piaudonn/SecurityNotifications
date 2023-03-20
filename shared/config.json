@@ -48,13 +48,7 @@
                             "inputs": {
                                 "schema": {
                                     "properties": {
-                                        "mode": {
-                                            "type": "string"
-                                        },
                                         "module": {
-                                            "type": "string"
-                                        },
-                                        "testEmail": {
                                             "type": "string"
                                         }
                                     },
@@ -178,10 +172,13 @@
                                 ],
                                 "Decoded_Header": [
                                     "Succeeded"
+                                ],
+                                "Get_Version": [
+                                    "Succeeded"
                                 ]
                             },
                             "cases": {
-                                "Case": {
+                                "Case_MFA": {
                                     "case": "mfa",
                                     "actions": {
                                         "Decode_MFA_template": {
@@ -217,11 +214,11 @@
                                             },
                                             "type": "Compose",
                                             "inputs": {
-                                                "bcc": "@{ outputs('Decoded_Config')['modules']['mfa']['bcc']}",
+                                                "bcc": "@{outputs('Decoded_Config')['modules']['mfa']['bcc']}",
                                                 "ccManager": "@outputs('Decoded_Config')?['modules']['mfa']['ccManager']",
                                                 "includeGuests": "@outputs('Decoded_Config')['modules']['mfa']['includeGuests']",
                                                 "mailFrom": "@{outputs('Decoded_Config')['mailFrom']}",
-                                                "recipient": "@{triggerBody()?['testEmail']}",
+                                                "recipient": "@{if(equals(outputs('Decoded_Config')['modules']['mfa']?['testMode'],true),outputs('Decoded_Config')['testEmail'],'')}",
                                                 "replyTo": "@{outputs('Decoded_Config')['replyTo']}",
                                                 "saveToSentItems": "@{outputs('Decoded_Config')['saveToSentItems']}",
                                                 "subject": "@{outputs('Decoded_Config')['modules']['mfa']['subject']}",
@@ -229,7 +226,7 @@
                                                 "timeZone": "@{outputs('Decoded_Config')['timeZone']}"
                                             }
                                         },
-                                        "Response": {
+                                        "MFA_Response": {
                                             "runAfter": {
                                                 "MFA_Config": [
                                                     "Succeeded"
@@ -239,6 +236,72 @@
                                             "kind": "Http",
                                             "inputs": {
                                                 "body": "@outputs('MFA_Config')",
+                                                "statusCode": 200
+                                            }
+                                        }
+                                    }
+                                },
+                                "Case_TAP": {
+                                    "case": "tap",
+                                    "actions": {
+                                        "Decode_TAP_template": {
+                                            "runAfter": {
+                                                "Get_TAP_template": [
+                                                    "Succeeded"
+                                                ]
+                                            },
+                                            "type": "Compose",
+                                            "inputs": "@replace(replace(replace(replace(base64ToString(body('Get_TAP_template')['$content']),'{SupportEmail}',outputs('Decoded_Config')['contact']['supportEmail']),'{SupportPhoneNumber}',outputs('Decoded_Config')['contact']['supportPhone']),'{Header}',outputs('Decoded_Header')),'{Footer}',outputs('Decoded_Footer'))"
+                                        },
+                                        "Get_TAP_template": {
+                                            "runAfter": {},
+                                            "metadata": {
+                                                "JTJmc2VlbiUyZnRlbXBsYXRlcyUyZnRhcC5odG1s": "/seen/templates/tap.html"
+                                            },
+                                            "type": "ApiConnection",
+                                            "inputs": {
+                                                "host": {
+                                                    "connection": {
+                                                        "name": "@parameters('$connections')['azureblob']['connectionId']"
+                                                    }
+                                                },
+                                                "method": "get",
+                                                "path": "[concat('/v2/datasets/@{encodeURIComponent(encodeURIComponent(''', parameters('StorageAccountName'), '''))}/files/@{encodeURIComponent(encodeURIComponent(''JTJmc2VlbiUyZnRlbXBsYXRlcyUyZnRhcC5odG1s''))}/content')]",
+                                                "queries": {
+                                                    "inferContentType": false
+                                                }
+                                            }
+                                        },
+                                        "TAP_Config": {
+                                            "runAfter": {
+                                                "Decode_TAP_template": [
+                                                    "Succeeded"
+                                                ]
+                                            },
+                                            "type": "Compose",
+                                            "inputs": {
+                                                "bcc": "@{outputs('Decoded_Config')['modules']['tap']['bcc']}",
+                                                "ccManager": "@outputs('Decoded_Config')?['modules']['tap']['ccManager']",
+                                                "includeUsage": "@outputs('Decoded_Config')['modules']['tap']['includeUsage']",
+                                                "mailFrom": "@{outputs('Decoded_Config')['mailFrom']}",
+                                                "recipient": "@{if(equals(outputs('Decoded_Config')['modules']['tap']?['testMode'],true),outputs('Decoded_Config')['testEmail'],'')}",
+                                                "replyTo": "@{outputs('Decoded_Config')['replyTo']}",
+                                                "saveToSentItems": "@{outputs('Decoded_Config')['saveToSentItems']}",
+                                                "subject": "@{outputs('Decoded_Config')['modules']['tap']['subject']}",
+                                                "template": "@{outputs('Decode_TAP_template')}",
+                                                "timeZone": "@{outputs('Decoded_Config')['timeZone']}"
+                                            }
+                                        },
+                                        "TAP_Response": {
+                                            "runAfter": {
+                                                "TAP_Config": [
+                                                    "Succeeded"
+                                                ]
+                                            },
+                                            "type": "Response",
+                                            "kind": "Http",
+                                            "inputs": {
+                                                "body": "@outputs('TAP_Config')",
                                                 "statusCode": 200
                                             }
                                         }

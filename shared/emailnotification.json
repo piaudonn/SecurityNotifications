@@ -3,7 +3,7 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "PlaybookName": {
-            "defaultValue": "SEEN-SendNotification",
+            "defaultValue": "SEEN-SendEmail",
             "type": "String"
         }
     },
@@ -132,11 +132,11 @@
                             "trackedProperties": {
                                 "EmailBcc": "@action()['inputs']['body']['emailBcc']",
                                 "EmailCc": "@action()['inputs']['body']['emailCc']",
+                                "EmailFrom": "@action()['inputs']['body']['emailFrom']",
                                 "EmailRecipient": "@action()['inputs']['body']['emailRecipient']",
                                 "EmailStatus": "@action()['inputs']['body']['emailStatus']",
                                 "EmailSubject": "@action()['inputs']['body']['emailSubject']",
-                                "Tracking": "@action()['inputs']['body']['tracking']",
-                                "emailFrom": "@action()['inputs']['body']['mailFrom']"
+                                "Tracking": "@action()['inputs']['body']['tracking']"
                             },
                             "type": "Response",
                             "kind": "Http",

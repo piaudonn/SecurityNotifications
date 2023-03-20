@@ -21,6 +21,10 @@
         "StorageAccountName": {
             "defaultValue": "",
             "type": "String"
+        },
+        "LogAnalyticsWorkspaceId": {
+            "defaultValue": "",
+            "type": "String"
         }
     },
     "variables": {},
@@ -42,6 +46,10 @@
                         "$connections": {
                             "defaultValue": {},
                             "type": "Object"
+                        },
+                        "WorkspaceId": {
+                            "defaultValue": "[parameters('LogAnalyticsWorkspaceId')]",
+                            "type": "String"
                         }
                     },
                     "triggers": {
@@ -95,9 +103,7 @@
                                     "type": "Workflow",
                                     "inputs": {
                                         "body": {
-                                            "mode": "on",
-                                            "module": "mfa",
-                                            "testEmail": "piaudonn@sentinellab.xyz"
+                                            "module": "mfa"
                                         },
                                         "host": {
                                             "triggerName": "manual",
@@ -109,6 +115,47 @@
                                 }
                             },
                             "runAfter": {},
+                            "type": "Scope"
+                        },
+                        "Exit": {
+                            "actions": {
+                                "Terminate": {
+                                    "runAfter": {
+                                        "Update_Entity_Tracker": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "type": "Terminate",
+                                    "inputs": {
+                                        "runError": {
+                                            "message": "@{outputs('AAD_Debug')}"
+                                        },
+                                        "runStatus": "@{result('Notification')[0]['status']}"
+                                    }
+                                },
+                                "Update_Entity_Tracker": {
+                                    "runAfter": {},
+                                    "type": "ApiConnection",
+                                    "inputs": {
+                                        "body": {
+                                            "Tracker": "@{body('Current_time')}"
+                                        },
+                                        "host": {
+                                            "connection": {
+                                                "name": "@parameters('$connections')['azuretables']['connectionId']"
+                                            }
+                                        },
+                                        "method": "put",
+                                        "path": "[concat('/v2/storageAccounts/@{encodeURIComponent(encodeURIComponent(''', parameters('StorageAccountName'), '''))}/tables/@{encodeURIComponent(''trackers'')}/entities(PartitionKey=''@{encodeURIComponent(''seen'')}'',RowKey=''@{encodeURIComponent(''MFAMethods'')}'')')]"
+                                    }
+                                }
+                            },
+                            "runAfter": {
+                                "Notification": [
+                                    "Succeeded",
+                                    "Failed"
+                                ]
+                            },
                             "type": "Scope"
                         },
                         "Notification": {
@@ -135,14 +182,15 @@
                                                 "uri": "https://graph.microsoft.com/v1.0/users/@{item()[1]}/?$expand=manager($levels=1;$select=mail)"
                                             }
                                         },
-                                        "AAD_Error": {
+                                        "AAD_Debug": {
                                             "runAfter": {
                                                 "AAD_Call": [
-                                                    "Failed"
+                                                    "Failed",
+                                                    "Succeeded"
                                                 ]
                                             },
                                             "type": "Compose",
-                                            "inputs": "@body('AAD_Call')"
+                                            "inputs": "@coalesce(body('AAD_Call')?['error']?['message'], concat('Mail to: ',body('AAD_Call')?['mail']))"
                                         },
                                         "Create_HTML_Activity_table": {
                                             "runAfter": {
@@ -247,7 +295,7 @@
                                             "timespan": "P1D"
                                         },
                                         "method": "POST",
-                                        "uri": "https://api.loganalytics.io/v1/workspaces/6ba2759c-1c00-4aa0-88e8-138379ea383c/query"
+                                        "uri": "https://api.loganalytics.io/v1/workspaces/@{parameters('WorkspaceId')}/query"
                                     }
                                 }
                             },
@@ -257,27 +305,6 @@
                                 ]
                             },
                             "type": "Scope"
-                        },
-                        "Update_Entity_Tracker": {
-                            "runAfter": {
-                                "Notification": [
-                                    "Succeeded",
-                                    "Failed"
-                                ]
-                            },
-                            "type": "ApiConnection",
-                            "inputs": {
-                                "body": {
-                                    "Tracker": "@{body('Current_time')}"
-                                },
-                                "host": {
-                                    "connection": {
-                                        "name": "@parameters('$connections')['azuretables']['connectionId']"
-                                    }
-                                },
-                                "method": "put",
-                                "path": "[concat('/v2/storageAccounts/@{encodeURIComponent(encodeURIComponent(''', parameters('StorageAccountName'), '''))}/tables/@{encodeURIComponent(''trackers'')}/entities(PartitionKey=''@{encodeURIComponent(''seen'')}'',RowKey=''@{encodeURIComponent(''MFAMethods'')}'')')]"
-                            }
                         }
                     },
                     "outputs": {}
