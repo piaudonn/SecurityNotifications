@@ -60,11 +60,11 @@ Example:
     -StorageAccountResourceGroupName "SEEN-RG" `
     -WorkspaceResourceGroupName "SEEN-RG" `
     -SEENResourceGroupName "SEEN-RG" `
-    -SupportEmail = "support@contoso.com" `
-    -SupportPhoneNumber = "(555) 123-1234" `
+    -SupportEmail "support@contoso.com" `
+    -SupportPhoneNumber "(555) 123-1234" `
     -MailFrom "security@contoso.com" `
     -TestEmail "test@security.contoso.com" `
-    -TimeZone = "Canada/Eastern"
+    -TimeZone "Canada/Eastern"
 ```
 
 ## Post deployment operation
