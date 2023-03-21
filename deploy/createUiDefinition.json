@@ -215,6 +215,9 @@
                         "options": {
                           "filter": {
                           }
+                        },
+                        "constraints": {
+                            "required": true
                         }
                       }
                 ]
