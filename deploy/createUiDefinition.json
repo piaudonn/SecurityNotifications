@@ -122,23 +122,6 @@
                                 }
                             },
                             {
-                                "name": "StorageAccountPrefix",
-                                "type": "Microsoft.Common.TextBox",
-                                "label": "Storage Account Prefix",
-                                "placeholder": "",
-                                "defaultValue": "seen",
-                                "toolTip": "",
-                                "constraints": {
-                                    "required": true,
-                                    "validations": [
-                                        {
-                                            "regex": "^[a-z0-9]{1,11}$",
-                                            "message": "Only lowercase characters and numbers are allowed, and the value must be 1-11 characters long."
-                                        }
-                                    ]
-                                }
-                            },
-                            {
                                 "name": "ConfigPlaybookName",
                                 "type": "Microsoft.Common.TextBox",
                                 "label": "Configuration Playbook Name",
