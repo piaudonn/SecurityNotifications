@@ -1,8 +1,8 @@
-# SEcurity End-user Notification 👀
+## SEcurity End-user Notification (SEEN) 👀
 
 ### Project description
 
-Consumer identity platforms are notifying their users when their password has changes, a suspicious logon is detected, or a new MFA method was added. It is also a common practice in the insurance and financial industries. Yet, our enterprise solution Azure AD does not have these capabilities.
+Consumer identity platforms are notifying their users when their password has changed, a suspicious logon is detected, or a new MFA method was added. It is also a common practice in the insurance and financial industries. Yet, our enterprise solution Azure AD does not have these capabilities.
 
 This project is leveraging a combination of Logic Apps to enable customers to quickly set up those notifications using ready to go (and customizable) email templates. 
 
@@ -20,6 +20,10 @@ The operators of the solution can customize the email templates that will be use
 
 ### Deployment
 
-* Deploy ARM Template
-* Run Setup Script
+The deployement of the solution is in two phases:
+1. Deploy the ARM template to create the resources in your Azure subscription 
+2. Run Setup Script which configure permissions and import the default configuration
 
+The full solution is available for deployment in the [Deployment](/deploy/) section and additional documentation can be found in [Docs](/docs/).
+
+If you have any questions about this project or would like to provide suggestions to the SEEN project maintainers please open an [issue](https://github.com/piaudonn/SecurityNotifications/issues/new/choose).
