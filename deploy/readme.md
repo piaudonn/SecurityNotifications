@@ -1,6 +1,6 @@
 # SEcurity End-user Notification 👀 - Deployment
 
-## Solution deployment
+## Prerequisites
 
 To deploy the ARM template you will need to be a contributor on the targeted resource group. The deployement will create the following resrouce types:
 
@@ -9,6 +9,14 @@ To deploy the ARM template you will need to be a contributor on the targeted res
 <img width="11" alt="image" src="https://user-images.githubusercontent.com/22434561/224331172-5c9c68c0-7ff4-41d9-92a9-d60129808f24.png"> Storage account
 
 All modules are using system managed identities and do not require the creation of generic accounts or any type of other user accounts in your Azure AD tenant.
+
+To use this solution you will also need an existing Log Analytics Workspace with the SigninLogs and AuditLogs data connected from Azure AD.
+
+> More information on setting up SigninLogs and AuditLogs connections can be found [here](https://learn.microsoft.com/azure/active-directory/reports-monitoring/howto-integrate-activity-logs-with-log-analytics)
+
+## Azure Resource Manager Template Deployment
+
+After you have met the pre-requisites, you can deploy the ARM templates to your Azure Subscription using the link below:
 
 [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://aka.ms/seendeploy)
 
