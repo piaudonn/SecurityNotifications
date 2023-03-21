@@ -1,4 +1,4 @@
-# SEcurity End-user Notification 👀
+## SEcurity End-user Notification (SEEN) 👀
 
 ### Project description
 
@@ -20,6 +20,10 @@ The operators of the solution can customize the email templates that will be use
 
 ### Deployment
 
-* Deploy ARM Template
-* Run Setup Script
+The deployement of the solution is in two phases:
+1. Deploy the ARM template to create the resources in your Azure subscription 
+2. Run Setup Script which configure permissions and import the default configuration
 
+The full solution is available for deployment in the [Deployment](/deploy/) section and additional documentation can be found in [Docs](/docs/).
+
+If you have any questions about this project or would like to provide suggestions to the SEEN project maintainers please open an [issue](https://github.com/piaudonn/SecurityNotifications/issues/new/choose).
