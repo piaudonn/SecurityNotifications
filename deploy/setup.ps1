@@ -1,4 +1,4 @@
-
+﻿
 # Required Permissions
 #  - Azure AD Global Administrator or an Azure AD Privileged Role Administrator to execute the Set-APIPermissions function
 #  - Resource Group Owner or User Access Administrator on the resource groups hosting the logic app and the storage account to execute the Set-RBACPermissions function
@@ -31,6 +31,10 @@ param(
     $TAPLogicAppName = "SEEN-TemporaryAccessPass",
     $SourceBranch = "main"
 )
+
+Write-Host "Before continuing, make sure you ahve the following RBAC role on $StorageAccountName in $StorageAccountResourceGroupName."
+Write-Host "`t- Storage Blob Data Contributor`n`t- Storage Table Data Contributor"
+Read-Host "Press enter to continue or Ctrl+C to abort"
 
 #region Connection
 Write-Host "⚙️ Connect to the Azure AD tenant: $TenantId"
@@ -157,23 +161,29 @@ if( !$CurrentConfig )
     Write-Host "A copy of that file can be found here: $OldConfigFile."
     #Copy-AzStorageBlob -SrcContainer "seen" -SrcBlob "seen.config" -DestContainer "seen" -DestBlob $ConfigOldFile -Context $StorageContext
 }
-Write-Host "📃 Uploading the config file" 
-Set-AzStorageBlobContent -Container seen -Blob "seen.config" -Context $StorageContext -File $TempConfigFile -Force | Out-Null
+Write-Host "📃 Uploading the config file"
+
+$SetConfigFile = Set-AzStorageBlobContent -Container seen -Blob "seen.config" -Context $StorageContext -File $TempConfigFile -Force -ErrorAction SilentlyContinue
+if ( !$SetConfigFile )
+{
+    Write-Host "⛔ Cannot upload the config file to the storage account.`n$($Error[0].Exception.Message)"
+    return
+}
 Write-Host "📃 Deleting the temporary file ($TempConfigFile)" 
 Remove-Item $TempConfigFile
 #endregion
 
 #region Templates
 Write-Host "⚙️ Uploading templates"
-try
+
+$GetHeaderTemplate = Invoke-WebRequest -Uri "https://raw.githubusercontent.com/piaudonn/SecurityNotifications/$SourceBranch/config/templates/header.html" -ErrorAction SilentlyContinue
+$GetFooterTemplate = Invoke-WebRequest -Uri "https://raw.githubusercontent.com/piaudonn/SecurityNotifications/$SourceBranch/config/templates/footer.html" -ErrorAction SilentlyContinue
+$GetMFATemplate = Invoke-WebRequest -Uri "https://raw.githubusercontent.com/piaudonn/SecurityNotifications/$SourceBranch/config/templates/mfa.html" -ErrorAction SilentlyContinue
+$GetTAPTemplate = Invoke-WebRequest -Uri "https://raw.githubusercontent.com/piaudonn/SecurityNotifications/$SourceBranch/config/templates/tap.html" -ErrorAction SilentlyContinue
+if ( !$GetHeaderTemplate )
 {
-    $GetHeaderTemplate = Invoke-WebRequest -Uri "https://raw.githubusercontent.com/piaudonn/SecurityNotifications/$SourceBranch/templates/header.html"
-    $GetFooterTemplate = Invoke-WebRequest -Uri "https://raw.githubusercontent.com/piaudonn/SecurityNotifications/$SourceBranch/templates/footer.html"
-    $GetMFATemplate = Invoke-WebRequest -Uri "https://raw.githubusercontent.com/piaudonn/SecurityNotifications/$SourceBranch/templates/mfa.html"
-    $GetTAPTemplate = Invoke-WebRequest -Uri "https://raw.githubusercontent.com/piaudonn/SecurityNotifications/$SourceBranch/templates/tap.html"
-}
-catch {
-    Write-Host "⛔ Cannot download the templates."
+    Write-Host "⛔ Cannot download the templates.`n$($Error[0].Exception.Message)"
+    return
 }
 Write-Host "📃 Creating temporary files for templates "
 $GetHeaderTemplateFile = New-TemporaryFile
@@ -184,15 +194,22 @@ $GetHeaderTemplate.Content | Out-File -LiteralPath $GetHeaderTemplateFile -Force
 $GetFooterTemplate.Content | Out-File -LiteralPath $GetFooterTemplateFile -Force
 $GetMFATemplate.Content | Out-File -LiteralPath $GetMFATemplateFile -Force
 $GetTAPTemplate.Content | Out-File -LiteralPath $GetTAPTemplateFile -Force
-Write-Host "🃏 Uploading the config file" 
-Set-AzStorageBlobContent -Container seen -Blob "templates/header.html" -Context $StorageContext -File $GetHeaderTemplateFile -Force | Out-Null
-Remove-Item $GetHeaderTemplateFile
-Set-AzStorageBlobContent -Container seen -Blob "templates/footer.html" -Context $StorageContext -File $GetFooterTemplateFile -Force | Out-Null
-Remove-Item $GetFooterTemplateFile
-Set-AzStorageBlobContent -Container seen -Blob "templates/mfa.html" -Context $StorageContext -File $GetMFATemplateFile -Force | Out-Null
-Remove-Item $GetMFATemplateFile
-Set-AzStorageBlobContent -Container seen -Blob "templates/tap.html" -Context $StorageContext -File $GetTAPTemplateFile -Force | Out-Null
-Remove-Item $GetTAPTemplateFile
+Write-Host "🃏 Uploading the config file"
+try
+{
+    Set-AzStorageBlobContent -Container seen -Blob "templates/header.html" -Context $StorageContext -File $GetHeaderTemplateFile -Force | Out-Null
+    Remove-Item $GetHeaderTemplateFile
+    Set-AzStorageBlobContent -Container seen -Blob "templates/footer.html" -Context $StorageContext -File $GetFooterTemplateFile -Force | Out-Null
+    Remove-Item $GetFooterTemplateFile
+    Set-AzStorageBlobContent -Container seen -Blob "templates/mfa.html" -Context $StorageContext -File $GetMFATemplateFile -Force | Out-Null
+    Remove-Item $GetMFATemplateFile
+    Set-AzStorageBlobContent -Container seen -Blob "templates/tap.html" -Context $StorageContext -File $GetTAPTemplateFile -Force | Out-Null
+    Remove-Item $GetTAPTemplateFile
+}
+catch
+{
+    Write-Host "⛔ Cannot upload the templates to the storage account.`n$($_.Exception.Message)"
+}
 #endregion
 
 #region Tables initialization 
@@ -206,8 +223,16 @@ $CurrentTable = Get-AzTableTable -resourceGroup $StorageAccountResourceGroupName
 #}
 $CurrentTime = (get-date -Format u).Replace(" ","T")
 Write-Host "⏲️ Initializing the tracker with the current time $CurrentTime"
-Add-AzTableRow -Table $CurrentTable -PartitionKey "seen" -RowKey "MFAMethods" -property @{"Tracker" = $CurrentTime} 
-Add-AzTableRow -Table $CurrentTable -PartitionKey "seen" -RowKey "TAPUsage" -property @{"Tracker" = $CurrentTime}
+try
+{
+
+    Add-AzTableRow -Table $CurrentTable -PartitionKey "seen" -RowKey "MFAMethods" -property @{"Tracker" = $CurrentTime} | Out-Null
+    Add-AzTableRow -Table $CurrentTable -PartitionKey "seen" -RowKey "TAPUsage" -property @{"Tracker" = $CurrentTime} | Out-Null
+}
+catch
+{
+    Write-Host "⛔ Cannot add the tracker to the table storage.`n$($_.Exception.Message)"
+}
 #endregion
 
 #region Enable modules
@@ -216,12 +241,12 @@ try
 {
     Write-Host "🟢 Enabling $MFAMethodsLogicAppName in $SEENResourceGroupName"
     Set-AzLogicApp -ResourceGroupName $SEENResourceGroupName -Name $MFAMethodsLogicAppName -State Enabled -Force | Out-Null
-    Write-Host "🟢 Enabling $TAPMethodsLogicAppName in $SEENResourceGroupName"
-    Set-AzLogicApp -ResourceGroupName $SEENResourceGroupName -Name $TAPMethodsLogicAppName -State Enabled -Force | Out-Null
+    Write-Host "🟢 Enabling $TAPLogicAppName in $SEENResourceGroupName"
+    Set-AzLogicApp -ResourceGroupName $SEENResourceGroupName -Name $TAPLogicAppName -State Enabled -Force | Out-Null
 }
 catch {
-    Write-Host "⛔ Cannot enable the logic apps."
+    Write-Host "⛔ Cannot enable the logic apps.`n $($_.Exception.Message)"
 }
 #endregion
 
-Write-Host "⚙️ End of the script. Please review the output and check for potential failures."
+Write-Host "⚙️ End of the script. Please review the output and check for potential failures."v
