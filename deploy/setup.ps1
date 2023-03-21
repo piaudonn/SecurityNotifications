@@ -194,7 +194,7 @@ $GetHeaderTemplate.Content | Out-File -LiteralPath $GetHeaderTemplateFile -Force
 $GetFooterTemplate.Content | Out-File -LiteralPath $GetFooterTemplateFile -Force
 $GetMFATemplate.Content | Out-File -LiteralPath $GetMFATemplateFile -Force
 $GetTAPTemplate.Content | Out-File -LiteralPath $GetTAPTemplateFile -Force
-Write-Host "🃏 Uploading the config file"
+Write-Host "🃏 Uploading the templates"
 try
 {
     Set-AzStorageBlobContent -Container seen -Blob "templates/header.html" -Context $StorageContext -File $GetHeaderTemplateFile -Force | Out-Null
@@ -210,6 +210,7 @@ catch
 {
     Write-Host "⛔ Cannot upload the templates to the storage account.`n$($_.Exception.Message)"
 }
+Write-Host "📃 Deleting temporary files for templates"
 #endregion
 
 #region Tables initialization 
