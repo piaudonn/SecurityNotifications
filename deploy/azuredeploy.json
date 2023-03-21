@@ -202,7 +202,7 @@
                         "value": "[reference('StorageTemplate').outputs.storageAccountName.value]"
                     },
                     "LogAnalyticsWorkspaceId": {
-                        "value": "[reference(parameters('LogAnalyticsResourceId'), '2021-06-01', 'Full').customerId]"
+                        "value": "[reference(parameters('LogAnalyticsResourceId'), '2021-06-01', 'Full').properties.customerId]"
                     }
                 }
             }
