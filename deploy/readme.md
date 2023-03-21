@@ -48,7 +48,7 @@ To run the script you will to provide the following parameters:
 - `SupportEmail` the email address of the support team the users can contact
 - `SupportPhoneNumber` the phone number of your support
 - `MailFrom` the email of the mailbox the notifications are sent from 
-- `TestEmail` the email address used when the modules run in test mode (modules runs in test mode by default)
+- `TestEmail` the email address used when the modules run in test mode (modules run in test mode by default)
 - `TimeZone` with the timezone information in the [Kusto timezone supported format](https://learn.microsoft.com/en-us/azure/data-explorer/kusto/query/timezone)
 
 Example:
@@ -66,6 +66,11 @@ Example:
     -TestEmail "test@security.contoso.com" `
     -TimeZone = "Canada/Eastern"
 ```
+
+## Post deployment operation
+
+After you deployed the templates and ran the script, the solution will be running in **test mode**. It means that the end users will not receive emails yet. All emails will be sent to the TestEmail you specificed in the script input.
+For the solution to start sending emails to the end-users, you will need to edit the configuration file to set the `testMode` to `false`.
 
 ## Permissions details
 
