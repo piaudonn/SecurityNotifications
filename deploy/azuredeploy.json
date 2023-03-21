@@ -2,8 +2,20 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "StorageAccountPrefix": {
+        "StorageAccountName": {
             "defaultValue": "seen",
+            "type": "String"
+        },
+        "StorageAccountKind": {
+            "defaultValue": "StorageV2",
+            "type": "String"
+        },
+        "StorageAccountType": {
+            "defaultValue": "Standard_LRS",
+            "type": "String"
+        },
+        "LogAnalyticsResourceId": {
+            "defaultValue": "",
             "type": "String"
         },
         "ConfigPlaybookName": {
@@ -24,10 +36,6 @@
         },
         "DeployFromBranch": {
             "defaultValue": "main",
-            "type": "String"
-        },
-        "LogAnalyticsWorkspaceId": {
-            "defaultValue": "",
             "type": "String"
         }
     },
@@ -52,8 +60,14 @@
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
-                    "StorageAccountPrefix": {
-                        "value": "[parameters('StorageAccountPrefix')]"
+                    "StorageAccountName": {
+                        "value": "[parameters('StorageAccountName')]"
+                    },
+                    "StorageAccountKind": {
+                        "value": "[parameters('StorageAccountKind')]"
+                    },
+                    "StorageAccountType": {
+                        "value": "[parameters('StorageAccountType')]"
                     }
                 }
             }
@@ -150,7 +164,7 @@
                         "value": "[reference('StorageTemplate').outputs.storageAccountName.value]"
                     },
                     "LogAnalyticsWorkspaceId": {
-                        "value": "[parameters('LogAnalyticsWorkspaceId')]"
+                        "value": "[reference(parameters('LogAnalyticsResourceId'), '2021-06-01', 'Full').properties.customerId]"
                     }
                 }
             }
@@ -188,7 +202,7 @@
                         "value": "[reference('StorageTemplate').outputs.storageAccountName.value]"
                     },
                     "LogAnalyticsWorkspaceId": {
-                        "value": "[parameters('LogAnalyticsWorkspaceId')]"
+                        "value": "[reference(parameters('LogAnalyticsResourceId'), '2021-06-01', 'Full').properties.customerId]"
                     }
                 }
             }
