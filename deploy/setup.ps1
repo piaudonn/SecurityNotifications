@@ -27,6 +27,7 @@ Write-Host "⚙️ Connecting to  to the Azure subscription: $AzureSubscriptionI
 try
 {
     Login-AzAccount -Subscription $AzureSubscriptionId -Tenant $TenantId -ErrorAction Stop | Out-Null
+    $Domain = (Get-AzTenant | Where-Object { $_.Id -eq "550a9b78-cb2e-43e0-9c5b-db194784b875" }).Domains[0]
 }
 catch
 {
@@ -126,4 +127,4 @@ catch
 
 Write-Host "⚙️ End of the script. Please review the output and check for potential failures."
 Write-Host "`n👏 You can now open the ""Manage and monitor"" workbook in the $SEENResourceGroupName resource group to configure and enable the modules. `n`n`t🔗 Click here: " -NoNewline
-Write-Host "https://portal.azure.com/#/resource/subscriptions/$($AzureSubscriptionId)/resourceGroups/$($SEENResourceGroupName)/providers/microsoft.insights/workbooks/7bea244d-869b-45a8-996a-2472c0d7bc5f/workbook `n`n"
+Write-Host "https://portal.azure.com/#@$($Domain)/resource/subscriptions/$($AzureSubscriptionId)/resourceGroups/$($SEENResourceGroupName)/providers/microsoft.insights/workbooks/7bea244d-869b-45a8-996a-2472c0d7bc5f/workbook `n`n"
