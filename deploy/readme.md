@@ -25,52 +25,36 @@ After you have met the pre-requisites, you can deploy the ARM templates to your 
 The setup script needs to be executed AFTER you deployed the ARM template. It will be used for the following tasks:
 - grant permissions to the system managed identities
 - populate the storage account table with starter values for trackers
-- import the default email templates into a blob container
-- import the configuration file for the solution into a blob container
-- prompt the operator for custom values to set in the configuration file
+- trigger the config logic to install the templates in your storage account
 
 To run the script, you will need the following permissions:
 - Azure AD Global Administrator or an Azure AD Privileged Role Administrator to set permission for the managed indei
 - Resource Group Owner or User Access Administrator on the resource groups hosting the logic app and the storage account to execute the Set-RBACPermissions function
-- Storage Blob Data Contributor on the resource group of your storage account
-- Storage Table Data Contributor on the resource group of your storage account
-This script also creates temporary files in the temp folder of your machine using the [New-TemporaryFile cmdLet](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.utility/new-temporaryfile).
 
 You can downlaod the script [here](https://raw.githubusercontent.com/piaudonn/SecurityNotifications/main/deploy/setup.ps1).
 To run the script you will to provide the following parameters:
 
 - `TenantId` the Azure AD tenant ID of your environment
 - `AzureSubscriptionId` the Azure subscriptipn ID of your deployement 
-- `StorageAccountName` the name of the starage account you selecetd for the deployement of the soluton
 - `StorageAccountResourceGroupName` the name of the resource group where the storage account deployed for the solution is
 - `WorkspaceResourceGroupName` the name of the resource group where the log analytic workspace is
 - `SEENResourceGroupName` the name of the resource group where the logic apps modules are
-- `SupportEmail` the email address of the support team the users can contact
-- `SupportPhoneNumber` the phone number of your support
-- `MailFrom` the email of the mailbox the notifications are sent from 
-- `TestEmail` the email address used when the modules run in test mode (modules run in test mode by default)
-- `TimeZone` with the timezone information in the [Kusto timezone supported format](https://learn.microsoft.com/en-us/azure/data-explorer/kusto/query/timezone)
 
 Example:
 
 ```
-.\setup.ps1 -TenantId "754c4d9d-1191-466d-804f-923361eab7cd `
-    -AzureSubscriptionId "122bfa03-e8e0-4b1b-bc58-62b4791082be" ` 
-    -StorageAccountName "SeenSA" `
-    -StorageAccountResourceGroupName "SEEN-RG" `
-    -WorkspaceResourceGroupName "SEEN-RG" `
-    -SEENResourceGroupName "SEEN-RG" `
-    -SupportEmail "support@contoso.com" `
-    -SupportPhoneNumber "(555) 123-1234" `
-    -MailFrom "security@contoso.com" `
-    -TestEmail "test@security.contoso.com" `
-    -TimeZone "Canada/Eastern"
+.\Setup.ps1 `
+     -TenantId "120cd98f-1002-45b7-80ff-69fc68bdd027" `
+     -AzureSubscriptionId "e893f408-3d86-419f-c1a6-9c91c6872761" `
+     -StorageAccountResourceGroupName "default-1" `
+     -WorkspaceResourceGroupName "default-1" `
+     -SEENResourceGroupName "default-1"
 ```
 
 ## Post deployment operation
 
 After you deployed the templates and ran the script, the solution will be running in **test mode**. It means that the end users will not receive emails yet. All emails will be sent to the TestEmail you specificed in the script input.
-For the solution to start sending emails to the end-users, you will need to edit the configuration file to set the `testMode` to `false`.
+For the solution to start sending emails to the end-users, you will to edit the configuration from the workbook. A link to the workbook should be in the output of the setup script. 
 
 ## Permissions details
 

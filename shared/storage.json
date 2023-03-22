@@ -16,7 +16,13 @@
         }
     },
     "variables": {
-        "containerName": "seen"
+        "containerName": "seen",
+        "blobSasFunctionValues": { 
+            "canonicalizedResource": "[concat('/blob/', parameters('StorageAccountName'), '/seen')]",
+            "signedResource": "c",
+            "signedPermission": "r",
+            "signedExpiry": "2099-01-01T00:00:00Z"
+        }
     },
     "resources": [
         {
@@ -156,6 +162,11 @@
         "storageAccountName": {
             "type": "string",
             "value": "[parameters('StorageAccountName')]"
+        },
+        "configSASUrl": {
+            "type": "string",
+            "value": "[concat('https://', parameters('StorageAccountName'), '.blob.core.windows.net/seen/seen.config?', listServiceSas(resourceId('Microsoft.Storage/storageAccounts', parameters('StorageAccountName')), '2018-02-01', variables('blobSasFunctionValues')).serviceSasToken)]"
         }
+
     }
 }

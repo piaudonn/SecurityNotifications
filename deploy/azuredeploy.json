@@ -26,6 +26,10 @@
             "defaultValue": "SEEN-SendEmail",
             "type": "String"
         },
+        "WorkbookName": {
+            "defaultValue": "SEEN-Manage and monitor",
+            "type": "String"
+        },
         "MFAPlaybookName": {
             "defaultValue": "SEEN-MFAMethods",
             "type": "String"
@@ -44,8 +48,11 @@
         "webConnectionTemplate": "[concat('https://raw.githubusercontent.com/piaudonn/SecurityNotifications/', parameters('DeployFromBranch'), '/shared/webconnections.json')]",
         "configTemplate": "[concat('https://raw.githubusercontent.com/piaudonn/SecurityNotifications/', parameters('DeployFromBranch'), '/shared/config.json')]",
         "emailTemplate": "[concat('https://raw.githubusercontent.com/piaudonn/SecurityNotifications/', parameters('DeployFromBranch'), '/shared/emailnotification.json')]",
+        "workbookTemplate": "[concat('https://raw.githubusercontent.com/piaudonn/SecurityNotifications/', parameters('DeployFromBranch'), '/shared/workbook.json')]",
         "mfaTemplate": "[concat('https://raw.githubusercontent.com/piaudonn/SecurityNotifications/', parameters('DeployFromBranch'), '/modules/MFAMethods/mfamethods.json')]",
-        "tapTemplate": "[concat('https://raw.githubusercontent.com/piaudonn/SecurityNotifications/', parameters('DeployFromBranch'), '/modules/TAP/tap.json')]"
+        "tapTemplate": "[concat('https://raw.githubusercontent.com/piaudonn/SecurityNotifications/', parameters('DeployFromBranch'), '/modules/TAP/tap.json')]",
+        "workbookId": "7bea244d-869b-45a8-996a-2472c0d7bc5f",
+        "workbookType": "workbook"
     },
     "resources": [
         {
@@ -107,6 +114,9 @@
                     "BlobConnectionResourceID": {
                         "value": "[reference('WebConnectionTemplate').outputs.BlobConnectionResourceID.value]"
                     },
+                    "TablesConnectionResourceID": {
+                        "value": "[reference('WebConnectionTemplate').outputs.TableConnectionResourceID.value]"
+                    },
                     "StorageAccountName": {
                         "value": "[reference('StorageTemplate').outputs.storageAccountName.value]"
                     }
@@ -138,8 +148,7 @@
             "dependsOn": [
                 "[resourceId('Microsoft.Resources/deployments', 'StorageTemplate')]",
                 "[resourceId('Microsoft.Resources/deployments', 'WebConnectionTemplate')]",
-                "[resourceId('Microsoft.Resources/deployments', 'ConfigTemplate')]",
-                "[resourceId('Microsoft.Resources/deployments', 'StorageTemplate')]"
+                "[resourceId('Microsoft.Resources/deployments', 'ConfigTemplate')]"
             ],
             "properties": {
                 "mode": "incremental",
@@ -176,8 +185,7 @@
             "dependsOn": [
                 "[resourceId('Microsoft.Resources/deployments', 'StorageTemplate')]",
                 "[resourceId('Microsoft.Resources/deployments', 'WebConnectionTemplate')]",
-                "[resourceId('Microsoft.Resources/deployments', 'ConfigTemplate')]",
-                "[resourceId('Microsoft.Resources/deployments', 'StorageTemplate')]"
+                "[resourceId('Microsoft.Resources/deployments', 'ConfigTemplate')]"
             ],
             "properties": {
                 "mode": "incremental",
@@ -203,6 +211,40 @@
                     },
                     "LogAnalyticsWorkspaceId": {
                         "value": "[reference(parameters('LogAnalyticsResourceId'), '2021-06-01', 'Full').properties.customerId]"
+                    }
+                }
+            }
+        },
+        {
+            "apiVersion": "2019-10-01",
+            "name": "WorkbookTemplate",
+            "type": "Microsoft.Resources/deployments",
+            "dependsOn": [
+                "[resourceId('Microsoft.Resources/deployments', 'StorageTemplate')]",
+                "[resourceId('Microsoft.Resources/deployments', 'WebConnectionTemplate')]",
+                "[resourceId('Microsoft.Resources/deployments', 'ConfigTemplate')]"
+            ],
+            "properties": {
+                "mode": "incremental",
+                "templateLink": {
+                    "uri": "[variables('workbookTemplate')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "workbookDisplayName": {
+                        "value": "[parameters('WorkbookName')]"
+                    },
+                    "workbookType": {
+                        "value": "[variables('workbookType')]"
+                    },
+                    "workbookSourceId": {
+                        "value": "[parameters('LogAnalyticsResourceId')]"
+                    },
+                    "configSASUrl": {
+                        "value": "[reference('StorageTemplate').outputs.configSASUrl.value]"
+                    },
+                    "workbookId": {
+                        "value": "[variables('workbookId')]"
                     }
                 }
             }

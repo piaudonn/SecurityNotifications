@@ -1,40 +1,24 @@
-﻿
 # Required Permissions
 #  - Azure AD Global Administrator or an Azure AD Privileged Role Administrator to execute the Set-APIPermissions function
 #  - Resource Group Owner or User Access Administrator on the resource groups hosting the logic app and the storage account to execute the Set-RBACPermissions function
-#  - Storage Blob Data Contributor on the resource group of your storage account
-#  - Storage Table Data Contributor on the resource group of your storage account
-# This script also creates temporary files in the temp folder of your machne using the New-TemporaryFile cmdLet
 
 # Required PowerShell modules:
 #  - MgGraph to grant MSI permissions using the Microsoft Graph API
-#  - Az grant permissons on Azure resources and provisiong the config and templates 
+#  - Az grant permissons on Azure resources and trigger the config logic app
 
-#Requires -Modules Microsoft.Graph.Applications, Az.Resources, Az.Storage, Az.LogicApp, AzTable
+#Requires -Modules Microsoft.Graph.Applications, Az.Resources, Az.LogicApp
 
 param(
     $TenantId,
     $AzureSubscriptionId,
-    $StorageAccountName,
     $StorageAccountResourceGroupName,
     $WorkspaceResourceGroupName,
     $SEENResourceGroupName,
-    $SupportEmail = "support@contoso.com",
-    $SupportPhoneNumber = "(555) 123-1234",
-    $MailFrom,
-    $ReplyTo = $MailFrom,
-    $TestEmail,
-    $TimeZone = "UTC", #https://learn.microsoft.com/en-us/azure/data-explorer/kusto/query/timezone
     $ConfigLogicAppName = "SEEN-Config",
     $SendEmailLogicAppName = "SEEN-SendEmail",
     $MFAMethodsLogicAppName = "SEEN-MFAMethods",
-    $TAPLogicAppName = "SEEN-TemporaryAccessPass",
-    $SourceBranch = "main"
+    $TAPLogicAppName = "SEEN-TemporaryAccessPass"
 )
-
-Write-Host "Before continuing, make sure you ahve the following RBAC role on $StorageAccountName in $StorageAccountResourceGroupName."
-Write-Host "`t- Storage Blob Data Contributor`n`t- Storage Table Data Contributor"
-Read-Host "Press enter to continue or Ctrl+C to abort"
 
 #region Connection
 Write-Host "⚙️ Connect to the Azure AD tenant: $TenantId"
@@ -128,126 +112,18 @@ Set-RBACPermissions -MSIName $TAPLogicAppName -Role "Storage Table Data Contribu
 Set-RBACPermissions -MSIName $TAPLogicAppName -Role "Log Analytics Reader" -ResourceGroup $WorkspaceResourceGroupName
 #endregion
 
-#region Config file
-Write-Host "⚙️ Setting up the configuration"
-$ConfigUrl = "https://raw.githubusercontent.com/piaudonn/SecurityNotifications/$SourceBranch/config/seen.config"
+#region Config LA in setup mode
+Write-Host "⚙️ Triggering the $ConfigLogicAppName logic app to provision the storage account used for SEEN."
 try
 {
-    $GetConfigFile = Invoke-WebRequest -Uri $ConfigUrl
-    $ConfigFile = $GetConfigFile.Content | ConvertFrom-Json
-}
-catch {
-    Write-Host "⛔ Cannot download the config file from $ConfigUrl.`nCheck the branch and retry."
-}
-
-$ConfigFile.contact.supportEmail = $SupportEmail
-$ConfigFile.contact.supportPhone = $SupportPhoneNumber
-$ConfigFile.mailFrom = $MailFrom
-$ConfigFile.replyTo = $ReplyTo
-$ConfigFile.timeZone = $TimeZone
-$ConfigFile.link = $ConfigUrl
-$ConfigFile.testEmail = $TestEmail
-Write-Host "📃 Creating a temporary file for config storage"
-$TempConfigFile = New-TemporaryFile
-$ConfigFile | ConvertTo-Json | Out-File -LiteralPath $TempConfigFile -Force
-
-$StorageContext = New-AzStorageContext -UseConnectedAccount -BlobEndpoint  "https://$StorageAccountName.blob.core.windows.net/" -TableEndpoint "https://$StorageAccountName.table.core.windows.net/"
-$CurrentConfig = Get-AzStorageBlob -Container seen -Blob seen.config -Context $StorageContext -ErrorAction SilentlyContinue
-if( !$CurrentConfig )
-{
-    $ConfigOldFile = (Get-Date -f yyyyMMddHHmmss) + "-seen.config"
-    Write-Host "⚠️ A config file last modified at $($_.LastModified) was found. " -NoNewline
-    $OldConfigFile = New-TemporaryFile
-    Write-Host "A copy of that file can be found here: $OldConfigFile."
-    #Copy-AzStorageBlob -SrcContainer "seen" -SrcBlob "seen.config" -DestContainer "seen" -DestBlob $ConfigOldFile -Context $StorageContext
-}
-Write-Host "📃 Uploading the config file"
-
-$SetConfigFile = Set-AzStorageBlobContent -Container seen -Blob "seen.config" -Context $StorageContext -File $TempConfigFile -Force -ErrorAction SilentlyContinue
-if ( !$SetConfigFile )
-{
-    Write-Host "⛔ Cannot upload the config file to the storage account.`n$($Error[0].Exception.Message)"
-    return
-}
-Write-Host "📃 Deleting the temporary file ($TempConfigFile)" 
-Remove-Item $TempConfigFile
-#endregion
-
-#region Templates
-Write-Host "⚙️ Uploading templates"
-
-$GetHeaderTemplate = Invoke-WebRequest -Uri "https://raw.githubusercontent.com/piaudonn/SecurityNotifications/$SourceBranch/config/templates/header.html" -ErrorAction SilentlyContinue
-$GetFooterTemplate = Invoke-WebRequest -Uri "https://raw.githubusercontent.com/piaudonn/SecurityNotifications/$SourceBranch/config/templates/footer.html" -ErrorAction SilentlyContinue
-$GetMFATemplate = Invoke-WebRequest -Uri "https://raw.githubusercontent.com/piaudonn/SecurityNotifications/$SourceBranch/config/templates/mfa.html" -ErrorAction SilentlyContinue
-$GetTAPTemplate = Invoke-WebRequest -Uri "https://raw.githubusercontent.com/piaudonn/SecurityNotifications/$SourceBranch/config/templates/tap.html" -ErrorAction SilentlyContinue
-if ( !$GetHeaderTemplate )
-{
-    Write-Host "⛔ Cannot download the templates.`n$($Error[0].Exception.Message)"
-    return
-}
-Write-Host "📃 Creating temporary files for templates "
-$GetHeaderTemplateFile = New-TemporaryFile
-$GetFooterTemplateFile = New-TemporaryFile
-$GetMFATemplateFile = New-TemporaryFile
-$GetTAPTemplateFile = New-TemporaryFile
-$GetHeaderTemplate.Content | Out-File -LiteralPath $GetHeaderTemplateFile -Force
-$GetFooterTemplate.Content | Out-File -LiteralPath $GetFooterTemplateFile -Force
-$GetMFATemplate.Content | Out-File -LiteralPath $GetMFATemplateFile -Force
-$GetTAPTemplate.Content | Out-File -LiteralPath $GetTAPTemplateFile -Force
-Write-Host "🃏 Uploading the templates"
-try
-{
-    Set-AzStorageBlobContent -Container seen -Blob "templates/header.html" -Context $StorageContext -File $GetHeaderTemplateFile -Force | Out-Null
-    Remove-Item $GetHeaderTemplateFile
-    Set-AzStorageBlobContent -Container seen -Blob "templates/footer.html" -Context $StorageContext -File $GetFooterTemplateFile -Force | Out-Null
-    Remove-Item $GetFooterTemplateFile
-    Set-AzStorageBlobContent -Container seen -Blob "templates/mfa.html" -Context $StorageContext -File $GetMFATemplateFile -Force | Out-Null
-    Remove-Item $GetMFATemplateFile
-    Set-AzStorageBlobContent -Container seen -Blob "templates/tap.html" -Context $StorageContext -File $GetTAPTemplateFile -Force | Out-Null
-    Remove-Item $GetTAPTemplateFile
+    Start-AzLogicApp -ResourceGroupName $SEENResourceGroupName -Name $ConfigLogicAppName -TriggerName "manual"
 }
 catch
 {
-    Write-Host "⛔ Cannot upload the templates to the storage account.`n$($_.Exception.Message)"
-}
-Write-Host "📃 Deleting temporary files for templates"
-#endregion
-
-#region Tables initialization 
-Write-Host "⚙️ Initializing the Azure table"
-
-#$CurrentTable = Get-AzStorageTable –Name "trackers" –Context $StorageContext.Context -ErrorAction SilentlyContinue
-$CurrentTable = Get-AzTableTable -resourceGroup $StorageAccountResourceGroupName -TableName "trackers" -storageAccountName $StorageAccountName -ErrorAction SilentlyContinue
-#if (!$CurrentTable)
-#{
-#    $CurrentTable = New-AzStorageTable –Name "trackers" –Context $StorageContext.Context
-#}
-$CurrentTime = (get-date -Format u).Replace(" ","T")
-Write-Host "⏲️ Initializing the tracker with the current time $CurrentTime"
-try
-{
-
-    Add-AzTableRow -Table $CurrentTable -PartitionKey "seen" -RowKey "MFAMethods" -property @{"Tracker" = $CurrentTime} | Out-Null
-    Add-AzTableRow -Table $CurrentTable -PartitionKey "seen" -RowKey "TAPUsage" -property @{"Tracker" = $CurrentTime} | Out-Null
-}
-catch
-{
-    Write-Host "⛔ Cannot add the tracker to the table storage.`n$($_.Exception.Message)"
+    Write-Host "⛔ Cannot trigger the logic app. The configuration is not finished.`n$($_.Exception.Message)"
 }
 #endregion
 
-#region Enable modules
-Write-Host "⚙️ Enabling Logic Apps modules"
-try
-{
-    Write-Host "🟢 Enabling $MFAMethodsLogicAppName in $SEENResourceGroupName"
-    Set-AzLogicApp -ResourceGroupName $SEENResourceGroupName -Name $MFAMethodsLogicAppName -State Enabled -Force | Out-Null
-    Write-Host "🟢 Enabling $TAPLogicAppName in $SEENResourceGroupName"
-    Set-AzLogicApp -ResourceGroupName $SEENResourceGroupName -Name $TAPLogicAppName -State Enabled -Force | Out-Null
-}
-catch {
-    Write-Host "⛔ Cannot enable the logic apps.`n $($_.Exception.Message)"
-}
-#endregion
-
-Write-Host "⚙️ End of the script. Please review the output and check for potential failures."v
+Write-Host "⚙️ End of the script. Please review the output and check for potential failures."
+Write-Host "`n👏 You can now open the ""Manage and monitor"" workbook in the $SEENResourceGroupName resource group to configure and enable the modules. `n`n`t🔗 Click here: " -NoNewline
+Write-Host "https://portal.azure.com/#/resource/subscriptions/$($AzureSubscriptionId)/resourceGroups/$($SEENResourceGroupName)/providers/microsoft.insights/workbooks/7bea244d-869b-45a8-996a-2472c0d7bc5f/workbook `n`n"
