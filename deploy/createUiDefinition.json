@@ -162,6 +162,16 @@
                                 "visible": true
                             },
                             {
+                                "name": "WorkbookName",
+                                "type": "Microsoft.Common.TextBox",
+                                "label": "SEEN Workbook Name",
+                                "placeholder": "",
+                                "defaultValue": "SEEN-Manage and monitor",
+                                "toolTip": "",
+                                "constraints": {},
+                                "visible": true
+                            },
+                            {
                                 "name": "DeploymentBranch",
                                 "type": "Microsoft.Common.TextBox",
                                 "label": "Deploy from a specific GitHub Branch",
@@ -229,6 +239,7 @@
             "EmailPlaybookName": "[coalesce(steps('seenModules').advancedSetup.EmailPlaybookName,'SEEN-SendEmail')]",
             "MFAPlaybookName": "[coalesce(steps('seenModules').advancedSetup.MFAPlaybookName,'SEEN-MFAMethods')]",
             "TAPPlaybookName": "[coalesce(steps('seenModules').advancedSetup.TAPPlaybookName,'SEEN-TemporaryAccessPass')]",
+            "WorkbookName": "[coalesce(steps('seenModules').advancedSetup.WorkbookName,'SEEN-Manage and monitor')]",
             "DeployFromBranch": "[coalesce(steps('seenModules').advancedSetup.DeploymentBranch,'main')]",
             "location": "[location()]"
         }

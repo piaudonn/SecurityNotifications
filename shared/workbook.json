@@ -17,13 +17,13 @@
     },
     "workbookSourceId": {
       "type": "string",
-      "defaultValue": "/subscriptions/397cdfbc-d326-412f-acdd-f3a40db4aaee/resourceGroups/OI-Default-East-US/providers/Microsoft.OperationalInsights/workspaces/briandel",
+      "defaultValue": "/subscriptions/<subscription>/resourceGroups/<rgname>/providers/Microsoft.OperationalInsights/workspaces/<workspacename>",
       "metadata": {
         "description": "The id of resource instance to which the workbook will be associated"
       }
     },
     "configSASUrl": {
-      "type": "string",
+      "type": "securestring",
       "defaultValue": "URL",
       "metadata": {
         "description": "The URL to get to the config file."
