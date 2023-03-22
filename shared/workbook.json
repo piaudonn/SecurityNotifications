@@ -69,7 +69,7 @@
                     "name": "CurrentConfig",
                     "type": 1,
                     "isGlobal": true,
-                    "query": "[concat('externaldata ( Config:string ) [\"', parameters('configSASUrl'),'\"] with(format=\"txt\")\r\n| project Config"')]",
+                    "query": "[concat('externaldata ( Config:string ) [\"', parameters('configSASUrl'),'\"] with(format=\"txt\")\r\n| project Config\"')]",
                     "isHiddenWhenLocked": true,
                     "timeContext": {
                       "durationMs": 86400000
