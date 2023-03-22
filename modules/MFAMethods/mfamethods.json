@@ -58,6 +58,14 @@
                         "WorkspaceId": {
                             "defaultValue": "[parameters('LogAnalyticsWorkspaceId')]",
                             "type": "String"
+                        },
+                        "ProjectName": {
+                            "defaultValue": "SEEN",
+                            "type": "String"
+                        },
+                        "ModuleVersion": {
+                            "defaultValue": "1.0",
+                            "type": "String"
                         }
                     },
                     "triggers": {
