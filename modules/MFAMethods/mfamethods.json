@@ -60,11 +60,11 @@
                             "type": "String"
                         },
                         "ProjectName": {
-                            "defaultValue": "SEEN",
+                            "defaultValue": "[parameters('ProjectName')]",
                             "type": "String"
                         },
                         "ModuleVersion": {
-                            "defaultValue": "1.0",
+                            "defaultValue": "[parameters('ModuleVersion')]",
                             "type": "String"
                         }
                     },
