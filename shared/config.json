@@ -214,6 +214,34 @@
                                     },
                                     "type": "Expression"
                                 },
+                                "Create_trackers_table": {
+                                    "inputs": {
+                                        "body": "trackers",
+                                        "host": {
+                                            "connection": {
+                                                "name": "@parameters('$connections')['azuretables']['connectionId']"
+                                            }
+                                        },
+                                        "method": "post",
+                                        "path": "[concat('/v2/storageAccounts/@{encodeURIComponent(encodeURIComponent(''', parameters('StorageAccountName'), '''))}/tables')]"
+                                    },
+                                    "runAfter": {
+                                        "Current_time": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "type": "ApiConnection"
+                                },
+                                "Current_time": {
+                                    "inputs": {},
+                                    "kind": "CurrentTime",
+                                    "runAfter": {
+                                        "Setup_Debug": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "type": "Expression"
+                                },
                                 "HTTP_Get_Config": {
                                     "inputs": {
                                         "headers": {
@@ -291,7 +319,7 @@
                                         "path": "[concat('/v2/storageAccounts/@{encodeURIComponent(encodeURIComponent(''', parameters('StorageAccountName'), '''))}/tables/@{encodeURIComponent('trackers')}/entities(PartitionKey='@{encodeURIComponent('seen')}',RowKey='@{encodeURIComponent('TAPUsage')}')')]"
                                     },
                                     "runAfter": {
-                                        "Current_time": [
+                                        "Create_trackers_table": [
                                             "Succeeded"
                                         ]
                                     },
@@ -311,7 +339,7 @@
                                         "path": "[concat('/v2/storageAccounts/@{encodeURIComponent(encodeURIComponent(''', parameters('StorageAccountName'), '''))}/tables/@{encodeURIComponent('trackers')}/entities(PartitionKey='@{encodeURIComponent('seen')}',RowKey='@{encodeURIComponent('MFAMethods')}')')]"
                                     },
                                     "runAfter": {
-                                        "Current_time": [
+                                        "Create_trackers_table": [
                                             "Succeeded"
                                         ]
                                     },
