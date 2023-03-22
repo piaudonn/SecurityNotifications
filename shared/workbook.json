@@ -64,20 +64,6 @@
                 "version": "KqlParameterItem/1.0",
                 "parameters": [
                   {
-                    "id": "2c5ad71b-8acd-4b8b-8e91-756cc82ef889",
-                    "version": "KqlParameterItem/1.0",
-                    "name": "CurrentConfig",
-                    "type": 1,
-                    "isGlobal": true,
-                    "query": "[concat('externaldata ( Config:string ) [\"', parameters('configSASUrl'),'\"] with(format=\"txt\")\r\n| project Config\"')]",
-                    "isHiddenWhenLocked": true,
-                    "timeContext": {
-                      "durationMs": 86400000
-                    },
-                    "queryType": 0,
-                    "resourceType": "microsoft.operationalinsights/workspaces"
-                  },
-                  {
                     "id": "a37fd215-135e-42dd-a8de-71a980fed282",
                     "version": "KqlParameterItem/1.0",
                     "name": "ListLogicApps",
@@ -100,6 +86,20 @@
                     "defaultValue": "value::all",
                     "queryType": 1,
                     "resourceType": "microsoft.resourcegraph/resources"
+                  },
+                  {
+                    "id": "114bc411-3e1f-4e24-90e7-2d2773b88fb3",
+                    "version": "KqlParameterItem/1.0",
+                    "name": "CurrentConfig",
+                    "type": 1,
+                    "isGlobal": true,
+                    "query": "[concat('externaldata ( Config:string ) [\"', parameters('configSASUrl'),'\"] with(format=\"txt\")\r\n| project Config\"')]",
+                    "isHiddenWhenLocked": true,
+                    "timeContext": {
+                      "durationMs": 86400000
+                    },
+                    "queryType": 0,
+                    "resourceType": "microsoft.operationalinsights/workspaces"
                   }
                 ],
                 "style": "pills",
