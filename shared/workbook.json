@@ -107,6 +107,45 @@
               "name": "WorkbookParameters"
             },
             {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "[concat('{\"version\":\"CustomEndpoint/1.0\",\"data\":null,\"headers\":[{\"key\":\"Content-Type\",\"value\":\"application/json\"},{\"key\":\"Pragma\",\"value\":\"no-cache\"}],\"method\":\"GET\",\"url\":\"', parameters('configSASUrl'),'\",\"contentType\":\"text/plain\",\"urlParams\":[],\"transformers\":null}')]",
+              "size": 4,
+              "queryType": 10,
+              "gridSettings": {
+                "formatters": [
+                  {
+                    "columnMatch": "Column",
+                    "formatter": 18,
+                    "formatOptions": {
+                      "thresholdsOptions": "icons",
+                      "thresholdsGrid": [
+                        {
+                          "operator": "Default",
+                          "thresholdValue": null,
+                          "representation": "uninitialized",
+                          "text": "Great! Please refresh the workbook."
+                        }
+                      ]
+                    }
+                  }
+                ],
+                "labelSettings": [
+                  {
+                    "columnId": "Column",
+                    "label": "Connectivity Check"
+                  }
+                ]
+              }
+            },
+            "conditionalVisibility": {
+              "parameterName": "CurrentConfig",
+              "comparison": "isEqualTo"
+            },
+            "name": "TestTrustedUrl"
+          },
+            {
               "type": 1,
               "content": {
                 "json": "{CurrentConfig}"
