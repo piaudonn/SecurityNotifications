@@ -35,6 +35,13 @@
       "metadata": {
         "description": "Hardcoded GUID for this workbook"
       }
+    },
+    "ConfigLAId": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Resouce id of the Config Logic App"
+      }
     }
   },
    "variables": {
@@ -695,7 +702,7 @@
                     "icon": "Save",
                     "linkIsContextBlade": true,
                     "armActionContext": {
-                      "path": "/subscriptions/f893f408-3d86-419f-b1a6-9c91c6872761/resourceGroups/piaudonn3/providers/Microsoft.Logic/workflows/SEEN-Config/triggers/manual/run",
+                      "path": "[concat(parameters('ConfigLAId'), '/triggers/manual/run')]",
                       "headers": [],
                       "params": [
                         {
