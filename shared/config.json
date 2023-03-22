@@ -10,6 +10,10 @@
             "defaultValue": "/subscriptions/<subscriptionid>/resourceGroups/<rgname>/providers/Microsoft.Web/connections/azureblob",
             "type": "String"
         },
+        "TablesConnectionResourceID": {
+            "defaultValue": "/subscriptions/<subscriptionid>/resourceGroups/<rgname>/providers/Microsoft.Web/connections/azuretables",
+            "type": "String"
+        },
         "StorageAccountName": {
             "defaultValue": "",
             "type": "String"
@@ -19,7 +23,7 @@
             "type": "String"
         },
         "ModuleVersion": {
-            "defaultValue": "0.1",
+            "defaultValue": "1.0",
             "type": "String"
         }
     },
@@ -42,71 +46,462 @@
                 },
                 "definition": {
                     "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
-                    "contentVersion": "1.0.0.0",
-                    "parameters": {
-                        "$connections": {
-                            "defaultValue": {},
-                            "type": "Object"
-                        }
-                    },
-                    "triggers": {
-                        "manual": {
-                            "type": "Request",
-                            "kind": "Http",
-                            "inputs": {
-                                "schema": {
-                                    "properties": {
-                                        "module": {
-                                            "type": "string"
+                    "actions": {
+                        "Config_setup_check": {
+                            "actions": {
+                                "Create_config": {
+                                    "inputs": {
+                                        "body": "@json(body('HTTP_Get_Config'))",
+                                        "headers": {
+                                            "ReadFileMetadataFromServer": true
+                                        },
+                                        "host": {
+                                            "connection": {
+                                                "name": "@parameters('$connections')['azureblob']['connectionId']"
+                                            }
+                                        },
+                                        "method": "post",
+                                        "path": "[concat('/v2/datasets/@{encodeURIComponent(encodeURIComponent(''', parameters('StorageAccountName'), '''))}/files')]",
+                                        "queries": {
+                                            "folderPath": "/seen",
+                                            "name": "seen.config",
+                                            "queryParametersSingleEncoded": true
                                         }
                                     },
-                                    "type": "object"
+                                    "runAfter": {
+                                        "HTTP_Get_Config": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "runtimeConfiguration": {
+                                        "contentTransfer": {
+                                            "transferMode": "Chunked"
+                                        }
+                                    },
+                                    "type": "ApiConnection"
+                                },
+                                "Create_footer": {
+                                    "inputs": {
+                                        "body": "@body('HTTP_Get_Footer')",
+                                        "headers": {
+                                            "ReadFileMetadataFromServer": true
+                                        },
+                                        "host": {
+                                            "connection": {
+                                                "name": "@parameters('$connections')['azureblob']['connectionId']"
+                                            }
+                                        },
+                                        "method": "post",
+                                        "path": "[concat('/v2/datasets/@{encodeURIComponent(encodeURIComponent(''', parameters('StorageAccountName'), '''))}/files')]",
+                                        "queries": {
+                                            "folderPath": "/seen/templates/",
+                                            "name": "footer.html",
+                                            "queryParametersSingleEncoded": true
+                                        }
+                                    },
+                                    "runAfter": {
+                                        "HTTP_Get_Footer": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "runtimeConfiguration": {
+                                        "contentTransfer": {
+                                            "transferMode": "Chunked"
+                                        }
+                                    },
+                                    "type": "ApiConnection"
+                                },
+                                "Create_header": {
+                                    "inputs": {
+                                        "body": "@body('HTTP_Get_Header')",
+                                        "headers": {
+                                            "ReadFileMetadataFromServer": true
+                                        },
+                                        "host": {
+                                            "connection": {
+                                                "name": "@parameters('$connections')['azureblob']['connectionId']"
+                                            }
+                                        },
+                                        "method": "post",
+                                        "path": "[concat('/v2/datasets/@{encodeURIComponent(encodeURIComponent(''', parameters('StorageAccountName'), '''))}/files')]",
+                                        "queries": {
+                                            "folderPath": "/seen/templates/",
+                                            "name": "header.html",
+                                            "queryParametersSingleEncoded": true
+                                        }
+                                    },
+                                    "runAfter": {
+                                        "HTTP_Get_Header": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "runtimeConfiguration": {
+                                        "contentTransfer": {
+                                            "transferMode": "Chunked"
+                                        }
+                                    },
+                                    "type": "ApiConnection"
+                                },
+                                "Create_mfa_template": {
+                                    "inputs": {
+                                        "body": "@body('HTTP_Get_MFA')",
+                                        "headers": {
+                                            "ReadFileMetadataFromServer": true
+                                        },
+                                        "host": {
+                                            "connection": {
+                                                "name": "@parameters('$connections')['azureblob']['connectionId']"
+                                            }
+                                        },
+                                        "method": "post",
+                                        "path": "[concat('/v2/datasets/@{encodeURIComponent(encodeURIComponent(''', parameters('StorageAccountName'), '''))}/files')]",
+                                        "queries": {
+                                            "folderPath": "/seen/templates/",
+                                            "name": "mfa.html",
+                                            "queryParametersSingleEncoded": true
+                                        }
+                                    },
+                                    "runAfter": {
+                                        "HTTP_Get_MFA": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "runtimeConfiguration": {
+                                        "contentTransfer": {
+                                            "transferMode": "Chunked"
+                                        }
+                                    },
+                                    "type": "ApiConnection"
+                                },
+                                "Create_tap_template": {
+                                    "inputs": {
+                                        "body": "@body('HTTP_Get_TAP')",
+                                        "headers": {
+                                            "ReadFileMetadataFromServer": true
+                                        },
+                                        "host": {
+                                            "connection": {
+                                                "name": "@parameters('$connections')['azureblob']['connectionId']"
+                                            }
+                                        },
+                                        "method": "post",
+                                        "path": "[concat('/v2/datasets/@{encodeURIComponent(encodeURIComponent(''', parameters('StorageAccountName'), '''))}/files')]",
+                                        "queries": {
+                                            "folderPath": "/seen/templates/",
+                                            "name": "tap.html",
+                                            "queryParametersSingleEncoded": true
+                                        }
+                                    },
+                                    "runAfter": {
+                                        "HTTP_Get_TAP": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "runtimeConfiguration": {
+                                        "contentTransfer": {
+                                            "transferMode": "Chunked"
+                                        }
+                                    },
+                                    "type": "ApiConnection"
+                                },
+                                "Current_time": {
+                                    "inputs": {},
+                                    "kind": "CurrentTime",
+                                    "runAfter": {
+                                        "Setup_Debug": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "type": "Expression"
+                                },
+                                "HTTP_Get_Config": {
+                                    "inputs": {
+                                        "headers": {
+                                            "Content-Type": "application/json"
+                                        },
+                                        "method": "GET",
+                                        "uri": "https://raw.githubusercontent.com/piaudonn/SecurityNotifications/main/config/seen.config"
+                                    },
+                                    "runAfter": {
+                                        "Setup_Debug": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "type": "Http"
+                                },
+                                "HTTP_Get_Footer": {
+                                    "inputs": {
+                                        "method": "GET",
+                                        "uri": "https://raw.githubusercontent.com/piaudonn/SecurityNotifications/main/config/templates/footer.html"
+                                    },
+                                    "runAfter": {
+                                        "Setup_Debug": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "type": "Http"
+                                },
+                                "HTTP_Get_Header": {
+                                    "inputs": {
+                                        "method": "GET",
+                                        "uri": "https://raw.githubusercontent.com/piaudonn/SecurityNotifications/main/config/templates/header.html"
+                                    },
+                                    "runAfter": {
+                                        "Setup_Debug": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "type": "Http"
+                                },
+                                "HTTP_Get_MFA": {
+                                    "inputs": {
+                                        "method": "GET",
+                                        "uri": "https://raw.githubusercontent.com/piaudonn/SecurityNotifications/main/config/templates/mfa.html"
+                                    },
+                                    "runAfter": {
+                                        "Setup_Debug": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "type": "Http"
+                                },
+                                "HTTP_Get_TAP": {
+                                    "inputs": {
+                                        "method": "GET",
+                                        "uri": "https://raw.githubusercontent.com/piaudonn/SecurityNotifications/main/config/templates/tap.html"
+                                    },
+                                    "runAfter": {
+                                        "Setup_Debug": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "type": "Http"
+                                },
+                                "Insert_TAPUsage_tracker": {
+                                    "inputs": {
+                                        "body": {
+                                            "Tracker": "@{body('Current_time')}"
+                                        },
+                                        "host": {
+                                            "connection": {
+                                                "name": "@parameters('$connections')['azuretables']['connectionId']"
+                                            }
+                                        },
+                                        "method": "put",
+                                        "path": "[concat('/v2/storageAccounts/@{encodeURIComponent(encodeURIComponent(''', parameters('StorageAccountName'), '''))}/tables/@{encodeURIComponent('trackers')}/entities(PartitionKey='@{encodeURIComponent('seen')}',RowKey='@{encodeURIComponent('TAPUsage')}')')]"
+                                    },
+                                    "runAfter": {
+                                        "Current_time": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "type": "ApiConnection"
+                                },
+                                "Insert_or_Replace_Entity_(V2)": {
+                                    "inputs": {
+                                        "body": {
+                                            "Tracker": "@{body('Current_time')}"
+                                        },
+                                        "host": {
+                                            "connection": {
+                                                "name": "@parameters('$connections')['azuretables']['connectionId']"
+                                            }
+                                        },
+                                        "method": "put",
+                                        "path": "[concat('/v2/storageAccounts/@{encodeURIComponent(encodeURIComponent(''', parameters('StorageAccountName'), '''))}/tables/@{encodeURIComponent('trackers')}/entities(PartitionKey='@{encodeURIComponent('seen')}',RowKey='@{encodeURIComponent('MFAMethods')}')')]"
+                                    },
+                                    "runAfter": {
+                                        "Current_time": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "type": "ApiConnection"
+                                },
+                                "Setup_Debug": {
+                                    "inputs": "@triggerOutputs()['headers']",
+                                    "runAfter": {},
+                                    "type": "Compose"
+                                },
+                                "Terminate_Setup": {
+                                    "inputs": {
+                                        "runStatus": "Succeeded"
+                                    },
+                                    "runAfter": {
+                                        "Create_config": [
+                                            "Succeeded",
+                                            "Failed"
+                                        ],
+                                        "Create_footer": [
+                                            "Succeeded",
+                                            "Failed"
+                                        ],
+                                        "Create_header": [
+                                            "Succeeded",
+                                            "Failed"
+                                        ],
+                                        "Create_mfa_template": [
+                                            "Succeeded",
+                                            "Failed"
+                                        ],
+                                        "Create_tap_template": [
+                                            "Succeeded",
+                                            "Failed"
+                                        ],
+                                        "Insert_TAPUsage_tracker": [
+                                            "Succeeded",
+                                            "Failed"
+                                        ],
+                                        "Insert_or_Replace_Entity_(V2)": [
+                                            "Succeeded",
+                                            "Failed"
+                                        ]
+                                    },
+                                    "type": "Terminate"
                                 }
-                            }
-                        }
-                    },
-                    "actions": {
+                            },
+                            "expression": {
+                                "and": [
+                                    {
+                                        "equals": [
+                                            "@triggerOutputs()['headers']?['CommandName']",
+                                            "Start-AzLogicApp"
+                                        ]
+                                    },
+                                    {
+                                        "contains": [
+                                            "@triggerOutputs()['headers']?['User-Agent']",
+                                            "Powershell"
+                                        ]
+                                    }
+                                ]
+                            },
+                            "runAfter": {},
+                            "type": "If"
+                        },
+                        "Config_update_check": {
+                            "actions": {
+                                "New_Config": {
+                                    "inputs": "@triggerBody()?['config']",
+                                    "runAfter": {},
+                                    "type": "Compose"
+                                },
+                                "Terminate": {
+                                    "inputs": {
+                                        "runStatus": "Succeeded"
+                                    },
+                                    "runAfter": {
+                                        "Update_Config": [
+                                            "Succeeded",
+                                            "Failed"
+                                        ]
+                                    },
+                                    "type": "Terminate"
+                                },
+                                "Update_Config": {
+                                    "inputs": {
+                                        "body": "@outputs('New_Config')",
+                                        "headers": {
+                                            "ReadFileMetadataFromServer": true
+                                        },
+                                        "host": {
+                                            "connection": {
+                                                "name": "@parameters('$connections')['azureblob']['connectionId']"
+                                            }
+                                        },
+                                        "method": "put",
+                                        "path": "[concat('/v2/datasets/@{encodeURIComponent(encodeURIComponent(''', parameters('StorageAccountName'), '''))}/files/@{encodeURIComponent(encodeURIComponent('JTJmc2VlbiUyZnNlZW4uY29uZmln'))}')]"
+                                    },
+                                    "metadata": {
+                                        "JTJmc2VlbiUyZnNlZW4uY29uZmln": "/seen/seen.config"
+                                    },
+                                    "runAfter": {
+                                        "New_Config": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "type": "ApiConnection"
+                                }
+                            },
+                            "expression": {
+                                "and": [
+                                    {
+                                        "equals": [
+                                            "@triggerBody()?['module']",
+                                            "config"
+                                        ]
+                                    }
+                                ]
+                            },
+                            "runAfter": {
+                                "Config_setup_check": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "If"
+                        },
                         "Decoded_Config": {
+                            "inputs": "@json(base64ToString(body('Get_Config')['$content']))",
                             "runAfter": {
                                 "Get_Config": [
                                     "Succeeded"
                                 ]
                             },
-                            "type": "Compose",
-                            "inputs": "@json(base64ToString(body('Get_Config')['$content']))"
+                            "type": "Compose"
                         },
                         "Decoded_Footer": {
+                            "inputs": "@base64ToString(body('Get_Footer')['$content'])",
                             "runAfter": {
                                 "Get_Footer": [
                                     "Succeeded"
                                 ]
                             },
-                            "type": "Compose",
-                            "inputs": "@base64ToString(body('Get_Footer')['$content'])"
+                            "type": "Compose"
                         },
                         "Decoded_Header": {
+                            "inputs": "@base64ToString(body('Get_Header')['$content'])",
                             "runAfter": {
                                 "Get_Header": [
                                     "Succeeded"
                                 ]
                             },
-                            "type": "Compose",
-                            "inputs": "@base64ToString(body('Get_Header')['$content'])"
+                            "type": "Compose"
                         },
                         "GET_Version_Redirect": {
-                            "runAfter": {},
-                            "type": "Http",
                             "inputs": {
                                 "method": "GET",
                                 "uri": "https://aka.ms/seenversion"
-                            }
+                            },
+                            "runAfter": {
+                                "Config_update_check": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "Http"
                         },
                         "Get_Config": {
-                            "runAfter": {},
+                            "inputs": {
+                                "host": {
+                                    "connection": {
+                                        "name": "@parameters('$connections')['azureblob']['connectionId']"
+                                    }
+                                },
+                                "method": "get",
+                                "path": "[concat('/v2/datasets/@{encodeURIComponent(encodeURIComponent(''', parameters('StorageAccountName'), '''))}/files/@{encodeURIComponent(encodeURIComponent('JTJmc2VlbiUyZnNlZW4uY29uZmln'))}/content')]",
+                                "queries": {
+                                    "inferContentType": false
+                                }
+                            },
                             "metadata": {
                                 "JTJmc2VlbiUyZnNlZW4uY29uZmln": "/seen/seen.config"
                             },
-                            "type": "ApiConnection",
+                            "runAfter": {
+                                "Config_update_check": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "ApiConnection"
+                        },
+                        "Get_Footer": {
                             "inputs": {
                                 "host": {
                                     "connection": {
@@ -114,18 +509,22 @@
                                     }
                                 },
                                 "method": "get",
-                                "path": "[concat('/v2/datasets/@{encodeURIComponent(encodeURIComponent(''', parameters('StorageAccountName'), '''))}/files/@{encodeURIComponent(encodeURIComponent(''JTJmc2VlbiUyZnNlZW4uY29uZmln''))}/content')]",
+                                "path": "[concat('/v2/datasets/@{encodeURIComponent(encodeURIComponent(''', parameters('StorageAccountName'), '''))}/files/@{encodeURIComponent(encodeURIComponent('JTJmc2VlbiUyZnRlbXBsYXRlcyUyZmZvb3Rlci5odG1s'))}/content')]",
                                 "queries": {
                                     "inferContentType": false
                                 }
-                            }
-                        },
-                        "Get_Footer": {
-                            "runAfter": {},
+                            },
                             "metadata": {
                                 "JTJmc2VlbiUyZnRlbXBsYXRlcyUyZmZvb3Rlci5odG1s": "/seen/templates/footer.html"
                             },
-                            "type": "ApiConnection",
+                            "runAfter": {
+                                "Config_update_check": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "ApiConnection"
+                        },
+                        "Get_Header": {
                             "inputs": {
                                 "host": {
                                     "connection": {
@@ -133,44 +532,169 @@
                                     }
                                 },
                                 "method": "get",
-                                "path": "[concat('/v2/datasets/@{encodeURIComponent(encodeURIComponent(''', parameters('StorageAccountName'), '''))}/files/@{encodeURIComponent(encodeURIComponent(''JTJmc2VlbiUyZnRlbXBsYXRlcyUyZmZvb3Rlci5odG1s''))}/content')]",
+                                "path": "[concat('/v2/datasets/@{encodeURIComponent(encodeURIComponent(''', parameters('StorageAccountName'), '''))}/files/@{encodeURIComponent(encodeURIComponent('JTJmc2VlbiUyZnRlbXBsYXRlcyUyZmhlYWRlci5odG1s'))}/content')]",
                                 "queries": {
                                     "inferContentType": false
                                 }
-                            }
-                        },
-                        "Get_Header": {
-                            "runAfter": {},
+                            },
                             "metadata": {
                                 "JTJmc2VlbiUyZnRlbXBsYXRlcyUyZmhlYWRlci5odG1s": "/seen/templates/header.html"
                             },
-                            "type": "ApiConnection",
-                            "inputs": {
-                                "host": {
-                                    "connection": {
-                                        "name": "@parameters('$connections')['azureblob']['connectionId']"
-                                    }
-                                },
-                                "method": "get",
-                                "path": "[concat('/v2/datasets/@{encodeURIComponent(encodeURIComponent(''', parameters('StorageAccountName'), '''))}/files/@{encodeURIComponent(encodeURIComponent(''JTJmc2VlbiUyZnRlbXBsYXRlcyUyZmhlYWRlci5odG1s''))}/content')]",
-                                "queries": {
-                                    "inferContentType": false
-                                }
-                            }
+                            "runAfter": {
+                                "Config_update_check": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "ApiConnection"
                         },
                         "Get_Version": {
+                            "inputs": {
+                                "method": "GET",
+                                "uri": "@{outputs('GET_Version_Redirect')['headers']?['Location']}"
+                            },
                             "runAfter": {
                                 "GET_Version_Redirect": [
                                     "Failed"
                                 ]
                             },
-                            "type": "Http",
-                            "inputs": {
-                                "method": "GET",
-                                "uri": "@{outputs('GET_Version_Redirect')['headers']?['Location']}"
-                            }
+                            "type": "Http"
                         },
                         "Switch": {
+                            "cases": {
+                                "Case_MFA": {
+                                    "actions": {
+                                        "Decode_MFA_template": {
+                                            "inputs": "@replace(replace(replace(replace(base64ToString(body('Get_MFA_template')['$content']),'{SupportEmail}',outputs('Decoded_Config')['contact']['supportEmail']),'{SupportPhoneNumber}',outputs('Decoded_Config')['contact']['supportPhone']),'{Header}',outputs('Decoded_Header')),'{Footer}',outputs('Decoded_Footer'))",
+                                            "runAfter": {
+                                                "Get_MFA_template": [
+                                                    "Succeeded"
+                                                ]
+                                            },
+                                            "type": "Compose"
+                                        },
+                                        "Get_MFA_template": {
+                                            "inputs": {
+                                                "host": {
+                                                    "connection": {
+                                                        "name": "@parameters('$connections')['azureblob']['connectionId']"
+                                                    }
+                                                },
+                                                "method": "get",
+                                                "path": "[concat('/v2/datasets/@{encodeURIComponent(encodeURIComponent(''', parameters('StorageAccountName'), '''))}/files/@{encodeURIComponent(encodeURIComponent('/seen/templates/mfa.html'))}/content')]",
+                                                "queries": {
+                                                    "inferContentType": false
+                                                }
+                                            },
+                                            "runAfter": {},
+                                            "type": "ApiConnection"
+                                        },
+                                        "MFA_Config": {
+                                            "inputs": {
+                                                "bcc": "@{outputs('Decoded_Config')['modules']['mfa']['bcc']}",
+                                                "ccManager": "@outputs('Decoded_Config')?['modules']['mfa']['ccManager']",
+                                                "includeGuests": "@outputs('Decoded_Config')['modules']['mfa']['includeGuests']",
+                                                "mailFrom": "@{outputs('Decoded_Config')['mailFrom']}",
+                                                "recipient": "@{if(equals(outputs('Decoded_Config')['modules']['mfa']?['testMode'],true),outputs('Decoded_Config')['testEmail'],'')}",
+                                                "replyTo": "@{outputs('Decoded_Config')['replyTo']}",
+                                                "saveToSentItems": "@{outputs('Decoded_Config')['saveToSentItems']}",
+                                                "subject": "@{outputs('Decoded_Config')['modules']['mfa']['subject']}",
+                                                "template": "@{outputs('Decode_MFA_template')}",
+                                                "timeZone": "@{outputs('Decoded_Config')['timeZone']}"
+                                            },
+                                            "runAfter": {
+                                                "Decode_MFA_template": [
+                                                    "Succeeded"
+                                                ]
+                                            },
+                                            "type": "Compose"
+                                        },
+                                        "MFA_Response": {
+                                            "inputs": {
+                                                "body": "@outputs('MFA_Config')",
+                                                "statusCode": 200
+                                            },
+                                            "kind": "Http",
+                                            "runAfter": {
+                                                "MFA_Config": [
+                                                    "Succeeded"
+                                                ]
+                                            },
+                                            "type": "Response"
+                                        }
+                                    },
+                                    "case": "mfa"
+                                },
+                                "Case_TAP": {
+                                    "actions": {
+                                        "Decode_TAP_template": {
+                                            "inputs": "@replace(replace(replace(replace(base64ToString(body('Get_TAP_template')['$content']),'{SupportEmail}',outputs('Decoded_Config')['contact']['supportEmail']),'{SupportPhoneNumber}',outputs('Decoded_Config')['contact']['supportPhone']),'{Header}',outputs('Decoded_Header')),'{Footer}',outputs('Decoded_Footer'))",
+                                            "runAfter": {
+                                                "Get_TAP_template": [
+                                                    "Succeeded"
+                                                ]
+                                            },
+                                            "type": "Compose"
+                                        },
+                                        "Get_TAP_template": {
+                                            "inputs": {
+                                                "host": {
+                                                    "connection": {
+                                                        "name": "@parameters('$connections')['azureblob']['connectionId']"
+                                                    }
+                                                },
+                                                "method": "get",
+                                                "path": "[concat('/v2/datasets/@{encodeURIComponent(encodeURIComponent(''', parameters('StorageAccountName'), '''))}/files/@{encodeURIComponent(encodeURIComponent('JTJmc2VlbiUyZnRlbXBsYXRlcyUyZnRhcC5odG1s'))}/content')]",
+                                                "queries": {
+                                                    "inferContentType": false
+                                                }
+                                            },
+                                            "metadata": {
+                                                "JTJmc2VlbiUyZnRlbXBsYXRlcyUyZnRhcC5odG1s": "/seen/templates/tap.html"
+                                            },
+                                            "runAfter": {},
+                                            "type": "ApiConnection"
+                                        },
+                                        "TAP_Config": {
+                                            "inputs": {
+                                                "bcc": "@{outputs('Decoded_Config')['modules']['tap']['bcc']}",
+                                                "ccManager": "@outputs('Decoded_Config')?['modules']['tap']['ccManager']",
+                                                "includeUsage": "@outputs('Decoded_Config')['modules']['tap']['includeUsage']",
+                                                "mailFrom": "@{outputs('Decoded_Config')['mailFrom']}",
+                                                "recipient": "@{if(equals(outputs('Decoded_Config')['modules']['tap']?['testMode'],true),outputs('Decoded_Config')['testEmail'],'')}",
+                                                "replyTo": "@{outputs('Decoded_Config')['replyTo']}",
+                                                "saveToSentItems": "@{outputs('Decoded_Config')['saveToSentItems']}",
+                                                "subject": "@{outputs('Decoded_Config')['modules']['tap']['subject']}",
+                                                "template": "@{outputs('Decode_TAP_template')}",
+                                                "timeZone": "@{outputs('Decoded_Config')['timeZone']}"
+                                            },
+                                            "runAfter": {
+                                                "Decode_TAP_template": [
+                                                    "Succeeded"
+                                                ]
+                                            },
+                                            "type": "Compose"
+                                        },
+                                        "TAP_Response": {
+                                            "inputs": {
+                                                "body": "@outputs('TAP_Config')",
+                                                "statusCode": 200
+                                            },
+                                            "kind": "Http",
+                                            "runAfter": {
+                                                "TAP_Config": [
+                                                    "Succeeded"
+                                                ]
+                                            },
+                                            "type": "Response"
+                                        }
+                                    },
+                                    "case": "tap"
+                                }
+                            },
+                            "default": {
+                                "actions": {}
+                            },
+                            "expression": "@triggerBody()?['module']",
                             "runAfter": {
                                 "Decoded_Config": [
                                     "Succeeded"
@@ -185,145 +709,36 @@
                                     "Succeeded"
                                 ]
                             },
-                            "cases": {
-                                "Case_MFA": {
-                                    "case": "mfa",
-                                    "actions": {
-                                        "Decode_MFA_template": {
-                                            "runAfter": {
-                                                "Get_MFA_template": [
-                                                    "Succeeded"
-                                                ]
-                                            },
-                                            "type": "Compose",
-                                            "inputs": "@replace(replace(replace(replace(base64ToString(body('Get_MFA_template')['$content']),'{SupportEmail}',outputs('Decoded_Config')['contact']['supportEmail']),'{SupportPhoneNumber}',outputs('Decoded_Config')['contact']['supportPhone']),'{Header}',outputs('Decoded_Header')),'{Footer}',outputs('Decoded_Footer'))"
-                                        },
-                                        "Get_MFA_template": {
-                                            "runAfter": {},
-                                            "type": "ApiConnection",
-                                            "inputs": {
-                                                "host": {
-                                                    "connection": {
-                                                        "name": "@parameters('$connections')['azureblob']['connectionId']"
-                                                    }
-                                                },
-                                                "method": "get",
-                                                "path": "[concat('/v2/datasets/@{encodeURIComponent(encodeURIComponent(''', parameters('StorageAccountName'), '''))}/files/@{encodeURIComponent(encodeURIComponent(''/seen/templates/mfa.html''))}/content')]",
-                                                "queries": {
-                                                    "inferContentType": false
-                                                }
-                                            }
-                                        },
-                                        "MFA_Config": {
-                                            "runAfter": {
-                                                "Decode_MFA_template": [
-                                                    "Succeeded"
-                                                ]
-                                            },
-                                            "type": "Compose",
-                                            "inputs": {
-                                                "bcc": "@{outputs('Decoded_Config')['modules']['mfa']['bcc']}",
-                                                "ccManager": "@outputs('Decoded_Config')?['modules']['mfa']['ccManager']",
-                                                "includeGuests": "@outputs('Decoded_Config')['modules']['mfa']['includeGuests']",
-                                                "mailFrom": "@{outputs('Decoded_Config')['mailFrom']}",
-                                                "recipient": "@{if(equals(outputs('Decoded_Config')['modules']['mfa']?['testMode'],true),outputs('Decoded_Config')['testEmail'],'')}",
-                                                "replyTo": "@{outputs('Decoded_Config')['replyTo']}",
-                                                "saveToSentItems": "@{outputs('Decoded_Config')['saveToSentItems']}",
-                                                "subject": "@{outputs('Decoded_Config')['modules']['mfa']['subject']}",
-                                                "template": "@{outputs('Decode_MFA_template')}",
-                                                "timeZone": "@{outputs('Decoded_Config')['timeZone']}"
-                                            }
-                                        },
-                                        "MFA_Response": {
-                                            "runAfter": {
-                                                "MFA_Config": [
-                                                    "Succeeded"
-                                                ]
-                                            },
-                                            "type": "Response",
-                                            "kind": "Http",
-                                            "inputs": {
-                                                "body": "@outputs('MFA_Config')",
-                                                "statusCode": 200
-                                            }
-                                        }
-                                    }
-                                },
-                                "Case_TAP": {
-                                    "case": "tap",
-                                    "actions": {
-                                        "Decode_TAP_template": {
-                                            "runAfter": {
-                                                "Get_TAP_template": [
-                                                    "Succeeded"
-                                                ]
-                                            },
-                                            "type": "Compose",
-                                            "inputs": "@replace(replace(replace(replace(base64ToString(body('Get_TAP_template')['$content']),'{SupportEmail}',outputs('Decoded_Config')['contact']['supportEmail']),'{SupportPhoneNumber}',outputs('Decoded_Config')['contact']['supportPhone']),'{Header}',outputs('Decoded_Header')),'{Footer}',outputs('Decoded_Footer'))"
-                                        },
-                                        "Get_TAP_template": {
-                                            "runAfter": {},
-                                            "metadata": {
-                                                "JTJmc2VlbiUyZnRlbXBsYXRlcyUyZnRhcC5odG1s": "/seen/templates/tap.html"
-                                            },
-                                            "type": "ApiConnection",
-                                            "inputs": {
-                                                "host": {
-                                                    "connection": {
-                                                        "name": "@parameters('$connections')['azureblob']['connectionId']"
-                                                    }
-                                                },
-                                                "method": "get",
-                                                "path": "[concat('/v2/datasets/@{encodeURIComponent(encodeURIComponent(''', parameters('StorageAccountName'), '''))}/files/@{encodeURIComponent(encodeURIComponent(''JTJmc2VlbiUyZnRlbXBsYXRlcyUyZnRhcC5odG1s''))}/content')]",
-                                                "queries": {
-                                                    "inferContentType": false
-                                                }
-                                            }
-                                        },
-                                        "TAP_Config": {
-                                            "runAfter": {
-                                                "Decode_TAP_template": [
-                                                    "Succeeded"
-                                                ]
-                                            },
-                                            "type": "Compose",
-                                            "inputs": {
-                                                "bcc": "@{outputs('Decoded_Config')['modules']['tap']['bcc']}",
-                                                "ccManager": "@outputs('Decoded_Config')?['modules']['tap']['ccManager']",
-                                                "includeUsage": "@outputs('Decoded_Config')['modules']['tap']['includeUsage']",
-                                                "mailFrom": "@{outputs('Decoded_Config')['mailFrom']}",
-                                                "recipient": "@{if(equals(outputs('Decoded_Config')['modules']['tap']?['testMode'],true),outputs('Decoded_Config')['testEmail'],'')}",
-                                                "replyTo": "@{outputs('Decoded_Config')['replyTo']}",
-                                                "saveToSentItems": "@{outputs('Decoded_Config')['saveToSentItems']}",
-                                                "subject": "@{outputs('Decoded_Config')['modules']['tap']['subject']}",
-                                                "template": "@{outputs('Decode_TAP_template')}",
-                                                "timeZone": "@{outputs('Decoded_Config')['timeZone']}"
-                                            }
-                                        },
-                                        "TAP_Response": {
-                                            "runAfter": {
-                                                "TAP_Config": [
-                                                    "Succeeded"
-                                                ]
-                                            },
-                                            "type": "Response",
-                                            "kind": "Http",
-                                            "inputs": {
-                                                "body": "@outputs('TAP_Config')",
-                                                "statusCode": 200
-                                            }
-                                        }
-                                    }
-                                }
-                            },
-                            "default": {
-                                "actions": {}
-                            },
-                            "expression": "@triggerBody()?['module']",
                             "type": "Switch"
                         }
                     },
-                    "outputs": {}
+                    "contentVersion": "1.0.0.0",
+                    "outputs": {},
+                    "parameters": {
+                        "$connections": {
+                            "defaultValue": {},
+                            "type": "Object"
+                        }
+                    },
+                    "triggers": {
+                        "manual": {
+                            "inputs": {
+                                "schema": {
+                                    "properties": {
+                                        "config": {
+                                            "type": "object"
+                                        },
+                                        "module": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            },
+                            "kind": "Http",
+                            "type": "Request"
+                        }
+                    }
                 },
                 "parameters": {
                     "$connections": {
@@ -337,6 +752,16 @@
                                     }
                                 },
                                 "id": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/azureblob')]"
+                            },
+                            "azuretables": {
+                                "connectionId": "[parameters('TablesConnectionResourceID')]",
+                                "connectionName": "azuretables",
+                                "connectionProperties": {
+                                    "authentication": {
+                                        "type": "ManagedServiceIdentity"
+                                    }
+                                },
+                                "id": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/azuretables')]"
                             }
                         }
                     }
