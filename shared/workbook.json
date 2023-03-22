@@ -62,7 +62,7 @@
                     "name": "CurrentConfig",
                     "type": 1,
                     "isGlobal": true,
-                    "query": "[concat('{\"version\":\"CustomEndpoint/1.0\",\"data\":null,\"headers\":[{\"key\":\"Content-Type\",\"value\":\"application/json\"},{\"key\":\"Pragma\",\"value\":\"no-cache\"}],\"method\":\"GET\",\"url\":\"', [parameters('configSASUrl')] ,'\",\"contentType\":\"text/plain\",\"urlParams\":[],\"transformers\":null}')]",
+                    "query": "[concat('{\"version\":\"CustomEndpoint/1.0\",\"data\":null,\"headers\":[{\"key\":\"Content-Type\",\"value\":\"application/json\"},{\"key\":\"Pragma\",\"value\":\"no-cache\"}],\"method\":\"GET\",\"url\":\"', parameters('configSASUrl'),'\",\"contentType\":\"text/plain\",\"urlParams\":[],\"transformers\":null}')]",
                     "isHiddenWhenLocked": true,
                     "timeContext": {
                       "durationMs": 86400000
@@ -269,7 +269,7 @@
                           }
                         ],
                         "armActionContext": {
-                          "path": "[\"id\"]/[\"Action\"]",
+                          "path": "[[\"id\"]/[\"Action\"]",
                           "headers": [],
                           "params": [
                             {
@@ -280,7 +280,7 @@
                           "httpMethod": "POST",
                           "title": "You are about to [\"Action\"] [\"name\"]",
                           "description": "### Review the following actions before confirming\n\nYou want to **[\"Action\"]** the logic app **[\"name\"]**.\n\nNote that you will need to refresh the workbook to see the updated status.",
-                          "actionName": "[\"Action\"] [\"name\"]",
+                          "actionName": "[[\"Action\"] [\"name\"]",
                           "runLabel": "Confirm"
                         },
                         "customColumnWidthSetting": "25ch"

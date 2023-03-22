@@ -52,13 +52,7 @@
         "mfaTemplate": "[concat('https://raw.githubusercontent.com/piaudonn/SecurityNotifications/', parameters('DeployFromBranch'), '/modules/MFAMethods/mfamethods.json')]",
         "tapTemplate": "[concat('https://raw.githubusercontent.com/piaudonn/SecurityNotifications/', parameters('DeployFromBranch'), '/modules/TAP/tap.json')]",
         "workbookId": "7bea244d-869b-45a8-996a-2472c0d7bc5f",
-        "workbookType": "workbook",
-        "blobSasFunctionValues": { 
-            "canonicalizedResource": "[concat('/blob/', parameters('StorageAccountName'), '/seen')]",
-            "signedResource": "c",
-            "signedPermission": "r",
-            "signedExpiry": "2099-01-01T00:00:00Z"
-        }
+        "workbookType": "workbook"
     },
     "resources": [
         {
@@ -247,7 +241,7 @@
                         "value": "[parameters('LogAnalyticsResourceId')]"
                     },
                     "configSASUrl": {
-                        "value": "[concat('https://', reference('StorageTemplate').outputs.storageAccountName.value, '.blob.core.windows.net/seen/seen.config?')]"
+                        "value": "[reference('StorageTemplate').outputs.configSASUrl.value]"
                     },
                     "workbookId": {
                         "value": "[variables('workbookId')]"
