@@ -302,7 +302,8 @@
                                     },
                                     "runAfter": {
                                         "Create_trackers_table": [
-                                            "Succeeded"
+                                            "Succeeded",
+                                            "Failed"
                                         ]
                                     },
                                     "type": "ApiConnection"
@@ -322,7 +323,8 @@
                                     },
                                     "runAfter": {
                                         "Create_trackers_table": [
-                                            "Succeeded"
+                                            "Succeeded",
+                                            "Failed"
                                         ]
                                     },
                                     "type": "ApiConnection"
