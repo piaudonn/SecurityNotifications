@@ -22,6 +22,13 @@
         "description": "The id of resource instance to which the workbook will be associated"
       }
     },
+    "configSASUrl": {
+      "type": "string",
+      "defaultValue": "URL",
+      "metadata": {
+        "description": "The URL to get to the config file."
+      }
+    },
     "workbookId": {
       "type": "string",
       "defaultValue": "7bea244d-869b-45a8-996a-2472c0d7bc5f",
@@ -55,7 +62,7 @@
                     "name": "CurrentConfig",
                     "type": 1,
                     "isGlobal": true,
-                    "query": "{\"version\":\"CustomEndpoint/1.0\",\"data\":null,\"headers\":[{\"key\":\"Content-Type\",\"value\":\"application/json\"},{\"key\":\"Pragma\",\"value\":\"no-cache\"}],\"method\":\"GET\",\"url\":\"https://seen.blob.core.windows.net/seen/seen.config?sp=r&st=2023-03-21T20:50:37Z&se=2027-03-22T04:50:37Z&spr=https&sv=2021-12-02&sr=c&sig=hslJj2nZtpKgkEihbPWxUTqb1hFpd%2BNejXn791168mM%3D\",\"contentType\":\"text/plain\",\"urlParams\":[],\"transformers\":null}",
+                    "query": "[concat('{\"version\":\"CustomEndpoint/1.0\",\"data\":null,\"headers\":[{\"key\":\"Content-Type\",\"value\":\"application/json\"},{\"key\":\"Pragma\",\"value\":\"no-cache\"}],\"method\":\"GET\",\"url\":\"', [parameters('configSASUrl')] ,'\",\"contentType\":\"text/plain\",\"urlParams\":[],\"transformers\":null}')]",
                     "isHiddenWhenLocked": true,
                     "timeContext": {
                       "durationMs": 86400000
