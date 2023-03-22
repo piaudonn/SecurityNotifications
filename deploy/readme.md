@@ -44,11 +44,11 @@ Example:
 
 ```
 .\Setup.ps1 `
-     -TenantId "020cd98f-1002-45b7-90ff-69fc68bdd027" `
-     -AzureSubscriptionId "f893f408-3d86-419f-b1a6-9c91c6872761" `
-     -StorageAccountResourceGroupName "piaudonn3" `
-     -WorkspaceResourceGroupName "oi-default-east-us" `
-     -SEENResourceGroupName "piaudonn3"
+     -TenantId "120cd98f-1002-45b7-80ff-69fc68bdd027" `
+     -AzureSubscriptionId "e893f408-3d86-419f-c1a6-9c91c6872761" `
+     -StorageAccountResourceGroupName "default-1" `
+     -WorkspaceResourceGroupName "default-1" `
+     -SEENResourceGroupName "default-1"
 ```
 
 ## Post deployment operation
