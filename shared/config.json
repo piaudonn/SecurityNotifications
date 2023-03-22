@@ -297,7 +297,7 @@
                                     },
                                     "type": "ApiConnection"
                                 },
-                                "Insert_or_Replace_Entity_(V2)": {
+                                "Insert_MFAMethods_tracker": {
                                     "inputs": {
                                         "body": {
                                             "Tracker": "@{body('Current_time')}"
@@ -351,7 +351,7 @@
                                             "Succeeded",
                                             "Failed"
                                         ],
-                                        "Insert_or_Replace_Entity_(V2)": [
+                                        "Insert_MFAMethods_tracker": [
                                             "Succeeded",
                                             "Failed"
                                         ]
