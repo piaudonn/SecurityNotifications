@@ -107,6 +107,9 @@
                     "BlobConnectionResourceID": {
                         "value": "[reference('WebConnectionTemplate').outputs.BlobConnectionResourceID.value]"
                     },
+                    "TablesConnectionResourceID": {
+                        "value": "[reference('WebConnectionTemplate').outputs.TableConnectionResourceID.value]"
+                    },
                     "StorageAccountName": {
                         "value": "[reference('StorageTemplate').outputs.storageAccountName.value]"
                     }
