@@ -143,9 +143,6 @@
                                     },
                                     "type": "Terminate",
                                     "inputs": {
-                                        "runError": {
-                                            "message": "@{outputs('AAD_Debug')}"
-                                        },
                                         "runStatus": "@{result('Notification')[0]['status']}"
                                     }
                                 },
