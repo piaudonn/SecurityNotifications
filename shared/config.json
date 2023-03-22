@@ -17,14 +17,6 @@
         "StorageAccountName": {
             "defaultValue": "",
             "type": "String"
-        },
-        "ProjectName": {
-            "defaultValue": "SEEN",
-            "type": "String"
-        },
-        "ModuleVersion": {
-            "defaultValue": "1.0",
-            "type": "String"
         }
     },
     "variables": {},
@@ -232,16 +224,6 @@
                                     },
                                     "type": "ApiConnection"
                                 },
-                                "Current_time": {
-                                    "inputs": {},
-                                    "kind": "CurrentTime",
-                                    "runAfter": {
-                                        "Setup_Debug": [
-                                            "Succeeded"
-                                        ]
-                                    },
-                                    "type": "Expression"
-                                },
                                 "HTTP_Get_Config": {
                                     "inputs": {
                                         "headers": {
@@ -316,7 +298,7 @@
                                             }
                                         },
                                         "method": "put",
-                                        "path": "[concat('/v2/storageAccounts/@{encodeURIComponent(encodeURIComponent(''', parameters('StorageAccountName'), '''))}/tables/@{encodeURIComponent('trackers')}/entities(PartitionKey='@{encodeURIComponent('seen')}',RowKey='@{encodeURIComponent('TAPUsage')}')')]"
+                                        "path": "[concat('/v2/storageAccounts/@{encodeURIComponent(encodeURIComponent(''', parameters('StorageAccountName'), '''))}/tables/@{encodeURIComponent(''trackers'')}/entities(PartitionKey=''@{encodeURIComponent(''seen'')}'',RowKey=''@{encodeURIComponent(''TAPUsage'')}'')')]"
                                     },
                                     "runAfter": {
                                         "Create_trackers_table": [
@@ -336,7 +318,7 @@
                                             }
                                         },
                                         "method": "put",
-                                        "path": "[concat('/v2/storageAccounts/@{encodeURIComponent(encodeURIComponent(''', parameters('StorageAccountName'), '''))}/tables/@{encodeURIComponent('trackers')}/entities(PartitionKey='@{encodeURIComponent('seen')}',RowKey='@{encodeURIComponent('MFAMethods')}')')]"
+                                        "path": "[concat('/v2/storageAccounts/@{encodeURIComponent(encodeURIComponent(''', parameters('StorageAccountName'), '''))}/tables/@{encodeURIComponent(''trackers'')}/entities(PartitionKey=''@{encodeURIComponent(''seen'')}'',RowKey=''@{encodeURIComponent(''MFAMethods'')}'')')]"
                                     },
                                     "runAfter": {
                                         "Create_trackers_table": [
@@ -437,7 +419,7 @@
                                             }
                                         },
                                         "method": "put",
-                                        "path": "[concat('/v2/datasets/@{encodeURIComponent(encodeURIComponent(''', parameters('StorageAccountName'), '''))}/files/@{encodeURIComponent(encodeURIComponent('JTJmc2VlbiUyZnNlZW4uY29uZmln'))}')]"
+                                        "path": "[concat('/v2/datasets/@{encodeURIComponent(encodeURIComponent(''', parameters('StorageAccountName'), '''))}/files/@{encodeURIComponent(encodeURIComponent(''JTJmc2VlbiUyZnNlZW4uY29uZmln''))}')]"
                                     },
                                     "metadata": {
                                         "JTJmc2VlbiUyZnNlZW4uY29uZmln": "/seen/seen.config"
@@ -514,7 +496,7 @@
                                     }
                                 },
                                 "method": "get",
-                                "path": "[concat('/v2/datasets/@{encodeURIComponent(encodeURIComponent(''', parameters('StorageAccountName'), '''))}/files/@{encodeURIComponent(encodeURIComponent('JTJmc2VlbiUyZnNlZW4uY29uZmln'))}/content')]",
+                                "path": "[concat('/v2/datasets/@{encodeURIComponent(encodeURIComponent(''', parameters('StorageAccountName'), '''))}/files/@{encodeURIComponent(encodeURIComponent(''JTJmc2VlbiUyZnNlZW4uY29uZmln''))}/content')]",
                                 "queries": {
                                     "inferContentType": false
                                 }
@@ -537,7 +519,7 @@
                                     }
                                 },
                                 "method": "get",
-                                "path": "[concat('/v2/datasets/@{encodeURIComponent(encodeURIComponent(''', parameters('StorageAccountName'), '''))}/files/@{encodeURIComponent(encodeURIComponent('JTJmc2VlbiUyZnRlbXBsYXRlcyUyZmZvb3Rlci5odG1s'))}/content')]",
+                                "path": "[concat('/v2/datasets/@{encodeURIComponent(encodeURIComponent(''', parameters('StorageAccountName'), '''))}/files/@{encodeURIComponent(encodeURIComponent(''JTJmc2VlbiUyZnRlbXBsYXRlcyUyZmZvb3Rlci5odG1s''))}/content')]",
                                 "queries": {
                                     "inferContentType": false
                                 }
@@ -560,7 +542,7 @@
                                     }
                                 },
                                 "method": "get",
-                                "path": "[concat('/v2/datasets/@{encodeURIComponent(encodeURIComponent(''', parameters('StorageAccountName'), '''))}/files/@{encodeURIComponent(encodeURIComponent('JTJmc2VlbiUyZnRlbXBsYXRlcyUyZmhlYWRlci5odG1s'))}/content')]",
+                                "path": "[concat('/v2/datasets/@{encodeURIComponent(encodeURIComponent(''', parameters('StorageAccountName'), '''))}/files/@{encodeURIComponent(encodeURIComponent(''JTJmc2VlbiUyZnRlbXBsYXRlcyUyZmhlYWRlci5odG1s''))}/content')]",
                                 "queries": {
                                     "inferContentType": false
                                 }
@@ -608,7 +590,7 @@
                                                     }
                                                 },
                                                 "method": "get",
-                                                "path": "[concat('/v2/datasets/@{encodeURIComponent(encodeURIComponent(''', parameters('StorageAccountName'), '''))}/files/@{encodeURIComponent(encodeURIComponent('/seen/templates/mfa.html'))}/content')]",
+                                                "path": "[concat('/v2/datasets/@{encodeURIComponent(encodeURIComponent(''', parameters('StorageAccountName'), '''))}/files/@{encodeURIComponent(encodeURIComponent(''/seen/templates/mfa.html''))}/content')]",
                                                 "queries": {
                                                     "inferContentType": false
                                                 }
@@ -671,7 +653,7 @@
                                                     }
                                                 },
                                                 "method": "get",
-                                                "path": "[concat('/v2/datasets/@{encodeURIComponent(encodeURIComponent(''', parameters('StorageAccountName'), '''))}/files/@{encodeURIComponent(encodeURIComponent('JTJmc2VlbiUyZnRlbXBsYXRlcyUyZnRhcC5odG1s'))}/content')]",
+                                                "path": "[concat('/v2/datasets/@{encodeURIComponent(encodeURIComponent(''', parameters('StorageAccountName'), '''))}/files/@{encodeURIComponent(encodeURIComponent(''JTJmc2VlbiUyZnRlbXBsYXRlcyUyZnRhcC5odG1s''))}/content')]",
                                                 "queries": {
                                                     "inferContentType": false
                                                 }
@@ -746,6 +728,14 @@
                         "$connections": {
                             "defaultValue": {},
                             "type": "Object"
+                        },
+                        "ProjectName": {
+                            "defaultValue": "SEEN",
+                            "type": "String"
+                        },
+                        "ModuleVersion": {
+                            "defaultValue": "1.0",
+                            "type": "String"
                         }
                     },
                     "triggers": {

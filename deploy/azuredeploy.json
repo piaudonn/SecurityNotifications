@@ -154,8 +154,7 @@
             "dependsOn": [
                 "[resourceId('Microsoft.Resources/deployments', 'StorageTemplate')]",
                 "[resourceId('Microsoft.Resources/deployments', 'WebConnectionTemplate')]",
-                "[resourceId('Microsoft.Resources/deployments', 'ConfigTemplate')]",
-                "[resourceId('Microsoft.Resources/deployments', 'StorageTemplate')]"
+                "[resourceId('Microsoft.Resources/deployments', 'ConfigTemplate')]"
             ],
             "properties": {
                 "mode": "incremental",
@@ -192,8 +191,7 @@
             "dependsOn": [
                 "[resourceId('Microsoft.Resources/deployments', 'StorageTemplate')]",
                 "[resourceId('Microsoft.Resources/deployments', 'WebConnectionTemplate')]",
-                "[resourceId('Microsoft.Resources/deployments', 'ConfigTemplate')]",
-                "[resourceId('Microsoft.Resources/deployments', 'StorageTemplate')]"
+                "[resourceId('Microsoft.Resources/deployments', 'ConfigTemplate')]"
             ],
             "properties": {
                 "mode": "incremental",
@@ -230,8 +228,7 @@
             "dependsOn": [
                 "[resourceId('Microsoft.Resources/deployments', 'StorageTemplate')]",
                 "[resourceId('Microsoft.Resources/deployments', 'WebConnectionTemplate')]",
-                "[resourceId('Microsoft.Resources/deployments', 'ConfigTemplate')]",
-                "[resourceId('Microsoft.Resources/deployments', 'StorageTemplate')]"
+                "[resourceId('Microsoft.Resources/deployments', 'ConfigTemplate')]"
             ],
             "properties": {
                 "mode": "incremental",
@@ -250,7 +247,7 @@
                         "value": "[parameters('LogAnalyticsResourceId')]"
                     },
                     "configSASUrl": {
-                        "value": "[concat('https://', reference('StorageTemplate').outputs.storageAccountName.value, '.blob.core.windows.net/seen/seen.config?', listServiceSas(resourceId('Microsoft.Storage/storageAccounts', parameters('StorageAccountName')), '2018-02-01', variables('blobSasFunctionValues')).serviceSasToken)]"
+                        "value": "[concat('https://', reference('StorageTemplate').outputs.storageAccountName.value, '.blob.core.windows.net/seen/seen.config?')]"
                     },
                     "workbookId": {
                         "value": "[variables('workbookId')]"
