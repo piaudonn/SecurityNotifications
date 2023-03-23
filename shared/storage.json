@@ -163,9 +163,13 @@
             "type": "string",
             "value": "[parameters('StorageAccountName')]"
         },
-        "configSASUrl": {
+        "storageUrl": {
             "type": "string",
-            "value": "[concat('https://', parameters('StorageAccountName'), '.blob.core.windows.net/seen/seen.config?', listServiceSas(resourceId('Microsoft.Storage/storageAccounts', parameters('StorageAccountName')), '2018-02-01', variables('blobSasFunctionValues')).serviceSasToken)]"
+            "value": "[concat('https://', parameters('StorageAccountName'), '.blob.core.windows.net']"
+        },
+        "storageSas": {
+            "type": "string",
+            "value": "[concat('?', listServiceSas(resourceId('Microsoft.Storage/storageAccounts', parameters('StorageAccountName')), '2018-02-01', variables('blobSasFunctionValues')).serviceSasToken)]"
         }
 
     }
