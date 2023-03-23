@@ -242,7 +242,7 @@
                                                 ]
                                             },
                                             "type": "Compose",
-                                            "inputs": "@replace(replace(body('SEEN-Config')['template'],'{UserFirstName}',coalesce(body('AAD_Call')['givenName'],body('AAD_Call')['displayName'])),'{MFAChanges}',body('Create_HTML_Activity_table'))"
+                                            "inputs": "@replace(replace(body('SEEN-Config')['template'],'{UserFirstName}',coalesce(body('AAD_Call')['givenName'],body('AAD_Call')['displayName'])),'{Activities}',body('Create_HTML_Activity_table'))"
                                         },
                                         "SEEN-SendNotification": {
                                             "runAfter": {

@@ -44,14 +44,14 @@
         }
     },
     "variables": {
-        "storageTemplate": "[concat('https://raw.githubusercontent.com/piaudonn/SecurityNotifications/', parameters('DeployFromBranch'), '/shared/storage.json')]",
+        "storageTemplate" : "[concat('https://raw.githubusercontent.com/piaudonn/SecurityNotifications/', parameters('DeployFromBranch'), '/shared/storage.json')]",
         "webConnectionTemplate": "[concat('https://raw.githubusercontent.com/piaudonn/SecurityNotifications/', parameters('DeployFromBranch'), '/shared/webconnections.json')]",
-        "configTemplate": "[concat('https://raw.githubusercontent.com/piaudonn/SecurityNotifications/', parameters('DeployFromBranch'), '/shared/config.json')]",
-        "emailTemplate": "[concat('https://raw.githubusercontent.com/piaudonn/SecurityNotifications/', parameters('DeployFromBranch'), '/shared/emailnotification.json')]",
-        "workbookTemplate": "[concat('https://raw.githubusercontent.com/piaudonn/SecurityNotifications/', parameters('DeployFromBranch'), '/shared/workbook.json')]",
-        "mfaTemplate": "[concat('https://raw.githubusercontent.com/piaudonn/SecurityNotifications/', parameters('DeployFromBranch'), '/modules/MFAMethods/mfamethods.json')]",
-        "tapTemplate": "[concat('https://raw.githubusercontent.com/piaudonn/SecurityNotifications/', parameters('DeployFromBranch'), '/modules/TAP/tap.json')]",
-        "workbookId": "7bea244d-869b-45a8-996a-2472c0d7bc5f",
+        "configTemplate" : "[concat('https://raw.githubusercontent.com/piaudonn/SecurityNotifications/', parameters('DeployFromBranch'), '/shared/config.json')]",
+        "emailTemplate" : "[concat('https://raw.githubusercontent.com/piaudonn/SecurityNotifications/', parameters('DeployFromBranch'), '/shared/emailnotification.json')]",
+        "workbookTemplate" : "[concat('https://raw.githubusercontent.com/piaudonn/SecurityNotifications/', parameters('DeployFromBranch'), '/shared/workbook.json')]",
+        "mfaTemplate" : "[concat('https://raw.githubusercontent.com/piaudonn/SecurityNotifications/', parameters('DeployFromBranch'), '/modules/MFAMethods/mfamethods.json')]",
+        "tapTemplate" : "[concat('https://raw.githubusercontent.com/piaudonn/SecurityNotifications/', parameters('DeployFromBranch'), '/modules/TAP/tap.json')]",
+        "workbookId" : "7bea244d-869b-45a8-996a-2472c0d7bc5f",
         "workbookType": "workbook"
     },
     "resources": [
@@ -240,8 +240,11 @@
                     "workbookSourceId": {
                         "value": "[parameters('LogAnalyticsResourceId')]"
                     },
-                    "configSASUrl": {
-                        "value": "[reference('StorageTemplate').outputs.configSASUrl.value]"
+                    "storageUrl": {
+                        "value": "[reference('StorageTemplate').outputs.storageUrl.value]"
+                    },
+                    "storageSas": {
+                        "value": "[reference('StorageTemplate').outputs.storageSas.value]"
                     },
                     "workbookId": {
                         "value": "[variables('workbookId')]"
