@@ -58,6 +58,14 @@
                         "WorkspaceId": {
                             "defaultValue": "[parameters('LogAnalyticsWorkspaceId')]",
                             "type": "String"
+                        },
+                        "ProjectName": {
+                            "defaultValue": "[parameters('ProjectName')]",
+                            "type": "String"
+                        },
+                        "ModuleVersion": {
+                            "defaultValue": "[parameters('ModuleVersion')]",
+                            "type": "String"
                         }
                     },
                     "triggers": {
@@ -135,9 +143,6 @@
                                     },
                                     "type": "Terminate",
                                     "inputs": {
-                                        "runError": {
-                                            "message": "@{outputs('AAD_Debug')}"
-                                        },
                                         "runStatus": "@{result('Notification')[0]['status']}"
                                     }
                                 },
