@@ -165,7 +165,7 @@
         },
         "storageUrl": {
             "type": "string",
-            "value": "[concat('https://', parameters('StorageAccountName'), '.blob.core.windows.net']"
+            "value": "[concat('https://', parameters('StorageAccountName'), '.blob.core.windows.net')]"
         },
         "storageSas": {
             "type": "string",
