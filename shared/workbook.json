@@ -1116,7 +1116,12 @@
             "content": {
               "json": "## Email templates\r\n\r\nHere are the possible key words:\r\n\r\n|Word|Replaced by|\r\n|---|---|\r\n|`{ Header }`|In the module emails, is replaced by the HTML header| \r\n|`{ Footer }`|In the module emails, is replaced by the HTML footer| \r\n|`{ UserFirstName }`|Is replaced by the first non null values: user's firstname or user's display name|\r\n|`{ SupportEmail }`|Is replaced by the support email from the configuration file| \r\n|`{ SupportPhoneNumber }`|Is replaced by the support phone number from the configuration file| \r\n|`{ Activities }`|The detected activities in an HTML table|  "
             },
-            "name": "text - 15"
+            "conditionalVisibility": {
+              "parameterName": "VisibleTab",
+              "comparison": "isEqualTo",
+              "value": "templates"
+            },
+            "name": "TemplateTitle"
           },
           {
             "type": 9,

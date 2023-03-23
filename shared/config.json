@@ -422,7 +422,7 @@
                                             "type": "Compose",
                                             "inputs": "@triggerBody()?['config']"
                                         },
-                                        "Terminate": {
+                                        "Terminate_Update_Config": {
                                             "runAfter": {
                                                 "Update_Config": [
                                                     "Succeeded"
@@ -462,7 +462,7 @@
                                 "Templates_Update_Case": {
                                     "case": "templates",
                                     "actions": {
-                                        "Terminate_2": {
+                                        "Terminate_Update_Template": {
                                             "runAfter": {
                                                 "Update_Footer_Template": [
                                                     "Succeeded"
