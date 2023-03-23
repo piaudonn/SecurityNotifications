@@ -35,7 +35,16 @@
                 "definition": {
                     "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
                     "contentVersion": "1.0.0.0",
-                    "parameters": {},
+                    "parameters": {
+                        "ProjectName": {
+                            "defaultValue": "SEEN",
+                            "type": "String"
+                        },
+                        "ModuleVersion": {
+                            "defaultValue": "1.0",
+                            "type": "String"
+                        }
+                    },
                     "triggers": {
                         "manual": {
                             "type": "Request",
