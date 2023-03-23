@@ -240,8 +240,11 @@
                     "workbookSourceId": {
                         "value": "[parameters('LogAnalyticsResourceId')]"
                     },
-                    "configSASUrl": {
-                        "value": "[reference('StorageTemplate').outputs.configSASUrl.value]"
+                    "storageUrl": {
+                        "value": "[reference('StorageTemplate').outputs.storageUrl.value]"
+                    },
+                    "confistorageUrl": {
+                        "value": "[reference('StorageTemplate').outputs.storageSas.value]"
                     },
                     "workbookId": {
                         "value": "[variables('workbookId')]"
