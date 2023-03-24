@@ -10,5 +10,5 @@ This folder contains the ARM templates for shared components. Shared components 
 |`webconnections.json`|The connection API object to manage managed identity access to the storage account|
 |`workbook.json`|The workbook to configure the solution and monitor it|
 
-Please refer to the [documentation](readme.md) for details.
+Please refer to the [documentation](/docs/readme.md) for details.
 
