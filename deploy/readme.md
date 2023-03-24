@@ -87,7 +87,7 @@ Add-DistributionGroupMember -Identity "Seen-Notifications@contoso.com" -Member "
 
 New-ApplicationAccessPolicy `
     -AppId 4f0c7083-49f1-43fc-bae4-8f3dd788fefa `
-    -PolicyScopeGroupId seen@piesec.onmicrosoft.com `
+    -PolicyScopeGroupId Seen-Notifications@contoso.com `
     -AccessRight RestrictAccess `
     -Description "Restrict SEEN managed identity"
 ```
