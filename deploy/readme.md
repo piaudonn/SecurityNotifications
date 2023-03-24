@@ -75,13 +75,21 @@ At the end of the script execution, you are given a hyper link to the workbook t
 By default, all the modules are disabled. It means that the end users will not receive emails yet. You must use the workbook to customize and enable the modules.
 
 In the **SEEN-Manage and monitor** workbook, make sure you are in the **Configuration** tab and scroll until you see the **SEEN Configuration** section:
+
+<img width="418" alt="image" src="https://user-images.githubusercontent.com/22434561/227535554-6fd33505-147b-4372-bc40-dd8e8ce7e11d.png">
+
 - Replace the **Mail From** value with the email address of the account from which you want to send notifications
 - Replace the **Test Email** value with the email address to who you want to send the notification when the solution runs in **Test Mode**.
 - Leave the modules in **Test Mode**. All emails will be sent to the TestEmail you specified instead of the end-user.
 
+<img width="74" alt="image" src="https://user-images.githubusercontent.com/22434561/227535697-6c5875d6-d153-4eb6-b7c7-49ddcd9f9112.png">
+
 Validate the configuration by clicking the **Save the configuration** button and confirming.
 
 Then in the list of Logic App at the top of the workbook, start the two modules which are disabled by default. Note that it takes few seconds for the modules to start. You can refresh the module until you confirmed the modules are started.
+
+<img width="361" alt="image" src="https://user-images.githubusercontent.com/22434561/227535860-61eb56b0-d5f2-4d6a-bffb-a006beea80f0.png">
+
 
 👏 **The solution is now running in test mode.**
 
