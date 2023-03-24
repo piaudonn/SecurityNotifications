@@ -1,25 +1,17 @@
-## SEcurity End-user Notification (SEEN) 👀
+## 👀 Security End-user Notification (SEEN) 
 
-### Project description
+### ❓ What is **SEEN**?
 
-Consumer identity platforms are notifying their users when their password has changed, a suspicious logon is detected, or a new MFA method was added. It is also a common practice in the insurance and financial industries. Yet, our enterprise solution Azure AD does not have these capabilities.
+**SEEN** allows you to send automatic email notifications to end-users when specific security events are detected on their Azure AD accounts. Events such as:
+- a Multi Factor Authentication method was added, updated or removed
+- a Temporary Access Pass ([TAP]()) was created or used
 
-This project is leveraging a combination of Logic Apps to enable customers to quickly set up those notifications using ready to go (and customizable) email templates. 
+**SEEN** let you customize the emails sent to inform the users of these events and encourage them to reach out to your security team or support. 
 
-These notifications encourage end-users to contact their support if the action which was detected does not seem to be legitimate. This will help supports and security operations in their investigations and security decisions. 
+**SEEN** is leveraging a combination of Logic Apps to automate the detection of the security events and the notification to end users with many customizable options. **SEEN** read the Azure AD sign-in logs and audit logs from a Log Analytics workspace (`SigninLogs` and `AuditLogs` tables). 
 
-### Supported scenarios
-
-Here is the list of activities which SEEN can use to trigger end-user notifications:
-- Multi Factor Authentication methods updates
-- Temporary Access Pass creations and usage
-
-Scenarios are implemented through modules (Logic Apps with a Recurrence trigger).
-
-The operators of the solution can customize the email templates that will be used to notify users per scenario.
-
-### Deployment
+### ⚙️ Deployment
 
 The full solution is available for deployment in the [Deployment](/deploy/) section and additional documentation can be found in [Docs](/docs/).
 
-If you have any questions about this project or would like to provide suggestions to the SEEN project maintainers please open an [issue](https://github.com/piaudonn/SecurityNotifications/issues/new/choose).
+If you have any questions about this project or would like to provide suggestions to the **SEEN** project maintainers please open an [issue](https://github.com/piaudonn/SecurityNotifications/issues/new/choose).

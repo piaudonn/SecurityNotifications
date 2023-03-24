@@ -31,7 +31,7 @@
             "type": "String"
         },
         "ModuleVersion": {
-            "defaultValue": "0.1",
+            "defaultValue": "1.0",
             "type": "String"
         }
     },
