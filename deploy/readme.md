@@ -31,7 +31,7 @@ To run the script, you will need the following permissions:
 - Azure AD Global Administrator or an Azure AD Privileged Role Administrator to set permission for the managed indei
 - Resource Group Owner or User Access Administrator on the resource groups hosting the logic app and the storage account to execute the Set-RBACPermissions function
 
-You can downlaod the script [here](https://raw.githubusercontent.com/piaudonn/SecurityNotifications/main/deploy/setup.ps1).
+You can download the script [here](https://raw.githubusercontent.com/piaudonn/SecurityNotifications/main/deploy/setup.ps1).
 To run the script you will to provide the following parameters:
 
 - `TenantId` the Azure AD tenant ID of your environment
