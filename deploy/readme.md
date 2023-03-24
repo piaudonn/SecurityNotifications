@@ -21,7 +21,7 @@ If that's currently not the case, refer to the following documentation to set it
 To deploy the ARM template you will need to be a contributor on the targeted resource group. The deployment will create the following resource types:
 
 <img width="11" alt="image" src=https://user-images.githubusercontent.com/22434561/224331040-c33e21ed-dbe7-4399-900b-907d7dc339df.png> Logic apps   
-<img width="11" alt="image" src=https://user-images.githubusercontent.com/22434561/224331040-c33e21ed-dbe7-4399-900b-907d7dc339df.png> Azure Monitor workbook   
+<img width="11" alt="image" src="https://user-images.githubusercontent.com/22434561/227536235-629f4e81-9b8d-46e4-bd91-10b3e6861146.png"> Azure Monitor workbook   
 <img width="11" alt="image" src=https://user-images.githubusercontent.com/22434561/224331104-e95a32cf-34ee-40e7-b7ed-e026bfbbf105.png> API connections   
 <img width="11" alt="image" src=https://user-images.githubusercontent.com/22434561/224331172-5c9c68c0-7ff4-41d9-92a9-d60129808f24.png> Storage account
 
