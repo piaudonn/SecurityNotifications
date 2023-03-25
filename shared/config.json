@@ -17,6 +17,14 @@
         "StorageAccountName": {
             "defaultValue": "",
             "type": "String"
+        },
+        "ProjectName": {
+            "defaultValue": "SEEN",
+            "type": "String"
+        },
+        "ModuleVersion": {
+            "defaultValue": "1.0",
+            "type": "String"
         }
     },
     "variables": {},
@@ -44,12 +52,12 @@
                             "defaultValue": {},
                             "type": "Object"
                         },
-                        "ModuleVersion": {
-                            "defaultValue": "1.0",
+                        "ProjectName": {
+                            "defaultValue": "[parameters('ProjectName')]",
                             "type": "String"
                         },
-                        "ProjectName": {
-                            "defaultValue": "SEEN",
+                        "ModuleVersion": {
+                            "defaultValue": "[parameters('ModuleVersion')]",
                             "type": "String"
                         }
                     },

@@ -1,9 +1,11 @@
 {
-  "configFile":"1",
+  "configFile":"1.1",
   "emailLA":"1.0",
   "configLA":"1.0",
+  "testLA":"1.0",
   "modules" : {
     "mfa":"1.0",
-    "tap":"1.0"
+    "tap":"1.0",
+    "travel":"1.0"
   }
 }

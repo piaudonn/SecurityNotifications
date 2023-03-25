@@ -17,6 +17,7 @@ param(
     $ConfigLogicAppName = "SEEN-Config",
     $SendEmailLogicAppName = "SEEN-SendEmail",
     $MFAMethodsLogicAppName = "SEEN-MFAMethods",
+    $TravelLogicAppName = "SEEN-Travel",
     $TAPLogicAppName = "SEEN-TemporaryAccessPass"
 )
 
@@ -111,6 +112,11 @@ Set-RBACPermissions -MSIName $MFAMethodsLogicAppName -Role "Log Analytics Reader
 Set-APIPermissions -MSIName $TAPLogicAppName -AppId "00000003-0000-0000-c000-000000000000" -PermissionName "User.Read.All"
 Set-RBACPermissions -MSIName $TAPLogicAppName -Role "Storage Table Data Contributor" -ResourceGroup $StorageAccountResourceGroupName
 Set-RBACPermissions -MSIName $TAPLogicAppName -Role "Log Analytics Reader" -ResourceGroup $WorkspaceResourceGroupName
+
+#TAP Logic APp
+Set-APIPermissions -MSIName $TravelLogicAppName -AppId "00000003-0000-0000-c000-000000000000" -PermissionName "User.Read.All"
+Set-RBACPermissions -MSIName $TravelLogicAppName -Role "Storage Table Data Contributor" -ResourceGroup $StorageAccountResourceGroupName
+Set-RBACPermissions -MSIName $TravelLogicAppName -Role "Log Analytics Reader" -ResourceGroup $WorkspaceResourceGroupName
 #endregion
 
 #region Config LA in setup mode

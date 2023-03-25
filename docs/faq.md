@@ -21,3 +21,7 @@ New-ApplicationAccessPolicy `
     -AccessRight RestrictAccess `
     -Description "Restrict SEEN managed identity"
 ```
+
+## Detecting atypical travels
+
+This notification relies on having Azure AD Identity Protection with Azure AD Premium P2 licences. If you enabled this module but do not have this level of license, the module will not trigger an notification.

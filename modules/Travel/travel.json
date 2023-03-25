@@ -1,0 +1,354 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "PlaybookName": {
+            "defaultValue": "SEEN-Travel",
+            "type": "String"
+        },
+        "ConfigResourceId": {
+            "defaultValue": "",
+            "type": "String"
+        },
+        "EmailNotificationResourceId": {
+            "defaultValue": "",
+            "type": "String"
+        },
+        "TablesConnectionResourceId": {
+            "defaultValue": "",
+            "type": "String"
+        },
+        "StorageAccountName": {
+            "defaultValue": "",
+            "type": "String"
+        },
+        "LogAnalyticsWorkspaceId": {
+            "defaultValue": "",
+            "type": "String"
+        },
+        "ProjectName": {
+            "defaultValue": "SEEN",
+            "type": "String"
+        },
+        "ModuleVersion": {
+            "defaultValue": "1.0",
+            "type": "String"
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.Logic/workflows",
+            "apiVersion": "2017-07-01",
+            "name": "[parameters('PlaybookName')]",
+            "location": "[resourceGroup().location]",
+            "identity": {
+                "type": "SystemAssigned"
+            },
+            "properties": {
+                "state": "Disabled",
+                "definition": {
+                    "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+                    "contentVersion": "1.0.0.0",
+                    "parameters": {
+                        "$connections": {
+                            "defaultValue": {},
+                            "type": "Object"
+                        },
+                        "WorkspaceId": {
+                            "defaultValue": "[parameters('LogAnalyticsWorkspaceId')]",
+                            "type": "String"
+                        },
+                        "ProjectName": {
+                            "defaultValue": "[parameters('ProjectName')]",
+                            "type": "String"
+                        },
+                        "ModuleVersion": {
+                            "defaultValue": "[parameters('ModuleVersion')]",
+                            "type": "String"
+                        }
+                    },
+                    "triggers": {
+                        "Recurrence": {
+                            "recurrence": {
+                                "frequency": "Minute",
+                                "interval": 15
+                            },
+                            "evaluatedRecurrence": {
+                                "frequency": "Minute",
+                                "interval": 15
+                            },
+                            "type": "Recurrence"
+                        }
+                    },
+                    "actions": {
+                        "Config": {
+                            "actions": {
+                                "Current_time": {
+                                    "runAfter": {},
+                                    "type": "Expression",
+                                    "kind": "CurrentTime",
+                                    "inputs": {}
+                                },
+                                "Get_entity_Tracker": {
+                                    "runAfter": {
+                                        "Current_time": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "type": "ApiConnection",
+                                    "inputs": {
+                                        "host": {
+                                            "connection": {
+                                                "name": "@parameters('$connections')['azuretables']['connectionId']"
+                                            }
+                                        },
+                                        "method": "get",
+                                        "path": "[concat('/v2/storageAccounts/@{encodeURIComponent(encodeURIComponent(''', parameters('StorageAccountName'), '''))}/tables/@{encodeURIComponent(''trackers'')}/entities(PartitionKey=''@{encodeURIComponent(''seen'')}'',RowKey=''@{encodeURIComponent(''Travel'')}'')')]",
+                                        "queries": {
+                                            "$select": "Tracker"
+                                        }
+                                    }
+                                },
+                                "SEEN-Config": {
+                                    "runAfter": {
+                                        "Current_time": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "type": "Workflow",
+                                    "inputs": {
+                                        "body": {
+                                            "module": "travel"
+                                        },
+                                        "host": {
+                                            "triggerName": "manual",
+                                            "workflow": {
+                                                "id": "[parameters('ConfigResourceId')]"
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            "runAfter": {},
+                            "type": "Scope"
+                        },
+                        "Exit": {
+                            "actions": {
+                                "Terminate": {
+                                    "runAfter": {
+                                        "Update_Entity_Tracker": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "type": "Terminate",
+                                    "inputs": {
+                                        "runStatus": "@{result('Notification')[0]['status']}"
+                                    }
+                                },
+                                "Update_Entity_Tracker": {
+                                    "runAfter": {},
+                                    "type": "ApiConnection",
+                                    "inputs": {
+                                        "body": {
+                                            "Tracker": "@{body('Current_time')}"
+                                        },
+                                        "host": {
+                                            "connection": {
+                                                "name": "@parameters('$connections')['azuretables']['connectionId']"
+                                            }
+                                        },
+                                        "method": "put",
+                                        "path": "[concat('/v2/storageAccounts/@{encodeURIComponent(encodeURIComponent(''', parameters('StorageAccountName'), '''))}/tables/@{encodeURIComponent(''trackers'')}/entities(PartitionKey=''@{encodeURIComponent(''seen'')}'',RowKey=''@{encodeURIComponent(''Travel'')}'')')]"
+                                    }
+                                }
+                            },
+                            "runAfter": {
+                                "Notification": [
+                                    "Succeeded",
+                                    "Failed"
+                                ]
+                            },
+                            "type": "Scope"
+                        },
+                        "Notification": {
+                            "actions": {
+                                "For_each_record": {
+                                    "foreach": "@body('Log_Analytics_Call')?['tables']?[0]?['rows']",
+                                    "actions": {
+                                        "AAD_Call": {
+                                            "runAfter": {
+                                                "Debug": [
+                                                    "Succeeded"
+                                                ]
+                                            },
+                                            "type": "Http",
+                                            "inputs": {
+                                                "authentication": {
+                                                    "audience": "https://graph.microsoft.com",
+                                                    "type": "ManagedServiceIdentity"
+                                                },
+                                                "headers": {
+                                                    "ConsistencyLevel": "eventual"
+                                                },
+                                                "method": "GET",
+                                                "uri": "https://graph.microsoft.com/v1.0/users/@{item()[1]}/?$expand=manager($levels=1;$select=mail)"
+                                            }
+                                        },
+                                        "AAD_Debug": {
+                                            "runAfter": {
+                                                "AAD_Call": [
+                                                    "Failed",
+                                                    "Succeeded"
+                                                ]
+                                            },
+                                            "type": "Compose",
+                                            "inputs": "@coalesce(body('AAD_Call')?['error']?['message'], concat('Mail to: ',body('AAD_Call')?['mail']))"
+                                        },
+                                        "Create_HTML_Activity_table": {
+                                            "runAfter": {
+                                                "Debug": [
+                                                    "Succeeded"
+                                                ]
+                                            },
+                                            "type": "Table",
+                                            "inputs": {
+                                                "columns": [
+                                                    {
+                                                        "header": "Time",
+                                                        "value": "@concat('📆 ',item()['TimeGenerated'])"
+                                                    },
+                                                    {
+                                                        "header": "Activity",
+                                                        "value": "@item()['Type']"
+                                                    }
+                                                ],
+                                                "format": "HTML",
+                                                "from": "@json(item()[2])"
+                                            }
+                                        },
+                                        "Debug": {
+                                            "runAfter": {},
+                                            "type": "Compose",
+                                            "inputs": "@item()"
+                                        },
+                                        "Email_Body": {
+                                            "runAfter": {
+                                                "AAD_Call": [
+                                                    "Succeeded"
+                                                ],
+                                                "Create_HTML_Activity_table": [
+                                                    "Succeeded"
+                                                ]
+                                            },
+                                            "type": "Compose",
+                                            "inputs": "@replace(replace(body('SEEN-Config')['template'],'{UserFirstName}',coalesce(body('AAD_Call')['givenName'],body('AAD_Call')['displayName'])),'{Activities}',body('Create_HTML_Activity_table'))"
+                                        },
+                                        "SEEN-SendNotification": {
+                                            "runAfter": {
+                                                "Email_Body": [
+                                                    "Succeeded"
+                                                ]
+                                            },
+                                            "type": "Workflow",
+                                            "inputs": {
+                                                "body": {
+                                                    "bcc": "@{if(equals(body('SEEN-Config')?['recipient'],''),body('SEEN-Config')['bcc'],null)}",
+                                                    "body": "@{outputs('Email_Body')}",
+                                                    "cc": "@{if(equals(body('SEEN-Config')?['recipient'],''),if(equals(body('SEEN-Config')['ccManager'],true),body('AAD_Call')?['manager']?['mail'],null),null)}",
+                                                    "importance": "high",
+                                                    "mailFrom": "@{body('SEEN-Config')['mailFrom']}",
+                                                    "replyTo": "@{body('SEEN-Config')['replyTo']}",
+                                                    "saveToSentItems": "@body('SEEN-Config')['saveToSentItems']",
+                                                    "subject": "@{body('SEEN-Config')['subject']}",
+                                                    "to": "@{if(equals(body('SEEN-Config')?['recipient'],''),body('AAD_Call')['mail'],body('SEEN-Config')?['recipient'])}",
+                                                    "tracking": "travel"
+                                                },
+                                                "host": {
+                                                    "triggerName": "manual",
+                                                    "workflow": {
+                                                        "id": "[parameters('EmailNotificationResourceId')]"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "runAfter": {},
+                                    "type": "Foreach"
+                                }
+                            },
+                            "runAfter": {
+                                "Query": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "Scope"
+                        },
+                        "Query": {
+                            "actions": {
+                                "KQL_Query": {
+                                    "runAfter": {},
+                                    "type": "Compose",
+                                    "inputs": "let IncludeUsage = @{body('SEEN-Config')['includeUsage']};\nlet StartTime = todatetime(\"@{body('Get_entity_Tracker')['Tracker']}\") ;\nlet EndTime = todatetime(\"@{body('Current_time')}\") ;\nlet TimeZone = \"@{body('SEEN-Config')['timeZone']}\" ;\nunion (AuditLogs\n| where ingestion_time() between (StartTime..EndTime)\n| where OperationName == \"Admin registered security info\"\n| where ResultDescription == \"Admin registered temporary access pass method for user\"\n| where Result == \"success\"\n| extend UserPrincipalName = tostring(TargetResources[0].userPrincipalName)\n| extend UserId = tostring(TargetResources[0].id)\n| extend Details = bag_pack(\"TimeGenerated\", format_datetime(datetime_utc_to_local(TimeGenerated,TimeZone), 'yyyy-MM-dd HH:mm:ss'), \"Type\", ResultDescription)\n| project UserPrincipalName = tolower(UserPrincipalName), UserId, Details),\n(SigninLogs\n| where IncludeUsage == true \n| where ingestion_time() between (StartTime..EndTime)\n| where ResultType == 0\n| where AuthenticationDetails contains \"Temporary Access Pass\"\n| extend Details = bag_pack(\"TimeGenerated\", format_datetime(datetime_utc_to_local(TimeGenerated,TimeZone), 'yyyy-MM-dd HH:mm:ss'), \"Type\", strcat(\"TAP was used to access \",AppDisplayName))\n| project UserId, UserPrincipalName = tolower(UserPrincipalName), Details )\n| summarize Summary = make_set(Details) by UserPrincipalName, UserId"
+                                },
+                                "Log_Analytics_Call": {
+                                    "runAfter": {
+                                        "KQL_Query": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "type": "Http",
+                                    "inputs": {
+                                        "authentication": {
+                                            "audience": "https://api.loganalytics.io",
+                                            "type": "ManagedServiceIdentity"
+                                        },
+                                        "body": {
+                                            "query": "@{outputs('KQL_Query')}",
+                                            "timespan": "P1D"
+                                        },
+                                        "method": "POST",
+                                        "uri": "https://api.loganalytics.io/v1/workspaces/@{parameters('WorkspaceId')}/query"
+                                    }
+                                }
+                            },
+                            "runAfter": {
+                                "Config": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "Scope"
+                        }
+                    },
+                    "outputs": {}
+                },
+                "parameters": {
+                    "$connections": {
+                        "value": {
+                            "azuretables": {
+                                "connectionId": "[parameters('TablesConnectionResourceId')]",
+                                "connectionName": "azuretables",
+                                "connectionProperties": {
+                                    "authentication": {
+                                        "type": "ManagedServiceIdentity"
+                                    }
+                                },
+                                "id": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/azuretables')]"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    ],
+    "outputs": {
+        "resourceID": {
+            "type": "string",
+            "value": "[resourceId('Microsoft.Logic/workflows', parameters('PlaybookName'))]"
+        },
+        "resourcePrincipalID": {
+            "type": "string",
+            "value": "[reference(resourceId('Microsoft.Logic/workflows', parameters('PlaybookName')), '2017-07-01', 'Full').identity.principalId]"
+        }
+    }
+}
