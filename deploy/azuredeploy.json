@@ -60,7 +60,6 @@
         "mfaTemplate" : "[concat('https://raw.githubusercontent.com/piaudonn/SecurityNotifications/', parameters('DeployFromBranch'), '/modules/MFAMethods/mfamethods.json')]",
         "tapTemplate" : "[concat('https://raw.githubusercontent.com/piaudonn/SecurityNotifications/', parameters('DeployFromBranch'), '/modules/TAP/tap.json')]",
         "travelTemplate" : "[concat('https://raw.githubusercontent.com/piaudonn/SecurityNotifications/', parameters('DeployFromBranch'), '/modules/Travel/travel.json')]",
-        "testTemplate" : "[concat('https://raw.githubusercontent.com/piaudonn/SecurityNotifications/', parameters('DeployFromBranch'), '/shared/testemail.json')]",
         "workbookId" : "7bea244d-869b-45a8-996a-2472c0d7bc5f",
         "workbookType": "workbook"
     },
