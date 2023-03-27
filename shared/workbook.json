@@ -127,7 +127,7 @@
                     "additionalResourceOptions": [],
                     "showDefault": false
                   },
-                  "jsonData": "[\r\n    {\"value\":true,\"label\":\"Yes\",\"selected\":true},\r\n    {\"value\":\"no\",\"label\":\"No\"}\r\n]"
+                  "jsonData": "[[\r\n    {\"value\":true,\"label\":\"Yes\",\"selected\":true},\r\n    {\"value\":\"no\",\"label\":\"No\"}\r\n]"
                 }
               ],
               "style": "pills",
