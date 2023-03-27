@@ -108,7 +108,8 @@
             "type": "Microsoft.Resources/deployments",
             "dependsOn": [
                 "[resourceId('Microsoft.Resources/deployments', 'StorageTemplate')]",
-                "[resourceId('Microsoft.Resources/deployments', 'WebConnectionTemplate')]"
+                "[resourceId('Microsoft.Resources/deployments', 'WebConnectionTemplate')]",
+                "[resourceId('Microsoft.Resources/deployments', 'EmailTemplate')]"
             ],
             "properties": {
                 "mode": "incremental",
@@ -125,6 +126,9 @@
                     },
                     "TablesConnectionResourceID": {
                         "value": "[reference('WebConnectionTemplate').outputs.TableConnectionResourceID.value]"
+                    },
+                    "EmailNotificationResourceId": {
+                        "value": "[reference('EmailTemplate').outputs.resourceID.value]"
                     },
                     "StorageAccountName": {
                         "value": "[reference('StorageTemplate').outputs.storageAccountName.value]"
@@ -231,7 +235,8 @@
             "dependsOn": [
                 "[resourceId('Microsoft.Resources/deployments', 'StorageTemplate')]",
                 "[resourceId('Microsoft.Resources/deployments', 'WebConnectionTemplate')]",
-                "[resourceId('Microsoft.Resources/deployments', 'ConfigTemplate')]"
+                "[resourceId('Microsoft.Resources/deployments', 'ConfigTemplate')]",
+                "[resourceId('Microsoft.Resources/deployments', 'EmailTemplate')]"
             ],
             "properties": {
                 "mode": "incremental",
@@ -260,6 +265,9 @@
                     },
                     "ConfigLAId": {
                         "value": "[reference('ConfigTemplate').outputs.resourceID.value]"
+                    },
+                    "EmailNotificationResourceId": {
+                        "value": "[reference('EmailTemplate').outputs.resourceID.value]"
                     }
                 }
             }

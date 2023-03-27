@@ -50,7 +50,7 @@
         "description": "Resouce id of the Config Logic App"
       }
     },
-    "SendEMailLAId": {
+    "EmailNotificationResourceId": {
       "type": "string",
       "defaultValue": "",
       "metadata": {
@@ -1521,7 +1521,7 @@
                         "icon": "Mail",
                         "linkIsContextBlade": true,
                         "armActionContext": {
-                          "path": "[concat(parameters('SendEMailLAId'), '/triggers/manual/run')]",
+                          "path": "[concat(parameters('EmailNotificationResourceId'), '/triggers/manual/run')]",
                           "headers": [],
                           "params": [
                             {
@@ -1616,7 +1616,7 @@
                         "icon": "Mail",
                         "linkIsContextBlade": true,
                         "armActionContext": {
-                          "path": "[concat(parameters('SendEMailLAId'), '/triggers/manual/run')]",
+                          "path": "[concat(parameters('EmailNotificationResourceId'), '/triggers/manual/run')]",
                           "headers": [],
                           "params": [
                             {
@@ -1716,7 +1716,7 @@
                         "icon": "Mail",
                         "linkIsContextBlade": true,
                         "armActionContext": {
-                          "path": "[concat(parameters('SendEMailLAId'), '/triggers/manual/run')]",
+                          "path": "[concat(parameters('EmailNotificationResourceId'), '/triggers/manual/run')]",
                           "headers": [],
                           "params": [
                             {
@@ -1816,7 +1816,7 @@
                         "icon": "Mail",
                         "linkIsContextBlade": true,
                         "armActionContext": {
-                          "path": "[concat(parameters('SendEMailLAId'), '/triggers/manual/run')]",
+                          "path": "[concat(parameters('EmailNotificationResourceId'), '/triggers/manual/run')]",
                           "headers": [],
                           "params": [
                             {

@@ -25,6 +25,10 @@
         "ModuleVersion": {
             "defaultValue": "1.0",
             "type": "String"
+        },
+        "EmailNotificationResourceId": {
+            "defaultValue": "1.0",
+            "type": "String"
         }
     },
     "variables": {},
@@ -46,53 +50,230 @@
                 },
                 "definition": {
                     "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
-                    "contentVersion": "1.0.0.0",
-                    "parameters": {
-                        "$connections": {
-                            "defaultValue": {},
-                            "type": "Object"
-                        },
-                        "ProjectName": {
-                            "defaultValue": "[parameters('ProjectName')]",
-                            "type": "String"
-                        },
-                        "ModuleVersion": {
-                            "defaultValue": "[parameters('ModuleVersion')]",
-                            "type": "String"
-                        }
-                    },
-                    "triggers": {
-                        "manual": {
-                            "type": "Request",
-                            "kind": "Http",
-                            "inputs": {
-                                "schema": {
-                                    "properties": {
-                                        "config": {
-                                            "type": "object"
-                                        },
-                                        "module": {
-                                            "type": "string"
-                                        },
-                                        "templates": {
-                                            "type": "object"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
                     "actions": {
                         "Config_setup_check": {
                             "actions": {
-                                "Create_config": {
+                                "Copy_old_MFA": {
+                                    "inputs": {
+                                        "headers": {
+                                            "ReadFileMetadataFromServer": true
+                                        },
+                                        "host": {
+                                            "connection": {
+                                                "name": "@parameters('$connections')['azureblob']['connectionId']"
+                                            }
+                                        },
+                                        "method": "post",
+                                        "path": "[concat('/v2/datasets/@{encodeURIComponent(encodeURIComponent(''', parameters('StorageAccountName'), '''))}/copyFile')]",
+                                        "queries": {
+                                            "destination": "/seen/templates/mfa.html.@{body('Current_time')}",
+                                            "overwrite": false,
+                                            "queryParametersSingleEncoded": true,
+                                            "source": "/seen/templates/mfa.html"
+                                        }
+                                    },
                                     "runAfter": {
-                                        "HTTP_Get_Config": [
+                                        "HTTP_Get_MFA": [
                                             "Succeeded"
                                         ]
                                     },
-                                    "type": "ApiConnection",
+                                    "type": "ApiConnection"
+                                },
+                                "Copy_old_TAP": {
+                                    "inputs": {
+                                        "headers": {
+                                            "ReadFileMetadataFromServer": true
+                                        },
+                                        "host": {
+                                            "connection": {
+                                                "name": "@parameters('$connections')['azureblob']['connectionId']"
+                                            }
+                                        },
+                                        "method": "post",
+                                        "path": "[concat('/v2/datasets/@{encodeURIComponent(encodeURIComponent(''', parameters('StorageAccountName'), '''))}/copyFile')]",
+                                        "queries": {
+                                            "destination": "/seen/templates/tap.html.@{body('Current_time')}",
+                                            "overwrite": false,
+                                            "queryParametersSingleEncoded": true,
+                                            "source": "/seen/templates/tap.html"
+                                        }
+                                    },
+                                    "runAfter": {
+                                        "HTTP_Get_TAP": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "type": "ApiConnection"
+                                },
+                                "Copy_old_Travel": {
+                                    "inputs": {
+                                        "headers": {
+                                            "ReadFileMetadataFromServer": true
+                                        },
+                                        "host": {
+                                            "connection": {
+                                                "name": "@parameters('$connections')['azureblob']['connectionId']"
+                                            }
+                                        },
+                                        "method": "post",
+                                        "path": "[concat('/v2/datasets/@{encodeURIComponent(encodeURIComponent(''', parameters('StorageAccountName'), '''))}/copyFile')]",
+                                        "queries": {
+                                            "destination": "/seen/templates/tap.html.@{body('Current_time')}",
+                                            "overwrite": false,
+                                            "queryParametersSingleEncoded": true,
+                                            "source": "/seen/templates/travel.html"
+                                        }
+                                    },
+                                    "runAfter": {
+                                        "HTTP_Get_Travel": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "type": "ApiConnection"
+                                },
+                                "Copy_old_Version": {
+                                    "inputs": {
+                                        "headers": {
+                                            "ReadFileMetadataFromServer": true
+                                        },
+                                        "host": {
+                                            "connection": {
+                                                "name": "@parameters('$connections')['azureblob']['connectionId']"
+                                            }
+                                        },
+                                        "method": "post",
+                                        "path": "[concat('/v2/datasets/@{encodeURIComponent(encodeURIComponent(''', parameters('StorageAccountName'), '''))}/copyFile')]",
+                                        "queries": {
+                                            "destination": "/seen/templates/version.html.@{body('Current_time')}",
+                                            "overwrite": false,
+                                            "queryParametersSingleEncoded": true,
+                                            "source": "/seen/templates/version.html"
+                                        }
+                                    },
+                                    "runAfter": {
+                                        "HTTP_Get_Version": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "type": "ApiConnection"
+                                },
+                                "Copy_old_footer_": {
+                                    "inputs": {
+                                        "headers": {
+                                            "ReadFileMetadataFromServer": true
+                                        },
+                                        "host": {
+                                            "connection": {
+                                                "name": "@parameters('$connections')['azureblob']['connectionId']"
+                                            }
+                                        },
+                                        "method": "post",
+                                        "path": "[concat('/v2/datasets/@{encodeURIComponent(encodeURIComponent(''', parameters('StorageAccountName'), '''))}/copyFile')]",
+                                        "queries": {
+                                            "destination": "/seen/templates/footer.html.@{body('Current_time')}",
+                                            "overwrite": true,
+                                            "queryParametersSingleEncoded": true,
+                                            "source": "/seen/templates/footer.html"
+                                        }
+                                    },
+                                    "runAfter": {
+                                        "HTTP_Get_Footer": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "type": "ApiConnection"
+                                },
+                                "Copy_old_header": {
+                                    "inputs": {
+                                        "headers": {
+                                            "ReadFileMetadataFromServer": true
+                                        },
+                                        "host": {
+                                            "connection": {
+                                                "name": "@parameters('$connections')['azureblob']['connectionId']"
+                                            }
+                                        },
+                                        "method": "post",
+                                        "path": "[concat('/v2/datasets/@{encodeURIComponent(encodeURIComponent(''', parameters('StorageAccountName'), '''))}/copyFile')]",
+                                        "queries": {
+                                            "destination": "/seen/templates/header.html.@{body('Current_time')}",
+                                            "overwrite": false,
+                                            "queryParametersSingleEncoded": true,
+                                            "source": "/seen/templates/header.html"
+                                        }
+                                    },
+                                    "runAfter": {
+                                        "HTTP_Get_Header": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "type": "ApiConnection"
+                                },
+                                "Create_Travel_template": {
+                                    "inputs": {
+                                        "body": "@body('HTTP_Get_Travel')",
+                                        "headers": {
+                                            "ReadFileMetadataFromServer": true
+                                        },
+                                        "host": {
+                                            "connection": {
+                                                "name": "@parameters('$connections')['azureblob']['connectionId']"
+                                            }
+                                        },
+                                        "method": "post",
+                                        "path": "[concat('/v2/datasets/@{encodeURIComponent(encodeURIComponent(''', parameters('StorageAccountName'), '''))}/files')]",
+                                        "queries": {
+                                            "folderPath": "/seen/templates/",
+                                            "name": "travel.html",
+                                            "queryParametersSingleEncoded": true
+                                        }
+                                    },
+                                    "runAfter": {
+                                        "Copy_old_Travel": [
+                                            "Succeeded",
+                                            "Failed"
+                                        ]
+                                    },
+                                    "runtimeConfiguration": {
+                                        "contentTransfer": {
+                                            "transferMode": "Chunked"
+                                        }
+                                    },
+                                    "type": "ApiConnection"
+                                },
+                                "Create_Version_template": {
+                                    "inputs": {
+                                        "body": "@body('HTTP_Get_Version')",
+                                        "headers": {
+                                            "ReadFileMetadataFromServer": true
+                                        },
+                                        "host": {
+                                            "connection": {
+                                                "name": "@parameters('$connections')['azureblob']['connectionId']"
+                                            }
+                                        },
+                                        "method": "post",
+                                        "path": "[concat('/v2/datasets/@{encodeURIComponent(encodeURIComponent(''', parameters('StorageAccountName'), '''))}/files')]",
+                                        "queries": {
+                                            "folderPath": "/seen/templates/",
+                                            "name": "version.html",
+                                            "queryParametersSingleEncoded": true
+                                        }
+                                    },
+                                    "runAfter": {
+                                        "Copy_old_Version": [
+                                            "Succeeded",
+                                            "Failed"
+                                        ]
+                                    },
+                                    "runtimeConfiguration": {
+                                        "contentTransfer": {
+                                            "transferMode": "Chunked"
+                                        }
+                                    },
+                                    "type": "ApiConnection"
+                                },
+                                "Create_config": {
                                     "inputs": {
                                         "body": "@json(body('HTTP_Get_Config'))",
                                         "headers": {
@@ -111,19 +292,20 @@
                                             "queryParametersSingleEncoded": true
                                         }
                                     },
+                                    "runAfter": {
+                                        "Save_old_config": [
+                                            "Succeeded",
+                                            "Failed"
+                                        ]
+                                    },
                                     "runtimeConfiguration": {
                                         "contentTransfer": {
                                             "transferMode": "Chunked"
                                         }
-                                    }
+                                    },
+                                    "type": "ApiConnection"
                                 },
                                 "Create_footer": {
-                                    "runAfter": {
-                                        "HTTP_Get_Footer": [
-                                            "Succeeded"
-                                        ]
-                                    },
-                                    "type": "ApiConnection",
                                     "inputs": {
                                         "body": "@body('HTTP_Get_Footer')",
                                         "headers": {
@@ -142,19 +324,20 @@
                                             "queryParametersSingleEncoded": true
                                         }
                                     },
+                                    "runAfter": {
+                                        "Copy_old_footer_": [
+                                            "Succeeded",
+                                            "Failed"
+                                        ]
+                                    },
                                     "runtimeConfiguration": {
                                         "contentTransfer": {
                                             "transferMode": "Chunked"
                                         }
-                                    }
+                                    },
+                                    "type": "ApiConnection"
                                 },
                                 "Create_header": {
-                                    "runAfter": {
-                                        "HTTP_Get_Header": [
-                                            "Succeeded"
-                                        ]
-                                    },
-                                    "type": "ApiConnection",
                                     "inputs": {
                                         "body": "@body('HTTP_Get_Header')",
                                         "headers": {
@@ -173,19 +356,20 @@
                                             "queryParametersSingleEncoded": true
                                         }
                                     },
+                                    "runAfter": {
+                                        "Copy_old_header": [
+                                            "Succeeded",
+                                            "Failed"
+                                        ]
+                                    },
                                     "runtimeConfiguration": {
                                         "contentTransfer": {
                                             "transferMode": "Chunked"
                                         }
-                                    }
+                                    },
+                                    "type": "ApiConnection"
                                 },
                                 "Create_mfa_template": {
-                                    "runAfter": {
-                                        "HTTP_Get_MFA": [
-                                            "Succeeded"
-                                        ]
-                                    },
-                                    "type": "ApiConnection",
                                     "inputs": {
                                         "body": "@body('HTTP_Get_MFA')",
                                         "headers": {
@@ -204,19 +388,20 @@
                                             "queryParametersSingleEncoded": true
                                         }
                                     },
+                                    "runAfter": {
+                                        "Copy_old_MFA": [
+                                            "Succeeded",
+                                            "Failed"
+                                        ]
+                                    },
                                     "runtimeConfiguration": {
                                         "contentTransfer": {
                                             "transferMode": "Chunked"
                                         }
-                                    }
+                                    },
+                                    "type": "ApiConnection"
                                 },
                                 "Create_tap_template": {
-                                    "runAfter": {
-                                        "HTTP_Get_TAP": [
-                                            "Succeeded"
-                                        ]
-                                    },
-                                    "type": "ApiConnection",
                                     "inputs": {
                                         "body": "@body('HTTP_Get_TAP')",
                                         "headers": {
@@ -235,92 +420,118 @@
                                             "queryParametersSingleEncoded": true
                                         }
                                     },
+                                    "runAfter": {
+                                        "Copy_old_TAP": [
+                                            "Succeeded",
+                                            "Failed"
+                                        ]
+                                    },
                                     "runtimeConfiguration": {
                                         "contentTransfer": {
                                             "transferMode": "Chunked"
                                         }
-                                    }
+                                    },
+                                    "type": "ApiConnection"
                                 },
                                 "Current_time": {
+                                    "inputs": {},
+                                    "kind": "CurrentTime",
                                     "runAfter": {
                                         "Setup_Debug": [
                                             "Succeeded"
                                         ]
                                     },
-                                    "type": "Expression",
-                                    "kind": "CurrentTime",
-                                    "inputs": {}
+                                    "type": "Expression"
                                 },
                                 "HTTP_Get_Config": {
-                                    "runAfter": {
-                                        "Setup_Debug": [
-                                            "Succeeded"
-                                        ]
-                                    },
-                                    "type": "Http",
                                     "inputs": {
                                         "headers": {
-                                            "Content-Type": "application/json"
+                                            "Content-Type": "application/json",
+                                            "Pragma": "no-cache"
                                         },
                                         "method": "GET",
                                         "uri": "https://raw.githubusercontent.com/piaudonn/SecurityNotifications/main/config/seen.config"
-                                    }
-                                },
-                                "HTTP_Get_Footer": {
-                                    "runAfter": {
-                                        "Setup_Debug": [
-                                            "Succeeded"
-                                        ]
                                     },
-                                    "type": "Http",
-                                    "inputs": {
-                                        "method": "GET",
-                                        "uri": "https://raw.githubusercontent.com/piaudonn/SecurityNotifications/main/config/templates/footer.html"
-                                    }
-                                },
-                                "HTTP_Get_Header": {
-                                    "runAfter": {
-                                        "Setup_Debug": [
-                                            "Succeeded"
-                                        ]
-                                    },
-                                    "type": "Http",
-                                    "inputs": {
-                                        "method": "GET",
-                                        "uri": "https://raw.githubusercontent.com/piaudonn/SecurityNotifications/main/config/templates/header.html"
-                                    }
-                                },
-                                "HTTP_Get_MFA": {
-                                    "runAfter": {
-                                        "Setup_Debug": [
-                                            "Succeeded"
-                                        ]
-                                    },
-                                    "type": "Http",
-                                    "inputs": {
-                                        "method": "GET",
-                                        "uri": "https://raw.githubusercontent.com/piaudonn/SecurityNotifications/main/config/templates/mfa.html"
-                                    }
-                                },
-                                "HTTP_Get_TAP": {
-                                    "runAfter": {
-                                        "Setup_Debug": [
-                                            "Succeeded"
-                                        ]
-                                    },
-                                    "type": "Http",
-                                    "inputs": {
-                                        "method": "GET",
-                                        "uri": "https://raw.githubusercontent.com/piaudonn/SecurityNotifications/main/config/templates/tap.html"
-                                    }
-                                },
-                                "Insert_MFAMethods_tracker": {
                                     "runAfter": {
                                         "Current_time": [
                                             "Succeeded"
                                         ]
                                     },
-                                    "type": "ApiConnection",
+                                    "type": "Http"
+                                },
+                                "HTTP_Get_Footer": {
+                                    "inputs": {
+                                        "method": "GET",
+                                        "uri": "https://raw.githubusercontent.com/piaudonn/SecurityNotifications/main/config/templates/footer.html"
+                                    },
+                                    "runAfter": {
+                                        "Current_time": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "type": "Http"
+                                },
+                                "HTTP_Get_Header": {
+                                    "inputs": {
+                                        "method": "GET",
+                                        "uri": "https://raw.githubusercontent.com/piaudonn/SecurityNotifications/main/config/templates/header.html"
+                                    },
+                                    "runAfter": {
+                                        "Current_time": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "type": "Http"
+                                },
+                                "HTTP_Get_MFA": {
+                                    "inputs": {
+                                        "method": "GET",
+                                        "uri": "https://raw.githubusercontent.com/piaudonn/SecurityNotifications/main/config/templates/mfa.html"
+                                    },
+                                    "runAfter": {
+                                        "Current_time": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "type": "Http"
+                                },
+                                "HTTP_Get_TAP": {
+                                    "inputs": {
+                                        "method": "GET",
+                                        "uri": "https://raw.githubusercontent.com/piaudonn/SecurityNotifications/main/config/templates/tap.html"
+                                    },
+                                    "runAfter": {
+                                        "Current_time": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "type": "Http"
+                                },
+                                "HTTP_Get_Travel": {
+                                    "inputs": {
+                                        "method": "GET",
+                                        "uri": "https://raw.githubusercontent.com/piaudonn/SecurityNotifications/main/config/templates/travel.html"
+                                    },
+                                    "runAfter": {
+                                        "Current_time": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "type": "Http"
+                                },
+                                "HTTP_Get_Version": {
+                                    "inputs": {
+                                        "method": "GET",
+                                        "uri": "https://raw.githubusercontent.com/piaudonn/SecurityNotifications/main/config/templates/version.html"
+                                    },
+                                    "runAfter": {
+                                        "Current_time": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "type": "Http"
+                                },
+                                "Insert_MFAMethods_tracker": {
                                     "inputs": {
                                         "body": {
                                             "Tracker": "@{body('Current_time')}"
@@ -332,15 +543,15 @@
                                         },
                                         "method": "put",
                                         "path": "[concat('/v2/storageAccounts/@{encodeURIComponent(encodeURIComponent(''', parameters('StorageAccountName'), '''))}/tables/@{encodeURIComponent(''trackers'')}/entities(PartitionKey=''@{encodeURIComponent(''seen'')}'',RowKey=''@{encodeURIComponent(''MFAMethods'')}'')')]"
-                                    }
-                                },
-                                "Insert_TAPUsage_tracker": {
+                                    },
                                     "runAfter": {
                                         "Current_time": [
                                             "Succeeded"
                                         ]
                                     },
-                                    "type": "ApiConnection",
+                                    "type": "ApiConnection"
+                                },
+                                "Insert_TAPUsage_tracker": {
                                     "inputs": {
                                         "body": {
                                             "Tracker": "@{body('Current_time')}"
@@ -351,16 +562,99 @@
                                             }
                                         },
                                         "method": "put",
-                                        "path": "[concat('/v2/storageAccounts/@{encodeURIComponent(encodeURIComponent(''', parameters('StorageAccountName'), '''))}/tables/@{encodeURIComponent(''trackers'')}/entities(PartitionKey=''@{encodeURIComponent(''seen'')}'',RowKey=''@{encodeURIComponent(''TAPUsage'')}'')')]"
-                                    }
+                                        "path": "[concat('/v2/storageAccounts/@{encodeURIComponent(encodeURIComponent(''', parameters('StorageAccountName'), '''))}/tables/@{encodeURIComponent(''trackers'')}/entities(PartitionKey=''@{encodeURIComponent(''seen')}'',RowKey=''@{encodeURIComponent(''TAPUsage'')}'')')]"
+                                    },
+                                    "runAfter": {
+                                        "Current_time": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "type": "ApiConnection"
+                                },
+                                "Insert_Travel_tracker": {
+                                    "inputs": {
+                                        "body": {
+                                            "Tracker": "@{body('Current_time')}"
+                                        },
+                                        "host": {
+                                            "connection": {
+                                                "name": "@parameters('$connections')['azuretables']['connectionId']"
+                                            }
+                                        },
+                                        "method": "put",
+                                        "path": "[concat('/v2/storageAccounts/@{encodeURIComponent(encodeURIComponent(''', parameters('StorageAccountName'), '''))}/tables/@{encodeURIComponent(''trackers'')}/entities(PartitionKey=''@{encodeURIComponent(''seen'')}'',RowKey=''@{encodeURIComponent(''Travel'')}'')')]"
+                                    },
+                                    "runAfter": {
+                                        "Current_time": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "type": "ApiConnection"
+                                },
+                                "Insert_Version_tracker": {
+                                    "inputs": {
+                                        "body": {
+                                            "Tracker": "@{body('Current_time')}"
+                                        },
+                                        "host": {
+                                            "connection": {
+                                                "name": "@parameters('$connections')['azuretables']['connectionId']"
+                                            }
+                                        },
+                                        "method": "patch",
+                                        "path": "[concat('/v2/storageAccounts/@{encodeURIComponent(encodeURIComponent(''', parameters('StorageAccountName'), '''))}/tables/@{encodeURIComponent(''trackers'')}/entities(PartitionKey=''@{encodeURIComponent(''seen'')}'',RowKey=''@{encodeURIComponent(''Version'')}'')')]"
+                                    },
+                                    "runAfter": {
+                                        "Current_time": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "type": "ApiConnection"
+                                },
+                                "Save_old_config": {
+                                    "inputs": {
+                                        "headers": {
+                                            "ReadFileMetadataFromServer": true
+                                        },
+                                        "host": {
+                                            "connection": {
+                                                "name": "@parameters('$connections')['azureblob']['connectionId']"
+                                            }
+                                        },
+                                        "method": "post",
+                                        "path": "[concat('/v2/datasets/@{encodeURIComponent(encodeURIComponent(''', parameters('StorageAccountName'), '''))}/copyFile')]",
+                                        "queries": {
+                                            "destination": "/seen/seen.config.@{body('Current_time')}",
+                                            "overwrite": true,
+                                            "queryParametersSingleEncoded": true,
+                                            "source": "/seen/seen.config"
+                                        }
+                                    },
+                                    "runAfter": {
+                                        "HTTP_Get_Config": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "type": "ApiConnection"
                                 },
                                 "Setup_Debug": {
+                                    "inputs": "@triggerOutputs()['headers']",
                                     "runAfter": {},
-                                    "type": "Compose",
-                                    "inputs": "@triggerOutputs()['headers']"
+                                    "type": "Compose"
                                 },
                                 "Terminate_Setup": {
+                                    "inputs": {
+                                        "runStatus": "Succeeded"
+                                    },
                                     "runAfter": {
+                                        "Create_Travel_template": [
+                                            "Succeeded",
+                                            "Failed"
+                                        ],
+                                        "Create_Version_template": [
+                                            "Succeeded",
+                                            "Failed"
+                                        ],
                                         "Create_config": [
                                             "Succeeded",
                                             "Failed"
@@ -388,15 +682,19 @@
                                         "Insert_TAPUsage_tracker": [
                                             "Succeeded",
                                             "Failed"
+                                        ],
+                                        "Insert_Travel_tracker": [
+                                            "Succeeded",
+                                            "Failed"
+                                        ],
+                                        "Insert_Version_tracker": [
+                                            "Succeeded",
+                                            "Failed"
                                         ]
                                     },
-                                    "type": "Terminate",
-                                    "inputs": {
-                                        "runStatus": "Succeeded"
-                                    }
+                                    "type": "Terminate"
                                 }
                             },
-                            "runAfter": {},
                             "expression": {
                                 "and": [
                                     {
@@ -413,44 +711,30 @@
                                     }
                                 ]
                             },
+                            "runAfter": {},
                             "type": "If"
                         },
                         "Config_switch": {
-                            "runAfter": {
-                                "Config_setup_check": [
-                                    "Succeeded"
-                                ]
-                            },
                             "cases": {
                                 "Config_Update_Case": {
-                                    "case": "config",
                                     "actions": {
                                         "New_Config": {
+                                            "inputs": "@triggerBody()?['config']",
                                             "runAfter": {},
-                                            "type": "Compose",
-                                            "inputs": "@triggerBody()?['config']"
+                                            "type": "Compose"
                                         },
                                         "Terminate_Update_Config": {
+                                            "inputs": {
+                                                "runStatus": "Succeeded"
+                                            },
                                             "runAfter": {
                                                 "Update_Config": [
                                                     "Succeeded"
                                                 ]
                                             },
-                                            "type": "Terminate",
-                                            "inputs": {
-                                                "runStatus": "Succeeded"
-                                            }
+                                            "type": "Terminate"
                                         },
                                         "Update_Config": {
-                                            "runAfter": {
-                                                "New_Config": [
-                                                    "Succeeded"
-                                                ]
-                                            },
-                                            "metadata": {
-                                                "JTJmc2VlbiUyZnNlZW4uY29uZmln": "/seen/seen.config"
-                                            },
-                                            "type": "ApiConnection",
                                             "inputs": {
                                                 "body": "@outputs('New_Config')",
                                                 "headers": {
@@ -463,14 +747,26 @@
                                                 },
                                                 "method": "put",
                                                 "path": "[concat('/v2/datasets/@{encodeURIComponent(encodeURIComponent(''', parameters('StorageAccountName'), '''))}/files/@{encodeURIComponent(encodeURIComponent(''JTJmc2VlbiUyZnNlZW4uY29uZmln''))}')]"
-                                            }
+                                            },
+                                            "metadata": {
+                                                "JTJmc2VlbiUyZnNlZW4uY29uZmln": "/seen/seen.config"
+                                            },
+                                            "runAfter": {
+                                                "New_Config": [
+                                                    "Succeeded"
+                                                ]
+                                            },
+                                            "type": "ApiConnection"
                                         }
-                                    }
+                                    },
+                                    "case": "config"
                                 },
                                 "Templates_Update_Case": {
-                                    "case": "templates",
                                     "actions": {
                                         "Terminate_Update_Template": {
+                                            "inputs": {
+                                                "runStatus": "Succeeded"
+                                            },
                                             "runAfter": {
                                                 "Update_Footer_Template": [
                                                     "Succeeded"
@@ -483,23 +779,17 @@
                                                 ],
                                                 "Update_TAP_Template": [
                                                     "Succeeded"
-                                                ]
-                                            },
-                                            "type": "Terminate",
-                                            "inputs": {
-                                                "runStatus": "Succeeded"
-                                            }
-                                        },
-                                        "Update_Footer_Template": {
-                                            "runAfter": {
-                                                "Updated_Templates": [
+                                                ],
+                                                "Update_Travel_Template": [
+                                                    "Succeeded"
+                                                ],
+                                                "Update_Version_Template": [
                                                     "Succeeded"
                                                 ]
                                             },
-                                            "metadata": {
-                                                "JTJmc2VlbiUyZnRlbXBsYXRlcyUyZmZvb3Rlci5odG1s": "/seen/templates/footer.html"
-                                            },
-                                            "type": "ApiConnection",
+                                            "type": "Terminate"
+                                        },
+                                        "Update_Footer_Template": {
                                             "inputs": {
                                                 "body": "@base64ToString(triggerBody()?['templates']?['footer'])",
                                                 "headers": {
@@ -512,18 +802,18 @@
                                                 },
                                                 "method": "put",
                                                 "path": "[concat('/v2/datasets/@{encodeURIComponent(encodeURIComponent(''', parameters('StorageAccountName'), '''))}/files/@{encodeURIComponent(encodeURIComponent(''JTJmc2VlbiUyZnRlbXBsYXRlcyUyZmZvb3Rlci5odG1s''))}')]"
-                                            }
-                                        },
-                                        "Update_Header_Template": {
+                                            },
+                                            "metadata": {
+                                                "JTJmc2VlbiUyZnRlbXBsYXRlcyUyZmZvb3Rlci5odG1s": "/seen/templates/footer.html"
+                                            },
                                             "runAfter": {
                                                 "Updated_Templates": [
                                                     "Succeeded"
                                                 ]
                                             },
-                                            "metadata": {
-                                                "JTJmc2VlbiUyZnRlbXBsYXRlcyUyZmhlYWRlci5odG1s": "/seen/templates/header.html"
-                                            },
-                                            "type": "ApiConnection",
+                                            "type": "ApiConnection"
+                                        },
+                                        "Update_Header_Template": {
                                             "inputs": {
                                                 "body": "@base64ToString(triggerBody()?['templates']?['header'])",
                                                 "headers": {
@@ -536,18 +826,18 @@
                                                 },
                                                 "method": "put",
                                                 "path": "[concat('/v2/datasets/@{encodeURIComponent(encodeURIComponent(''', parameters('StorageAccountName'), '''))}/files/@{encodeURIComponent(encodeURIComponent(''JTJmc2VlbiUyZnRlbXBsYXRlcyUyZmhlYWRlci5odG1s''))}')]"
-                                            }
-                                        },
-                                        "Update_MFA_Template": {
+                                            },
+                                            "metadata": {
+                                                "JTJmc2VlbiUyZnRlbXBsYXRlcyUyZmhlYWRlci5odG1s": "/seen/templates/header.html"
+                                            },
                                             "runAfter": {
                                                 "Updated_Templates": [
                                                     "Succeeded"
                                                 ]
                                             },
-                                            "metadata": {
-                                                "JTJmc2VlbiUyZnRlbXBsYXRlcyUyZm1mYS5odG1s": "/seen/templates/mfa.html"
-                                            },
-                                            "type": "ApiConnection",
+                                            "type": "ApiConnection"
+                                        },
+                                        "Update_MFA_Template": {
                                             "inputs": {
                                                 "body": "@base64ToString(triggerBody()?['templates']?['mfa'])",
                                                 "headers": {
@@ -559,19 +849,19 @@
                                                     }
                                                 },
                                                 "method": "put",
-                                                "path": "[concat('/v2/datasets/@{encodeURIComponent(encodeURIComponent(''', parameters('StorageAccountName'), '''))}/files/@{encodeURIComponent(encodeURIComponent(''JTJmc2VlbiUyZnRlbXBsYXRlcyUyZm1mYS5odG1s''))}')]"
-                                            }
-                                        },
-                                        "Update_TAP_Template": {
+                                                "path": "/v2/datasets/@{encodeURIComponent(encodeURIComponent('myseen'))}/files/@{encodeURIComponent(encodeURIComponent(''JTJmc2VlbiUyZnRlbXBsYXRlcyUyZm1mYS5odG1s''))}')]"
+                                            },
+                                            "metadata": {
+                                                "JTJmc2VlbiUyZnRlbXBsYXRlcyUyZm1mYS5odG1s": "/seen/templates/mfa.html"
+                                            },
                                             "runAfter": {
                                                 "Updated_Templates": [
                                                     "Succeeded"
                                                 ]
                                             },
-                                            "metadata": {
-                                                "JTJmc2VlbiUyZnRlbXBsYXRlcyUyZnRhcC5odG1s": "/seen/templates/tap.html"
-                                            },
-                                            "type": "ApiConnection",
+                                            "type": "ApiConnection"
+                                        },
+                                        "Update_TAP_Template": {
                                             "inputs": {
                                                 "body": "@base64ToString(triggerBody()?['templates']?['tap'])",
                                                 "headers": {
@@ -584,173 +874,231 @@
                                                 },
                                                 "method": "put",
                                                 "path": "[concat('/v2/datasets/@{encodeURIComponent(encodeURIComponent(''', parameters('StorageAccountName'), '''))}/files/@{encodeURIComponent(encodeURIComponent(''JTJmc2VlbiUyZnRlbXBsYXRlcyUyZnRhcC5odG1s''))}')]"
-                                            }
+                                            },
+                                            "metadata": {
+                                                "JTJmc2VlbiUyZnRlbXBsYXRlcyUyZnRhcC5odG1s": "/seen/templates/tap.html"
+                                            },
+                                            "runAfter": {
+                                                "Updated_Templates": [
+                                                    "Succeeded"
+                                                ]
+                                            },
+                                            "type": "ApiConnection"
+                                        },
+                                        "Update_Travel_Template": {
+                                            "inputs": {
+                                                "body": "@base64ToString(triggerBody()?['templates']?['travel'])",
+                                                "headers": {
+                                                    "ReadFileMetadataFromServer": true
+                                                },
+                                                "host": {
+                                                    "connection": {
+                                                        "name": "@parameters('$connections')['azureblob']['connectionId']"
+                                                    }
+                                                },
+                                                "method": "put",
+                                                "path": "[concat('/v2/datasets/@{encodeURIComponent(encodeURIComponent(''', parameters('StorageAccountName'), '''))}/files/@{encodeURIComponent(encodeURIComponent(''JTJmc2VlbiUyZnRlbXBsYXRlcyUyZnRyYXZlbC5odG1s''))}"
+                                            },
+                                            "metadata": {
+                                                "JTJmc2VlbiUyZnRlbXBsYXRlcyUyZnRyYXZlbC5odG1s": "/seen/templates/travel.html"
+                                            },
+                                            "runAfter": {
+                                                "Updated_Templates": [
+                                                    "Succeeded"
+                                                ]
+                                            },
+                                            "type": "ApiConnection"
+                                        },
+                                        "Update_Version_Template": {
+                                            "inputs": {
+                                                "body": "@base64ToString(triggerBody()?['templates']?['version'])",
+                                                "headers": {
+                                                    "ReadFileMetadataFromServer": true
+                                                },
+                                                "host": {
+                                                    "connection": {
+                                                        "name": "@parameters('$connections')['azureblob']['connectionId']"
+                                                    }
+                                                },
+                                                "method": "put",
+                                                "path": "[concat('/v2/datasets/@{encodeURIComponent(encodeURIComponent(''', parameters('StorageAccountName'), '''))}/files/@{encodeURIComponent(encodeURIComponent(''/seen/templates/version.html''))}')]"
+                                            },
+                                            "runAfter": {
+                                                "Updated_Templates": [
+                                                    "Succeeded"
+                                                ]
+                                            },
+                                            "type": "ApiConnection"
                                         },
                                         "Updated_Templates": {
+                                            "inputs": "Header: @{triggerBody()?['templates']?['header']}\nFooter: @{triggerBody()?['templates']?['footer']}\nMFA: @{triggerBody()?['templates']?['mfa']}\nTAP: @{triggerBody()?['templates']?['tap']}\nTravel: @{triggerBody()?['templates']?['travel']}\nVersion: @{triggerBody()?['templates']?['version']}",
                                             "runAfter": {},
-                                            "type": "Compose",
-                                            "inputs": "Header: @{triggerBody()?['templates']?['header']}\nFooter: @{triggerBody()?['templates']?['footer']}\nMFA: @{triggerBody()?['templates']?['mfa']}\nTAP: @{triggerBody()?['templates']?['tap']}"
+                                            "type": "Compose"
                                         }
-                                    }
+                                    },
+                                    "case": "templates"
                                 }
                             },
                             "default": {
                                 "actions": {}
                             },
                             "expression": "@triggerBody()?['module']",
+                            "runAfter": {
+                                "Config_setup_check": [
+                                    "Succeeded"
+                                ]
+                            },
                             "type": "Switch"
                         },
                         "Decoded_Config": {
+                            "inputs": "@json(base64ToString(body('Get_Config')['$content']))",
                             "runAfter": {
                                 "Get_Config": [
                                     "Succeeded"
                                 ]
                             },
-                            "type": "Compose",
-                            "inputs": "@json(base64ToString(body('Get_Config')['$content']))"
+                            "type": "Compose"
                         },
                         "Decoded_Footer": {
+                            "inputs": "@base64ToString(body('Get_Footer')['$content'])",
                             "runAfter": {
                                 "Get_Footer": [
                                     "Succeeded"
                                 ]
                             },
-                            "type": "Compose",
-                            "inputs": "@base64ToString(body('Get_Footer')['$content'])"
+                            "type": "Compose"
                         },
                         "Decoded_Header": {
+                            "inputs": "@base64ToString(body('Get_Header')['$content'])",
                             "runAfter": {
                                 "Get_Header": [
                                     "Succeeded"
                                 ]
                             },
-                            "type": "Compose",
-                            "inputs": "@base64ToString(body('Get_Header')['$content'])"
+                            "type": "Compose"
                         },
                         "GET_Version_Redirect": {
-                            "runAfter": {
-                                "Config_switch": [
-                                    "Succeeded"
-                                ]
-                            },
-                            "type": "Http",
                             "inputs": {
                                 "method": "GET",
                                 "uri": "https://aka.ms/seenversion"
-                            }
-                        },
-                        "Get_Config": {
+                            },
                             "runAfter": {
-                                "Config_switch": [
-                                    "Succeeded"
-                                ]
-                            },
-                            "metadata": {
-                                "JTJmc2VlbiUyZnNlZW4uY29uZmln": "/seen/seen.config"
-                            },
-                            "type": "ApiConnection",
-                            "inputs": {
-                                "host": {
-                                    "connection": {
-                                        "name": "@parameters('$connections')['azureblob']['connectionId']"
-                                    }
-                                },
-                                "method": "get",
-                                "path": "[concat('/v2/datasets/@{encodeURIComponent(encodeURIComponent(''', parameters('StorageAccountName'), '''))}/files/@{encodeURIComponent(encodeURIComponent(''JTJmc2VlbiUyZnNlZW4uY29uZmln''))}/content')]",
-                                "queries": {
-                                    "inferContentType": false
-                                }
-                            }
-                        },
-                        "Get_Footer": {
-                            "runAfter": {
-                                "Config_switch": [
-                                    "Succeeded"
-                                ]
-                            },
-                            "metadata": {
-                                "JTJmc2VlbiUyZnRlbXBsYXRlcyUyZmZvb3Rlci5odG1s": "/seen/templates/footer.html"
-                            },
-                            "type": "ApiConnection",
-                            "inputs": {
-                                "host": {
-                                    "connection": {
-                                        "name": "@parameters('$connections')['azureblob']['connectionId']"
-                                    }
-                                },
-                                "method": "get",
-                                "path": "[concat('/v2/datasets/@{encodeURIComponent(encodeURIComponent(''', parameters('StorageAccountName'), '''))}/files/@{encodeURIComponent(encodeURIComponent(''JTJmc2VlbiUyZnRlbXBsYXRlcyUyZmZvb3Rlci5odG1s''))}/content')]",
-                                "queries": {
-                                    "inferContentType": false
-                                }
-                            }
-                        },
-                        "Get_Header": {
-                            "runAfter": {
-                                "Config_switch": [
-                                    "Succeeded"
-                                ]
-                            },
-                            "metadata": {
-                                "JTJmc2VlbiUyZnRlbXBsYXRlcyUyZmhlYWRlci5odG1s": "/seen/templates/header.html"
-                            },
-                            "type": "ApiConnection",
-                            "inputs": {
-                                "host": {
-                                    "connection": {
-                                        "name": "@parameters('$connections')['azureblob']['connectionId']"
-                                    }
-                                },
-                                "method": "get",
-                                "path": "[concat('/v2/datasets/@{encodeURIComponent(encodeURIComponent(''', parameters('StorageAccountName'), '''))}/files/@{encodeURIComponent(encodeURIComponent(''JTJmc2VlbiUyZnRlbXBsYXRlcyUyZmhlYWRlci5odG1s''))}/content')]",
-                                "queries": {
-                                    "inferContentType": false
-                                }
-                            }
-                        },
-                        "Get_Version": {
-                            "runAfter": {
-                                "GET_Version_Redirect": [
-                                    "Failed"
-                                ]
-                            },
-                            "type": "Http",
-                            "inputs": {
-                                "method": "GET",
-                                "uri": "@{outputs('GET_Version_Redirect')['headers']?['Location']}"
-                            }
-                        },
-                        "Switch": {
-                            "runAfter": {
-                                "Decoded_Config": [
-                                    "Succeeded"
-                                ],
                                 "Decoded_Footer": [
                                     "Succeeded"
                                 ],
                                 "Decoded_Header": [
                                     "Succeeded"
-                                ],
+                                ]
+                            },
+                            "type": "Http"
+                        },
+                        "Get_Config": {
+                            "inputs": {
+                                "host": {
+                                    "connection": {
+                                        "name": "@parameters('$connections')['azureblob']['connectionId']"
+                                    }
+                                },
+                                "method": "get",
+                                "path": "[concat('/v2/datasets/@{encodeURIComponent(encodeURIComponent(''', parameters('StorageAccountName'), '''))}/files/@{encodeURIComponent(encodeURIComponent('JTJmc2VlbiUyZnNlZW4uY29uZmln'))}/content')]",
+                                "queries": {
+                                    "inferContentType": false
+                                }
+                            },
+                            "metadata": {
+                                "JTJmc2VlbiUyZnNlZW4uY29uZmln": "/seen/seen.config"
+                            },
+                            "runAfter": {
+                                "Config_switch": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "ApiConnection"
+                        },
+                        "Get_Footer": {
+                            "inputs": {
+                                "host": {
+                                    "connection": {
+                                        "name": "@parameters('$connections')['azureblob']['connectionId']"
+                                    }
+                                },
+                                "method": "get",
+                                "path": "[concat('/v2/datasets/@{encodeURIComponent(encodeURIComponent(''', parameters('StorageAccountName'), '''))}/files/@{encodeURIComponent(encodeURIComponent('JTJmc2VlbiUyZnRlbXBsYXRlcyUyZmZvb3Rlci5odG1s'))}/content')]",
+                                "queries": {
+                                    "inferContentType": false
+                                }
+                            },
+                            "metadata": {
+                                "JTJmc2VlbiUyZnRlbXBsYXRlcyUyZmZvb3Rlci5odG1s": "/seen/templates/footer.html"
+                            },
+                            "runAfter": {
+                                "Decoded_Config": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "ApiConnection"
+                        },
+                        "Get_Header": {
+                            "inputs": {
+                                "host": {
+                                    "connection": {
+                                        "name": "@parameters('$connections')['azureblob']['connectionId']"
+                                    }
+                                },
+                                "method": "get",
+                                "path": "[concat('/v2/datasets/@{encodeURIComponent(encodeURIComponent(''', parameters('StorageAccountName'), '''))}/files/@{encodeURIComponent(encodeURIComponent('JTJmc2VlbiUyZnRlbXBsYXRlcyUyZmhlYWRlci5odG1s'))}/content')]",
+                                "queries": {
+                                    "inferContentType": false
+                                }
+                            },
+                            "metadata": {
+                                "JTJmc2VlbiUyZnRlbXBsYXRlcyUyZmhlYWRlci5odG1s": "/seen/templates/header.html"
+                            },
+                            "runAfter": {
+                                "Decoded_Config": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "ApiConnection"
+                        },
+                        "Get_Version": {
+                            "inputs": {
+                                "headers": {
+                                    "Content-Type": "application/json"
+                                },
+                                "method": "GET",
+                                "uri": "@{outputs('GET_Version_Redirect')['headers']?['Location']}"
+                            },
+                            "runAfter": {
+                                "GET_Version_Redirect": [
+                                    "Failed"
+                                ]
+                            },
+                            "type": "Http"
+                        },
+                        "Parse_Version": {
+                            "inputs": "@json(body('Get_Version'))",
+                            "runAfter": {
                                 "Get_Version": [
                                     "Succeeded"
                                 ]
                             },
+                            "type": "Compose"
+                        },
+                        "Switch": {
                             "cases": {
                                 "Case_MFA": {
-                                    "case": "mfa",
                                     "actions": {
                                         "Decode_MFA_template": {
+                                            "inputs": "@replace(replace(replace(replace(base64ToString(body('Get_MFA_template')['$content']),'{SupportEmail}',outputs('Decoded_Config')['contact']['supportEmail']),'{SupportPhoneNumber}',outputs('Decoded_Config')['contact']['supportPhone']),'{Header}',outputs('Decoded_Header')),'{Footer}',outputs('Decoded_Footer'))",
                                             "runAfter": {
                                                 "Get_MFA_template": [
                                                     "Succeeded"
                                                 ]
                                             },
-                                            "type": "Compose",
-                                            "inputs": "@replace(replace(replace(replace(base64ToString(body('Get_MFA_template')['$content']),'{SupportEmail}',outputs('Decoded_Config')['contact']['supportEmail']),'{SupportPhoneNumber}',outputs('Decoded_Config')['contact']['supportPhone']),'{Header}',outputs('Decoded_Header')),'{Footer}',outputs('Decoded_Footer'))"
+                                            "type": "Compose"
                                         },
                                         "Get_MFA_template": {
-                                            "runAfter": {},
-                                            "type": "ApiConnection",
                                             "inputs": {
                                                 "host": {
                                                     "connection": {
@@ -758,19 +1106,15 @@
                                                     }
                                                 },
                                                 "method": "get",
-                                                "path": "[concat('/v2/datasets/@{encodeURIComponent(encodeURIComponent(''', parameters('StorageAccountName'), '''))}/files/@{encodeURIComponent(encodeURIComponent(''/seen/templates/mfa.html''))}/content')]",
+                                                "path": "[concat('/v2/datasets/@{encodeURIComponent(encodeURIComponent(''', parameters('StorageAccountName'), '''))}/files/@{encodeURIComponent(encodeURIComponent('/seen/templates/mfa.html'))}/content')]",
                                                 "queries": {
                                                     "inferContentType": false
                                                 }
-                                            }
+                                            },
+                                            "runAfter": {},
+                                            "type": "ApiConnection"
                                         },
                                         "MFA_Config": {
-                                            "runAfter": {
-                                                "Decode_MFA_template": [
-                                                    "Succeeded"
-                                                ]
-                                            },
-                                            "type": "Compose",
                                             "inputs": {
                                                 "bcc": "@{outputs('Decoded_Config')['modules']['mfa']['bcc']}",
                                                 "ccManager": "@outputs('Decoded_Config')?['modules']['mfa']['ccManager']",
@@ -782,41 +1126,42 @@
                                                 "subject": "@{outputs('Decoded_Config')['modules']['mfa']['subject']}",
                                                 "template": "@{outputs('Decode_MFA_template')}",
                                                 "timeZone": "@{outputs('Decoded_Config')['timeZone']}"
-                                            }
+                                            },
+                                            "runAfter": {
+                                                "Decode_MFA_template": [
+                                                    "Succeeded"
+                                                ]
+                                            },
+                                            "type": "Compose"
                                         },
                                         "MFA_Response": {
+                                            "inputs": {
+                                                "body": "@outputs('MFA_Config')",
+                                                "statusCode": 200
+                                            },
+                                            "kind": "Http",
                                             "runAfter": {
                                                 "MFA_Config": [
                                                     "Succeeded"
                                                 ]
                                             },
-                                            "type": "Response",
-                                            "kind": "Http",
-                                            "inputs": {
-                                                "body": "@outputs('MFA_Config')",
-                                                "statusCode": 200
-                                            }
+                                            "type": "Response"
                                         }
-                                    }
+                                    },
+                                    "case": "mfa"
                                 },
                                 "Case_TAP": {
-                                    "case": "tap",
                                     "actions": {
                                         "Decode_TAP_template": {
+                                            "inputs": "@replace(replace(replace(replace(base64ToString(body('Get_TAP_template')['$content']),'{SupportEmail}',outputs('Decoded_Config')['contact']['supportEmail']),'{SupportPhoneNumber}',outputs('Decoded_Config')['contact']['supportPhone']),'{Header}',outputs('Decoded_Header')),'{Footer}',outputs('Decoded_Footer'))",
                                             "runAfter": {
                                                 "Get_TAP_template": [
                                                     "Succeeded"
                                                 ]
                                             },
-                                            "type": "Compose",
-                                            "inputs": "@replace(replace(replace(replace(base64ToString(body('Get_TAP_template')['$content']),'{SupportEmail}',outputs('Decoded_Config')['contact']['supportEmail']),'{SupportPhoneNumber}',outputs('Decoded_Config')['contact']['supportPhone']),'{Header}',outputs('Decoded_Header')),'{Footer}',outputs('Decoded_Footer'))"
+                                            "type": "Compose"
                                         },
                                         "Get_TAP_template": {
-                                            "runAfter": {},
-                                            "metadata": {
-                                                "JTJmc2VlbiUyZnRlbXBsYXRlcyUyZnRhcC5odG1s": "/seen/templates/tap.html"
-                                            },
-                                            "type": "ApiConnection",
                                             "inputs": {
                                                 "host": {
                                                     "connection": {
@@ -824,19 +1169,18 @@
                                                     }
                                                 },
                                                 "method": "get",
-                                                "path": "[concat('/v2/datasets/@{encodeURIComponent(encodeURIComponent(''', parameters('StorageAccountName'), '''))}/files/@{encodeURIComponent(encodeURIComponent(''JTJmc2VlbiUyZnRlbXBsYXRlcyUyZnRhcC5odG1s''))}/content')]",
+                                                "path": "[concat('/v2/datasets/@{encodeURIComponent(encodeURIComponent(''', parameters('StorageAccountName'), '''))}/files/@{encodeURIComponent(encodeURIComponent('JTJmc2VlbiUyZnRlbXBsYXRlcyUyZnRhcC5odG1s'))}/content')]",
                                                 "queries": {
                                                     "inferContentType": false
                                                 }
-                                            }
+                                            },
+                                            "metadata": {
+                                                "JTJmc2VlbiUyZnRlbXBsYXRlcyUyZnRhcC5odG1s": "/seen/templates/tap.html"
+                                            },
+                                            "runAfter": {},
+                                            "type": "ApiConnection"
                                         },
                                         "TAP_Config": {
-                                            "runAfter": {
-                                                "Decode_TAP_template": [
-                                                    "Succeeded"
-                                                ]
-                                            },
-                                            "type": "Compose",
                                             "inputs": {
                                                 "bcc": "@{outputs('Decoded_Config')['modules']['tap']['bcc']}",
                                                 "ccManager": "@outputs('Decoded_Config')?['modules']['tap']['ccManager']",
@@ -848,32 +1192,313 @@
                                                 "subject": "@{outputs('Decoded_Config')['modules']['tap']['subject']}",
                                                 "template": "@{outputs('Decode_TAP_template')}",
                                                 "timeZone": "@{outputs('Decoded_Config')['timeZone']}"
-                                            }
+                                            },
+                                            "runAfter": {
+                                                "Decode_TAP_template": [
+                                                    "Succeeded"
+                                                ]
+                                            },
+                                            "type": "Compose"
                                         },
                                         "TAP_Response": {
+                                            "inputs": {
+                                                "body": "@outputs('TAP_Config')",
+                                                "statusCode": 200
+                                            },
+                                            "kind": "Http",
                                             "runAfter": {
                                                 "TAP_Config": [
                                                     "Succeeded"
                                                 ]
                                             },
-                                            "type": "Response",
-                                            "kind": "Http",
-                                            "inputs": {
-                                                "body": "@outputs('TAP_Config')",
-                                                "statusCode": 200
-                                            }
+                                            "type": "Response"
                                         }
-                                    }
+                                    },
+                                    "case": "tap"
+                                },
+                                "Case_Travel": {
+                                    "actions": {
+                                        "Decode_Travel_template": {
+                                            "inputs": "@replace(replace(replace(replace(base64ToString(body('Get_Travel_template')['$content']),'{SupportEmail}',outputs('Decoded_Config')['contact']['supportEmail']),'{SupportPhoneNumber}',outputs('Decoded_Config')['contact']['supportPhone']),'{Header}',outputs('Decoded_Header')),'{Footer}',outputs('Decoded_Footer'))",
+                                            "runAfter": {
+                                                "Get_Travel_template": [
+                                                    "Succeeded"
+                                                ]
+                                            },
+                                            "type": "Compose"
+                                        },
+                                        "Get_Travel_template": {
+                                            "inputs": {
+                                                "host": {
+                                                    "connection": {
+                                                        "name": "@parameters('$connections')['azureblob']['connectionId']"
+                                                    }
+                                                },
+                                                "method": "get",
+                                                "path": "[concat('/v2/datasets/@{encodeURIComponent(encodeURIComponent(''', parameters('StorageAccountName'), '''))}/files/@{encodeURIComponent(encodeURIComponent('JTJmc2VlbiUyZnRlbXBsYXRlcyUyZnRyYXZlbC5odG1s'))}/content')]",
+                                                "queries": {
+                                                    "inferContentType": false
+                                                }
+                                            },
+                                            "metadata": {
+                                                "JTJmc2VlbiUyZnRlbXBsYXRlcyUyZnRyYXZlbC5odG1s": "/seen/templates/travel.html"
+                                            },
+                                            "runAfter": {},
+                                            "type": "ApiConnection"
+                                        },
+                                        "Travel_Config": {
+                                            "inputs": {
+                                                "bcc": "@{outputs('Decoded_Config')['modules']['travel']['bcc']}",
+                                                "ccManager": "@outputs('Decoded_Config')?['modules']['travel']['ccManager']",
+                                                "includeDismissed": "@outputs('Decoded_Config')['modules']['travel']['includeDismissed']",
+                                                "mailFrom": "@{outputs('Decoded_Config')['mailFrom']}",
+                                                "recipient": "@{if(equals(outputs('Decoded_Config')['modules']['travel']?['testMode'],true),outputs('Decoded_Config')['testEmail'],'')}",
+                                                "replyTo": "@{outputs('Decoded_Config')['replyTo']}",
+                                                "saveToSentItems": "@{outputs('Decoded_Config')['saveToSentItems']}",
+                                                "subject": "@{outputs('Decoded_Config')['modules']['travel']['subject']}",
+                                                "template": "@{outputs('Decode_Travel_template')}",
+                                                "timeZone": "@{outputs('Decoded_Config')['timeZone']}"
+                                            },
+                                            "runAfter": {
+                                                "Decode_Travel_template": [
+                                                    "Succeeded"
+                                                ]
+                                            },
+                                            "type": "Compose"
+                                        },
+                                        "Travel_Response": {
+                                            "inputs": {
+                                                "body": "@outputs('Travel_Config')",
+                                                "statusCode": 200
+                                            },
+                                            "kind": "Http",
+                                            "runAfter": {
+                                                "Travel_Config": [
+                                                    "Succeeded"
+                                                ]
+                                            },
+                                            "type": "Response"
+                                        }
+                                    },
+                                    "case": "travel"
                                 }
                             },
                             "default": {
                                 "actions": {}
                             },
                             "expression": "@triggerBody()?['module']",
+                            "runAfter": {
+                                "Decoded_Footer": [
+                                    "Succeeded"
+                                ],
+                                "Decoded_Header": [
+                                    "Succeeded"
+                                ]
+                            },
                             "type": "Switch"
+                        },
+                        "Version_Check": {
+                            "actions": {
+                                "Add_to_time": {
+                                    "inputs": {
+                                        "baseTime": "@{body('Get_Version_Tracker')['Tracker']}",
+                                        "interval": 15,
+                                        "timeUnit": "Day"
+                                    },
+                                    "kind": "AddToTime",
+                                    "runAfter": {
+                                        "Get_Version_Tracker": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "type": "Expression"
+                                },
+                                "Check_Notify_Time": {
+                                    "actions": {
+                                        "Decode_Version_template": {
+                                            "inputs": "@replace(replace(replace(replace(base64ToString(body('Get_Version_template')['$content']),'{SupportEmail}',outputs('Decoded_Config')['contact']['supportEmail']),'{SupportPhoneNumber}',outputs('Decoded_Config')['contact']['supportPhone']),'{Header}',outputs('Decoded_Header')),'{Footer}',outputs('Decoded_Footer'))",
+                                            "runAfter": {
+                                                "Get_Version_template": [
+                                                    "Succeeded"
+                                                ]
+                                            },
+                                            "type": "Compose"
+                                        },
+                                        "Get_Version_template": {
+                                            "inputs": {
+                                                "host": {
+                                                    "connection": {
+                                                        "name": "@parameters('$connections')['azureblob']['connectionId']"
+                                                    }
+                                                },
+                                                "method": "get",
+                                                "path": "[concat('/v2/datasets/@{encodeURIComponent(encodeURIComponent(''', parameters('StorageAccountName'), '''))}/files/@{encodeURIComponent(encodeURIComponent('/seen/templates/version.html'))}/content')]",
+                                                "queries": {
+                                                    "inferContentType": false
+                                                }
+                                            },
+                                            "runAfter": {
+                                                "Version_Debug": [
+                                                    "Succeeded"
+                                                ]
+                                            },
+                                            "type": "ApiConnection"
+                                        },
+                                        "SEEN-SendEmail": {
+                                            "inputs": {
+                                                "body": {
+                                                    "body": "@{replace(outputs('Decode_Version_template'),'{VersionTable}',outputs('Version_details'))}",
+                                                    "mailFrom": "@{outputs('Decoded_Config')['mailFrom']}",
+                                                    "replyTo": "@{outputs('Decoded_Config')['mailFrom']}",
+                                                    "saveToSentItems": false,
+                                                    "subject": "@{outputs('Decoded_Config')['versionManagement']?['subject']}",
+                                                    "to": "@{outputs('Decoded_Config')['versionManagement']?['adminEmail']}",
+                                                    "tracking": "version"
+                                                },
+                                                "host": {
+                                                    "triggerName": "manual",
+                                                    "workflow": {
+                                                        "id": "[parameters('EmailNotificationResourceId')]"
+                                                    }
+                                                }
+                                            },
+                                            "runAfter": {
+                                                "Version_details": [
+                                                    "Succeeded"
+                                                ]
+                                            },
+                                            "type": "Workflow"
+                                        },
+                                        "Update_Version_tracker_after_notification": {
+                                            "inputs": {
+                                                "body": {
+                                                    "Tracker": "@{getFutureTime(0,'Day')}"
+                                                },
+                                                "host": {
+                                                    "connection": {
+                                                        "name": "@parameters('$connections')['azuretables']['connectionId']"
+                                                    }
+                                                },
+                                                "method": "put",
+                                                "path": "[concat('/v2/storageAccounts/@{encodeURIComponent(encodeURIComponent(''', parameters('StorageAccountName'), '''))}/tables/@{encodeURIComponent(''trackers'')}/entities(PartitionKey=''@{encodeURIComponent(''seen'')}'',RowKey=''@{encodeURIComponent(''Version'')}'')')]"
+                                            },
+                                            "runAfter": {
+                                                "SEEN-SendEmail": [
+                                                    "Succeeded"
+                                                ]
+                                            },
+                                            "type": "ApiConnection"
+                                        },
+                                        "Version_Debug": {
+                                            "inputs": "Config: @{outputs('Decoded_Config')?['versionManagement']['checkFrequencyInDays']}\nTracker: @{body('Get_Version_Tracker')['Tracker']}\nTime check: @{body('Add_to_time')}",
+                                            "runAfter": {},
+                                            "type": "Compose"
+                                        },
+                                        "Version_details": {
+                                            "inputs": "Current version: <b>@{parameters('ModuleVersion')}</b><br />\nNew version: <b>@{outputs('Parse_Version')?['configLA']}</b>",
+                                            "runAfter": {
+                                                "Decode_Version_template": [
+                                                    "Succeeded"
+                                                ]
+                                            },
+                                            "type": "Compose"
+                                        }
+                                    },
+                                    "expression": {
+                                        "and": [
+                                            {
+                                                "greater": [
+                                                    "@getFutureTime(0,'Day')",
+                                                    "@body('Add_to_time')"
+                                                ]
+                                            },
+                                            {
+                                                "equals": [
+                                                    "",
+                                                    ""
+                                                ]
+                                            }
+                                        ]
+                                    },
+                                    "runAfter": {
+                                        "Add_to_time": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "type": "If"
+                                },
+                                "Get_Version_Tracker": {
+                                    "inputs": {
+                                        "host": {
+                                            "connection": {
+                                                "name": "@parameters('$connections')['azuretables']['connectionId']"
+                                            }
+                                        },
+                                        "method": "get",
+                                        "path": "[concat('/v2/storageAccounts/@{encodeURIComponent(encodeURIComponent(''', parameters('StorageAccountName'), '''))}/tables/@{encodeURIComponent(''trackers'')}/entities(PartitionKey=''@{encodeURIComponent(''seen'')}'',RowKey=''@{encodeURIComponent(''Version'')}'')')]"
+                                    },
+                                    "runAfter": {},
+                                    "type": "ApiConnection"
+                                }
+                            },
+                            "expression": {
+                                "and": [
+                                    {
+                                        "not": {
+                                            "equals": [
+                                                "@outputs('Parse_Version')?['configLA']",
+                                                "x"
+                                            ]
+                                        }
+                                    }
+                                ]
+                            },
+                            "runAfter": {
+                                "Parse_Version": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "If"
                         }
                     },
-                    "outputs": {}
+                    "contentVersion": "1.0.0.0",
+                    "outputs": {},
+                    "parameters": {
+                        "$connections": {
+                            "defaultValue": {},
+                            "type": "Object"
+                        },
+                        "ModuleVersion": {
+                            "defaultValue": "1.0",
+                            "type": "String"
+                        },
+                        "ProjectName": {
+                            "defaultValue": "SEEN",
+                            "type": "String"
+                        }
+                    },
+                    "triggers": {
+                        "manual": {
+                            "inputs": {
+                                "schema": {
+                                    "properties": {
+                                        "config": {
+                                            "type": "object"
+                                        },
+                                        "module": {
+                                            "type": "string"
+                                        },
+                                        "templates": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            },
+                            "kind": "Http",
+                            "type": "Request"
+                        }
+                    }
                 },
                 "parameters": {
                     "$connections": {
