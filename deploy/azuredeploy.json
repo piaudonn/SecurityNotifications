@@ -193,6 +193,43 @@
         },
         {
             "apiVersion": "2019-10-01",
+            "name": "TravelTemplate",
+            "type": "Microsoft.Resources/deployments",
+            "dependsOn": [
+                "[resourceId('Microsoft.Resources/deployments', 'StorageTemplate')]",
+                "[resourceId('Microsoft.Resources/deployments', 'WebConnectionTemplate')]",
+                "[resourceId('Microsoft.Resources/deployments', 'ConfigTemplate')]"
+            ],
+            "properties": {
+                "mode": "incremental",
+                "templateLink": {
+                    "uri": "[variables('mfaTemplate')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "PlaybookName": {
+                        "value": "[parameters('MFAPlaybookName')]"
+                    },
+                    "TablesConnectionResourceId": {
+                        "value": "[reference('WebConnectionTemplate').outputs.TableConnectionResourceID.value]"
+                    },
+                    "ConfigResourceId": {
+                        "value": "[reference('ConfigTemplate').outputs.resourceID.value]"
+                    },
+                    "EmailNotificationResourceId": {
+                        "value": "[reference('EmailTemplate').outputs.resourceID.value]"
+                    },
+                    "StorageAccountName": {
+                        "value": "[reference('StorageTemplate').outputs.storageAccountName.value]"
+                    },
+                    "LogAnalyticsWorkspaceId": {
+                        "value": "[reference(parameters('LogAnalyticsResourceId'), '2021-06-01', 'Full').properties.customerId]"
+                    }
+                }
+            }
+        },
+        {
+            "apiVersion": "2019-10-01",
             "name": "TAPTemplate",
             "type": "Microsoft.Resources/deployments",
             "dependsOn": [
