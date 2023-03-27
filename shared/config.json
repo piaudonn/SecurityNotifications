@@ -849,7 +849,7 @@
                                                     }
                                                 },
                                                 "method": "put",
-                                                "path": "/v2/datasets/@{encodeURIComponent(encodeURIComponent('myseen'))}/files/@{encodeURIComponent(encodeURIComponent(''JTJmc2VlbiUyZnRlbXBsYXRlcyUyZm1mYS5odG1s''))}')]"
+                                                "path": "[concat('/v2/datasets/@{encodeURIComponent(encodeURIComponent(''', parameters('StorageAccountName'), '''))}/files/@{encodeURIComponent(encodeURIComponent(''JTJmc2VlbiUyZnRlbXBsYXRlcyUyZm1mYS5odG1s''))}')]"
                                             },
                                             "metadata": {
                                                 "JTJmc2VlbiUyZnRlbXBsYXRlcyUyZm1mYS5odG1s": "/seen/templates/mfa.html"
