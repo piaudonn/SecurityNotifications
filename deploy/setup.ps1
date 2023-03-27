@@ -48,7 +48,7 @@ function Set-APIPermissions ($MSIName, $AppId, $PermissionName) {
         Write-Host "❌ Principal not found." -ForegroundColor Red
         return 
     }
-    Start-Sleep -Seconds 2 # Wait in case the MSI identity creation tool some time
+    Start-Sleep -Milliseconds 500 # Wait in case the MSI identity creation tool some time
     $GraphServicePrincipal = Get-MgServicePrincipal -Filter "appId eq '$AppId'"
     $AppRole = $GraphServicePrincipal.AppRoles | Where-Object {$_.Value -eq $PermissionName -and $_.AllowedMemberTypes -contains "Application"}
     try

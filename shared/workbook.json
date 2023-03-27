@@ -961,7 +961,7 @@
                   "icon": "Save",
                   "linkIsContextBlade": true,
                   "armActionContext": {
-                    "path": "/subscriptions/12f5f23d-9ade-4a66-ad94-67cf1314f629/resourceGroups/MySeen/providers/Microsoft.Logic/workflows/SEEN-Config/triggers/manual/run",
+                    "path": "[concat(parameters('ConfigLAId'), '/triggers/manual/run')]",
                     "headers": [],
                     "params": [
                       {
