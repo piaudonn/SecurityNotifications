@@ -1447,7 +1447,7 @@
                                         "not": {
                                             "equals": [
                                                 "@outputs('Parse_Version')?['configLA']",
-                                                "x"
+                                                "@parameters('ModuleVersion')"
                                             ]
                                         }
                                     }
