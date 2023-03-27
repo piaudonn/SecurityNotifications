@@ -897,7 +897,7 @@
                                                     }
                                                 },
                                                 "method": "put",
-                                                "path": "[concat('/v2/datasets/@{encodeURIComponent(encodeURIComponent(''', parameters('StorageAccountName'), '''))}/files/@{encodeURIComponent(encodeURIComponent(''JTJmc2VlbiUyZnRlbXBsYXRlcyUyZnRyYXZlbC5odG1s''))}"
+                                                "path": "[concat('/v2/datasets/@{encodeURIComponent(encodeURIComponent(''', parameters('StorageAccountName'), '''))}/files/@{encodeURIComponent(encodeURIComponent(''JTJmc2VlbiUyZnRlbXBsYXRlcyUyZnRyYXZlbC5odG1s''))}')]"
                                             },
                                             "metadata": {
                                                 "JTJmc2VlbiUyZnRlbXBsYXRlcyUyZnRyYXZlbC5odG1s": "/seen/templates/travel.html"
