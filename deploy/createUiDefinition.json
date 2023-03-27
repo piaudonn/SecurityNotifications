@@ -152,6 +152,16 @@
                                 "visible": true
                             },
                             {
+                                "name": "TravelPlaybookName",
+                                "type": "Microsoft.Common.TextBox",
+                                "label": "Travel Playbook Name",
+                                "placeholder": "",
+                                "defaultValue": "SEEN-Travel",
+                                "toolTip": "",
+                                "constraints": {},
+                                "visible": true
+                            },
+                            {
                                 "name": "TAPPlaybookName",
                                 "type": "Microsoft.Common.TextBox",
                                 "label": "Temporary Access Pass Playbook Name",
@@ -238,6 +248,7 @@
             "ConfigPlaybookName": "[coalesce(steps('seenModules').advancedSetup.ConfigPlaybookName,'SEEN-Config')]",
             "EmailPlaybookName": "[coalesce(steps('seenModules').advancedSetup.EmailPlaybookName,'SEEN-SendEmail')]",
             "MFAPlaybookName": "[coalesce(steps('seenModules').advancedSetup.MFAPlaybookName,'SEEN-MFAMethods')]",
+            "TravelPlaybookName": "[coalesce(steps('seenModules').advancedSetup.TravelPlaybookName,'SEEN-Travel')]",
             "TAPPlaybookName": "[coalesce(steps('seenModules').advancedSetup.TAPPlaybookName,'SEEN-TemporaryAccessPass')]",
             "WorkbookName": "[coalesce(steps('seenModules').advancedSetup.WorkbookName,'SEEN-Manage and monitor')]",
             "DeployFromBranch": "[coalesce(steps('seenModules').advancedSetup.DeploymentBranch,'main')]",
