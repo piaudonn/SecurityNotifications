@@ -1000,7 +1000,7 @@
                                     }
                                 },
                                 "method": "get",
-                                "path": "[concat('/v2/datasets/@{encodeURIComponent(encodeURIComponent(''', parameters('StorageAccountName'), '''))}/files/@{encodeURIComponent(encodeURIComponent('JTJmc2VlbiUyZnNlZW4uY29uZmln'))}/content')]",
+                                "path": "[concat('/v2/datasets/@{encodeURIComponent(encodeURIComponent(''', parameters('StorageAccountName'), '''))}/files/@{encodeURIComponent(encodeURIComponent(''JTJmc2VlbiUyZnNlZW4uY29uZmln''))}/content')]",
                                 "queries": {
                                     "inferContentType": false
                                 }
