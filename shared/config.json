@@ -1023,7 +1023,7 @@
                                     }
                                 },
                                 "method": "get",
-                                "path": "[concat('/v2/datasets/@{encodeURIComponent(encodeURIComponent(''', parameters('StorageAccountName'), '''))}/files/@{encodeURIComponent(encodeURIComponent('JTJmc2VlbiUyZnRlbXBsYXRlcyUyZmZvb3Rlci5odG1s'))}/content')]",
+                                "path": "[concat('/v2/datasets/@{encodeURIComponent(encodeURIComponent(''', parameters('StorageAccountName'), '''))}/files/@{encodeURIComponent(encodeURIComponent(''JTJmc2VlbiUyZnRlbXBsYXRlcyUyZmZvb3Rlci5odG1s''))}/content')]",
                                 "queries": {
                                     "inferContentType": false
                                 }
@@ -1046,7 +1046,7 @@
                                     }
                                 },
                                 "method": "get",
-                                "path": "[concat('/v2/datasets/@{encodeURIComponent(encodeURIComponent(''', parameters('StorageAccountName'), '''))}/files/@{encodeURIComponent(encodeURIComponent('JTJmc2VlbiUyZnRlbXBsYXRlcyUyZmhlYWRlci5odG1s'))}/content')]",
+                                "path": "[concat('/v2/datasets/@{encodeURIComponent(encodeURIComponent(''', parameters('StorageAccountName'), '''))}/files/@{encodeURIComponent(encodeURIComponent(''JTJmc2VlbiUyZnRlbXBsYXRlcyUyZmhlYWRlci5odG1s''))}/content')]",
                                 "queries": {
                                     "inferContentType": false
                                 }
@@ -1106,7 +1106,7 @@
                                                     }
                                                 },
                                                 "method": "get",
-                                                "path": "[concat('/v2/datasets/@{encodeURIComponent(encodeURIComponent(''', parameters('StorageAccountName'), '''))}/files/@{encodeURIComponent(encodeURIComponent('/seen/templates/mfa.html'))}/content')]",
+                                                "path": "[concat('/v2/datasets/@{encodeURIComponent(encodeURIComponent(''', parameters('StorageAccountName'), '''))}/files/@{encodeURIComponent(encodeURIComponent(''/seen/templates/mfa.html''))}/content')]",
                                                 "queries": {
                                                     "inferContentType": false
                                                 }
@@ -1169,7 +1169,7 @@
                                                     }
                                                 },
                                                 "method": "get",
-                                                "path": "[concat('/v2/datasets/@{encodeURIComponent(encodeURIComponent(''', parameters('StorageAccountName'), '''))}/files/@{encodeURIComponent(encodeURIComponent('JTJmc2VlbiUyZnRlbXBsYXRlcyUyZnRhcC5odG1s'))}/content')]",
+                                                "path": "[concat('/v2/datasets/@{encodeURIComponent(encodeURIComponent(''', parameters('StorageAccountName'), '''))}/files/@{encodeURIComponent(encodeURIComponent(''JTJmc2VlbiUyZnRlbXBsYXRlcyUyZnRhcC5odG1s''))}/content')]",
                                                 "queries": {
                                                     "inferContentType": false
                                                 }
@@ -1235,7 +1235,7 @@
                                                     }
                                                 },
                                                 "method": "get",
-                                                "path": "[concat('/v2/datasets/@{encodeURIComponent(encodeURIComponent(''', parameters('StorageAccountName'), '''))}/files/@{encodeURIComponent(encodeURIComponent('JTJmc2VlbiUyZnRlbXBsYXRlcyUyZnRyYXZlbC5odG1s'))}/content')]",
+                                                "path": "[concat('/v2/datasets/@{encodeURIComponent(encodeURIComponent(''', parameters('StorageAccountName'), '''))}/files/@{encodeURIComponent(encodeURIComponent(''JTJmc2VlbiUyZnRlbXBsYXRlcyUyZnRyYXZlbC5odG1s''))}/content')]",
                                                 "queries": {
                                                     "inferContentType": false
                                                 }
@@ -1332,7 +1332,7 @@
                                                     }
                                                 },
                                                 "method": "get",
-                                                "path": "[concat('/v2/datasets/@{encodeURIComponent(encodeURIComponent(''', parameters('StorageAccountName'), '''))}/files/@{encodeURIComponent(encodeURIComponent('/seen/templates/version.html'))}/content')]",
+                                                "path": "[concat('/v2/datasets/@{encodeURIComponent(encodeURIComponent(''', parameters('StorageAccountName'), '''))}/files/@{encodeURIComponent(encodeURIComponent(''/seen/templates/version.html''))}/content')]",
                                                 "queries": {
                                                     "inferContentType": false
                                                 }
