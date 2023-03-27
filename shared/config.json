@@ -562,7 +562,7 @@
                                             }
                                         },
                                         "method": "put",
-                                        "path": "[concat('/v2/storageAccounts/@{encodeURIComponent(encodeURIComponent(''', parameters('StorageAccountName'), '''))}/tables/@{encodeURIComponent(''trackers'')}/entities(PartitionKey=''@{encodeURIComponent(''seen')}'',RowKey=''@{encodeURIComponent(''TAPUsage'')}'')')]"
+                                        "path": "[concat('/v2/storageAccounts/@{encodeURIComponent(encodeURIComponent(''', parameters('StorageAccountName'), '''))}/tables/@{encodeURIComponent(''trackers'')}/entities(PartitionKey=''@{encodeURIComponent(''seen'')}'',RowKey=''@{encodeURIComponent(''TAPUsage'')}'')')]"
                                     },
                                     "runAfter": {
                                         "Current_time": [
