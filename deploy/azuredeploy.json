@@ -203,12 +203,12 @@
             "properties": {
                 "mode": "incremental",
                 "templateLink": {
-                    "uri": "[variables('mfaTemplate')]",
+                    "uri": "[variables('travelTemplate')]",
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
                     "PlaybookName": {
-                        "value": "[parameters('MFAPlaybookName')]"
+                        "value": "[parameters('TravelPlaybookName')]"
                     },
                     "TablesConnectionResourceId": {
                         "value": "[reference('WebConnectionTemplate').outputs.TableConnectionResourceID.value]"
