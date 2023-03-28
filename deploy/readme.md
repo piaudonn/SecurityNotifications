@@ -8,6 +8,8 @@ The deployment has 3 steps:
 
 Make sure you have met the prerequisites outlined in this page prior deploying the solution. 
 
+For detailed advanced deployment documentation, refer to the [deployment documentation article](/docs/deployment.md).
+
 ## Prerequisites
 
 ### Azure AD logs

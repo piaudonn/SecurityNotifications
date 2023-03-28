@@ -49,6 +49,13 @@
       "metadata": {
         "description": "Resouce id of the Config Logic App"
       }
+    },
+    "EmailNotificationResourceId": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Resouce id of the Send EMail Logic App"
+      }
     }
   },
    "variables": {
@@ -107,10 +114,25 @@
                   },
                   "queryType": 0,
                   "resourceType": "microsoft.operationalinsights/workspaces"
+                },
+                {
+                  "id": "7538c735-9184-412f-8e47-a3484e318939",
+                  "version": "KqlParameterItem/1.0",
+                  "name": "ShowHelp",
+                  "label": "Show help",
+                  "type": 2,
+                  "description": "Display/Hide the help text from the workbook",
+                  "isRequired": true,
+                  "typeSettings": {
+                    "additionalResourceOptions": [],
+                    "showDefault": false
+                  },
+                  "jsonData": "[[\r\n    {\"value\":true,\"label\":\"Yes\",\"selected\":true},\r\n    {\"value\":\"no\",\"label\":\"No\"}\r\n]"
                 }
               ],
               "style": "pills",
-              "queryType": 0
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces"
             },
             "name": "WorkbookParameters"
           },
@@ -332,7 +354,7 @@
           {
             "type": 1,
             "content": {
-              "json": "### SEEN Configuration\r\n\r\nEdit the settings and click **Save the configuration** once you are done. \r\n\r\n|Setting|Explanation|\r\n|---|---|\r\n|Mail From|The user principalname of the account you want to send the notifications from|\r\n|Time Zone|The time zone used to display the activity time in the notifications|\r\n|Test Email|The email to whom the notifications are sent when the modules are in Test Mode|\r\n|Suppor Email|The email address listed as a point of contact for questions and support in the notifications|\r\n|Support Phone|The phone number listed as a point of contact for questions and support in the notifications| "
+              "json": "### SEEN Configuration\r\n\r\nEdit the settings and click **Save the configuration** once you are done. "
             },
             "conditionalVisibility": {
               "parameterName": "VisibleTab",
@@ -340,6 +362,25 @@
               "value": "config"
             },
             "name": "ConfigTitle"
+          },
+          {
+            "type": 1,
+            "content": {
+              "json": "|Setting|Explanation|\r\n|---|---|\r\n|Mail From|The user principalname of the account you want to send the notifications from|\r\n|Time Zone|The time zone used to display the activity time in the notifications|\r\n|Test Email|The email to whom the notifications are sent when the modules are in Test Mode|\r\n|Suppor Email|The email address listed as a point of contact for questions and support in the notifications|\r\n|Support Phone|The phone number listed as a point of contact for questions and support in the notifications| \r\n|Notify when new version|Notify the admin when a new version of SEEN is available| \r\n|Admin Email|The email address of the admin to notify when a new version is available| "
+            },
+            "conditionalVisibilities": [
+              {
+                "parameterName": "VisibleTab",
+                "comparison": "isEqualTo",
+                "value": "config"
+              },
+              {
+                "parameterName": "ShowHelp",
+                "comparison": "isEqualTo",
+                "value": "true"
+              }
+            ],
+            "name": "ConfigHelp"
           },
           {
             "type": 9,
@@ -384,8 +425,7 @@
                     "durationMs": 86400000
                   },
                   "queryType": 0,
-                  "resourceType": "microsoft.operationalinsights/workspaces",
-                  "value": null
+                  "resourceType": "microsoft.operationalinsights/workspaces"
                 },
                 {
                   "id": "ed475d5d-f232-40bf-a274-35506e5b4bc0",
@@ -443,10 +483,51 @@
                     "durationMs": 86400000
                   },
                   "queryType": 8
+                },
+                {
+                  "id": "50d64431-2955-46aa-bf06-56834092f1c0",
+                  "version": "KqlParameterItem/1.0",
+                  "name": "versionNotifyAdmin",
+                  "label": "Notify when new version",
+                  "type": 2,
+                  "isGlobal": true,
+                  "query": "let Options = datatable(value:string,label:string,selected:bool) [\r\n\"true\",\"Enabled\",false,\r\n\"false\",\"Disabled\",false\r\n] ;\r\nOptions\r\n| extend selected = iif( value == \"{CurrentConfig:$.versionManagement.notifyAdmins}\", true, false)",
+                  "typeSettings": {
+                    "additionalResourceOptions": []
+                  },
+                  "timeContext": {
+                    "durationMs": 86400000
+                  },
+                  "queryType": 0,
+                  "resourceType": "microsoft.operationalinsights/workspaces"
+                },
+                {
+                  "id": "f54e7920-8e3e-4d45-9660-1181f07b2b76",
+                  "version": "KqlParameterItem/1.0",
+                  "name": "adminEmail",
+                  "label": "Admin Email",
+                  "type": 1,
+                  "description": "The recipient who gets notifications when a new version of SEEN is available",
+                  "isGlobal": true,
+                  "query": "{\"version\":\"1.0.0\",\"content\":\"{CurrentConfig}\",\"transformers\":[{\"type\":\"jsonpath\",\"settings\":{\"tablePath\":\"$.versionManagement.adminEmail\",\"columns\":[]}}]}",
+                  "typeSettings": {
+                    "paramValidationRules": [
+                      {
+                        "regExp": "(^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$|^$)",
+                        "match": true,
+                        "message": "This must be a valid email address"
+                      }
+                    ]
+                  },
+                  "timeContext": {
+                    "durationMs": 86400000
+                  },
+                  "queryType": 8
                 }
               ],
               "style": "above",
-              "queryType": 8
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces"
             },
             "conditionalVisibility": {
               "parameterName": "VisibleTab",
@@ -465,9 +546,21 @@
                 {
                   "type": 1,
                   "content": {
-                    "json": "### MFA Module\r\n\r\nNotify the end-users when MFA methods get created, updated or deleted on their accounts.\r\n\r\n|Setting|Explanation|\r\n|---|---|\r\n|Test Mode|When the module is set in test mode, it will not send the notifications to the end-users but to only to **{mailFrom}**|\r\n|Email Subject|The subject line for the MFA activities notification| \r\n|Copy to Manager|When enabled, sends a copy to the user's manager if it is defined in Azure AD| \r\n|BCC|Email address to who the email will be BCCed to. Only one email address is supported| \r\n|Include Guests|Also notify guest accounts (Azure B2B users) in your tenant| "
+                    "json": "### MFA Module\r\n\r\nNotify the end-users when MFA methods get created, updated or deleted on their accounts."
                   },
                   "name": "MFAConfigTitle"
+                },
+                {
+                  "type": 1,
+                  "content": {
+                    "json": "|Setting|Explanation|\r\n|---|---|\r\n|Test Mode|When the module is set in test mode, it will not send the notifications to the end-users but to only to **{mailFrom}**|\r\n|Email Subject|The subject line for the MFA activities notification| \r\n|Copy to Manager|When enabled, sends a copy to the user's manager if it is defined in Azure AD| \r\n|BCC|Email address to who the email will be BCCed to. Only one email address is supported| \r\n|Include Guests|Also notify guest accounts (Azure B2B users) in your tenant| "
+                  },
+                  "conditionalVisibility": {
+                    "parameterName": "ShowHelp",
+                    "comparison": "isEqualTo",
+                    "value": "true"
+                  },
+                  "name": "MFAConfigHelp"
                 },
                 {
                   "type": 9,
@@ -490,8 +583,7 @@
                           "durationMs": 86400000
                         },
                         "queryType": 0,
-                        "resourceType": "microsoft.operationalinsights/workspaces",
-                        "value": null
+                        "resourceType": "microsoft.operationalinsights/workspaces"
                       },
                       {
                         "id": "73bd317b-1a81-44f5-9cad-d0abe62cc8de",
@@ -522,8 +614,7 @@
                           "durationMs": 86400000
                         },
                         "queryType": 0,
-                        "resourceType": "microsoft.operationalinsights/workspaces",
-                        "value": null
+                        "resourceType": "microsoft.operationalinsights/workspaces"
                       },
                       {
                         "id": "17abd97e-8a4d-4c5a-b3d8-b8632c25a46c",
@@ -562,8 +653,7 @@
                           "durationMs": 86400000
                         },
                         "queryType": 0,
-                        "resourceType": "microsoft.operationalinsights/workspaces",
-                        "value": null
+                        "resourceType": "microsoft.operationalinsights/workspaces"
                       }
                     ],
                     "style": "formHorizontal",
@@ -593,9 +683,21 @@
                 {
                   "type": 1,
                   "content": {
-                    "json": "### TAP Module\r\n\r\nNotify the end-users when TAP get provisionned on their accounts.\r\n\r\n|Setting|Explanation|\r\n|---|---|\r\n|Test Mode|When the module is set in test mode, it will not send the notifications to the end-users but to only to **{mailFrom}**|\r\n|Email Subject|The subject line for the MFA activities notification| \r\n|Copy to Manager|When enabled, sends a copy to the user's manager if it is defined in Azure AD| \r\n|BCC|Email address to who the email will be BCCed to. Only one email address is supported| \r\n|Inlcude TAP Usage|Also notify users when TAP are being used| "
+                    "json": "### TAP Module\r\n\r\nNotify the end-users when TAP get provisionned on their accounts."
                   },
                   "name": "TAPConfigTitle"
+                },
+                {
+                  "type": 1,
+                  "content": {
+                    "json": "|Setting|Explanation|\r\n|---|---|\r\n|Test Mode|When the module is set in test mode, it will not send the notifications to the end-users but to only to **{mailFrom}**|\r\n|Email Subject|The subject line for the MFA activities notification| \r\n|Copy to Manager|When enabled, sends a copy to the user's manager if it is defined in Azure AD| \r\n|BCC|Email address to who the email will be BCCed to. Only one email address is supported| \r\n|Inlcude TAP Usage|Also notify users when TAP are being used| "
+                  },
+                  "conditionalVisibility": {
+                    "parameterName": "ShowHelp",
+                    "comparison": "isEqualTo",
+                    "value": "true"
+                  },
+                  "name": "TAPConfigHelp"
                 },
                 {
                   "type": 9,
@@ -618,8 +720,7 @@
                           "durationMs": 86400000
                         },
                         "queryType": 0,
-                        "resourceType": "microsoft.operationalinsights/workspaces",
-                        "value": null
+                        "resourceType": "microsoft.operationalinsights/workspaces"
                       },
                       {
                         "id": "ac894fc2-dfd4-4f17-b693-356ca90edd98",
@@ -650,8 +751,7 @@
                           "durationMs": 86400000
                         },
                         "queryType": 0,
-                        "resourceType": "microsoft.operationalinsights/workspaces",
-                        "value": null
+                        "resourceType": "microsoft.operationalinsights/workspaces"
                       },
                       {
                         "id": "69d6413d-894e-4cda-876f-05ecf699b7da",
@@ -690,15 +790,14 @@
                           "durationMs": 86400000
                         },
                         "queryType": 0,
-                        "resourceType": "microsoft.operationalinsights/workspaces",
-                        "value": null
+                        "resourceType": "microsoft.operationalinsights/workspaces"
                       }
                     ],
                     "style": "formHorizontal",
                     "queryType": 0,
                     "resourceType": "microsoft.operationalinsights/workspaces"
                   },
-                  "name": "TAPConfigT"
+                  "name": "TAPConfig"
                 }
               ],
               "exportParameters": true
@@ -710,6 +809,143 @@
             },
             "customWidth": "50",
             "name": "TAPGroup"
+          },
+          {
+            "type": 12,
+            "content": {
+              "version": "NotebookGroup/1.0",
+              "groupType": "editable",
+              "loadType": "always",
+              "items": [
+                {
+                  "type": 1,
+                  "content": {
+                    "json": "### Travel Module\r\n\r\nNotify the end-users when atypical travels are detected on their accounts. This will only work if you have Azure AD P2 licenses on your Azure AD tenant."
+                  },
+                  "name": "TravelConfigTitle"
+                },
+                {
+                  "type": 1,
+                  "content": {
+                    "json": "|Setting|Explanation|\r\n|---|---|\r\n|Test Mode|When the module is set in test mode, it will not send the notifications to the end-users but to only to **{mailFrom}**|\r\n|Email Subject|The subject line for the MFA activities notification| \r\n|Copy to Manager|When enabled, sends a copy to the user's manager if it is defined in Azure AD| \r\n|BCC|Email address to who the email will be BCCed to. Only one email address is supported| \r\n|Inlcude Dismissed Risk|Also notify when users succesfuly performed MFA for this location| "
+                  },
+                  "conditionalVisibility": {
+                    "parameterName": "ShowHelp",
+                    "comparison": "isEqualTo",
+                    "value": "true"
+                  },
+                  "name": "TravelConfigHelp"
+                },
+                {
+                  "type": 9,
+                  "content": {
+                    "version": "KqlParameterItem/1.0",
+                    "parameters": [
+                      {
+                        "id": "42448f8f-0b85-43ca-9b98-caafeff1a02d",
+                        "version": "KqlParameterItem/1.0",
+                        "name": "travel_testMode",
+                        "label": "Test Mode",
+                        "type": 2,
+                        "isRequired": true,
+                        "query": "let Options = datatable(value:string,label:string,selected:bool) [\r\n\"true\",\"Enabled\",false,\r\n\"false\",\"Disabled\",false\r\n] ;\r\nOptions\r\n| extend selected = iif( value == \"{CurrentConfig:$.modules.travel.testMode}\", true, false)",
+                        "typeSettings": {
+                          "additionalResourceOptions": [],
+                          "showDefault": false
+                        },
+                        "timeContext": {
+                          "durationMs": 86400000
+                        },
+                        "queryType": 0,
+                        "resourceType": "microsoft.operationalinsights/workspaces"
+                      },
+                      {
+                        "id": "ac894fc2-dfd4-4f17-b693-356ca90edd98",
+                        "version": "KqlParameterItem/1.0",
+                        "name": "travel_subject",
+                        "label": "Email Subject",
+                        "type": 1,
+                        "isRequired": true,
+                        "query": "{\"version\":\"1.0.0\",\"content\":\"{CurrentConfig}\",\"transformers\":[{\"type\":\"jsonpath\",\"settings\":{\"tablePath\":\"$.modules.travel.subject\",\"columns\":[]}}]}",
+                        "timeContext": {
+                          "durationMs": 86400000
+                        },
+                        "queryType": 8
+                      },
+                      {
+                        "id": "8ef96a06-ed3d-4fd6-b326-648162f84088",
+                        "version": "KqlParameterItem/1.0",
+                        "name": "travel_ccManager",
+                        "label": "Copy to Manager",
+                        "type": 2,
+                        "isRequired": true,
+                        "query": "let Options = datatable(value:string,label:string,selected:bool) [\r\n\"true\",\"Enabled\",false,\r\n\"false\",\"Disabled\",false\r\n] ;\r\nOptions\r\n| extend selected = iif( value == \"{CurrentConfig:$.modules.travel.ccManager}\", true, false)",
+                        "typeSettings": {
+                          "additionalResourceOptions": [],
+                          "showDefault": false
+                        },
+                        "timeContext": {
+                          "durationMs": 86400000
+                        },
+                        "queryType": 0,
+                        "resourceType": "microsoft.operationalinsights/workspaces"
+                      },
+                      {
+                        "id": "69d6413d-894e-4cda-876f-05ecf699b7da",
+                        "version": "KqlParameterItem/1.0",
+                        "name": "travel_bcc",
+                        "label": "BCC",
+                        "type": 1,
+                        "query": "{\"version\":\"1.0.0\",\"content\":\"{CurrentConfig}\",\"transformers\":[{\"type\":\"jsonpath\",\"settings\":{\"tablePath\":\"$.modules.travel.bcc\",\"columns\":[]}}]}",
+                        "typeSettings": {
+                          "paramValidationRules": [
+                            {
+                              "regExp": "(^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$|^$)",
+                              "match": true,
+                              "message": ""
+                            }
+                          ]
+                        },
+                        "timeContext": {
+                          "durationMs": 86400000
+                        },
+                        "queryType": 8
+                      },
+                      {
+                        "id": "42be0b5c-ac91-4f58-a1a3-369e6ead4aaf",
+                        "version": "KqlParameterItem/1.0",
+                        "name": "travel_includeDismissed",
+                        "label": "Inlcude Dismissed Risks",
+                        "type": 2,
+                        "isRequired": true,
+                        "query": "let Options = datatable(value:string,label:string,selected:bool) [\r\n\"true\",\"Enabled\",false,\r\n\"false\",\"Disabled\",false\r\n] ;\r\nOptions\r\n| extend selected = iif( value == \"{CurrentConfig:$.modules.travel.includeDismissed}\", true, false)",
+                        "typeSettings": {
+                          "additionalResourceOptions": [],
+                          "showDefault": false
+                        },
+                        "timeContext": {
+                          "durationMs": 86400000
+                        },
+                        "queryType": 0,
+                        "resourceType": "microsoft.operationalinsights/workspaces"
+                      }
+                    ],
+                    "style": "formHorizontal",
+                    "queryType": 0,
+                    "resourceType": "microsoft.operationalinsights/workspaces"
+                  },
+                  "name": "TravelConfig"
+                }
+              ],
+              "exportParameters": true
+            },
+            "conditionalVisibility": {
+              "parameterName": "VisibleTab",
+              "comparison": "isEqualTo",
+              "value": "config"
+            },
+            "customWidth": "50",
+            "name": "TravelGroup"
           },
           {
             "type": 11,
@@ -733,10 +969,10 @@
                         "value": "2016-06-01"
                       }
                     ],
-                    "body": "{\r\n  \"module\":\"config\",\r\n  \"config\":\r\n  {\r\n    \"version\":1,\r\n    \"mailFrom\":\"{mailFrom}\",\r\n    \"replyTo\":\"{mailFrom}\",\r\n    \"saveToSentItems\":false,\r\n    \"timeZone\":\"{timeZone}\",\r\n    \"testEmail\":\"{testEmail}\",\r\n    \"contact\" : {\r\n        \"supportEmail\":\"{supportEmail}\",\r\n        \"supportPhone\": \"{supportPhone}\"\r\n    },\r\n    \"modules\": {\r\n        \"mfa\" : {\r\n            \"testMode\":{mfa_testMode},\r\n            \"subject\":\"{mfa_subject}\",\r\n            \"ccManager\":{mfa_ccManager},\r\n            \"bcc\":\"{mfa_bcc}\",\r\n            \"includeGuests\":{mfa_includeGuests}\r\n        },\r\n        \"tap\" : {\r\n            \"testMode\":{tap_testMode},\r\n            \"subject\":\"{tap_subject}\",\r\n            \"ccManager\":{tap_ccManager},\r\n            \"bcc\":\"{tap_bcc}\",\r\n            \"includeUsage\":{tap_includeUsage}\r\n        } \r\n    }\r\n}\r\n}",
+                    "body": "{\r\n  \"module\":\"config\",\r\n  \"config\":\r\n  {\r\n    \"version\":1,\r\n    \"versionManagement\": {\r\n        \"notifyAdmins\":{versionNotifyAdmin},\r\n        \"checkFrequencyInDays\":15,\r\n        \"adminEmail\":\"{adminEmail}\",\r\n        \"subject\":\"A new version of SEEN is available!\"\r\n    },\r\n    \"mailFrom\":\"{mailFrom}\",\r\n    \"replyTo\":\"{mailFrom}\",\r\n    \"saveToSentItems\":false,\r\n    \"timeZone\":\"{timeZone}\",\r\n    \"testEmail\":\"{testEmail}\",\r\n    \"contact\" : {\r\n        \"supportEmail\":\"{supportEmail}\",\r\n        \"supportPhone\": \"{supportPhone}\"\r\n    },\r\n    \"modules\": {\r\n        \"mfa\" : {\r\n            \"testMode\":{mfa_testMode},\r\n            \"subject\":\"{mfa_subject}\",\r\n            \"ccManager\":{mfa_ccManager},\r\n            \"bcc\":\"{mfa_bcc}\",\r\n            \"includeGuests\":{mfa_includeGuests}\r\n        },\r\n        \"tap\" : {\r\n            \"testMode\":{tap_testMode},\r\n            \"subject\":\"{tap_subject}\",\r\n            \"ccManager\":{tap_ccManager},\r\n            \"bcc\":\"{tap_bcc}\",\r\n            \"includeUsage\":{tap_includeUsage}\r\n        },\r\n        \"travel\" : {\r\n            \"testMode\":{travel_testMode},\r\n            \"subject\":\"{travel_subject}\",\r\n            \"ccManager\":{travel_ccManager},\r\n            \"bcc\":\"{travel_bcc}\",\r\n            \"includeDismissed\":{travel_includeDismissed}\r\n        } \r\n    }\r\n}\r\n}",
                     "httpMethod": "POST",
                     "title": "Update SEEN configuration",
-                    "description": "### Review the following settings before confirming\n\n|Global Settings ||\n|---|---|\n|Mail From|{mailFrom}|\n|Time Zone|{timeZone}|\n|Test Email|{testEmail}|\n|Support Email|{supportEmail}|\n|Support Phone|{supportPhone}|\n\n\n|MFA Module ||\n|---|---|\n|Test Mode|{mfa_testMode:label}|\n|Email Subject|{mfa_subject}|\n|Copy Manager|{mfa_ccManager:label}|\n|BCC|{mfa_bcc}|\n|Include Guests|{mfa_includeGuests}|\n\n|TAP Module ||\n|---|---|\n|Test Mode|{tap_testMode:label}|\n|Email Subject|{tap_subject}|\n|Copy Manager|{tap_ccManager:label}|\n|BCC|{tap_bcc}|\n|Include Guests|{tap_includeUsage}|\n\nRefresh the workbook once the change is confirmed.",
+                    "description": "### Review the following settings before confirming\n\n|Global Settings ||\n|---|---|\n|Mail From|{mailFrom}|\n|Time Zone|{timeZone}|\n|Test Email|{testEmail}|\n|Support Email|{supportEmail}|\n|Support Phone|{supportPhone}|\n|Notify admins of new version|{versionNotifyAdmin:label}|\n|Admin Email|{adminEmail}|\n\n\n|MFA Module ||\n|---|---|\n|Test Mode|{mfa_testMode:label}|\n|Email Subject|{mfa_subject}|\n|Copy Manager|{mfa_ccManager:label}|\n|BCC|{mfa_bcc}|\n|Include Guests|{mfa_includeGuests}|\n\n|TAP Module ||\n|---|---|\n|Test Mode|{tap_testMode:label}|\n|Email Subject|{tap_subject}|\n|Copy Manager|{tap_ccManager:label}|\n|BCC|{tap_bcc}|\n|Include Guests|{tap_includeUsage}|\n\n|Travel Module ||\n|---|---|\n|Test Mode|{travel_testMode:label}|\n|Email Subject|{travel_subject}|\n|Copy Manager|{travel_ccManager:label}|\n|BCC|{travel_bcc}|\n|Include Dismissed Risks|{travel_includeDismissed}|\n\nRefresh the workbook once the change is confirmed.",
                     "actionName": "Update SEEN configuration",
                     "runLabel": "Confirm the changes"
                   }
@@ -1114,7 +1350,7 @@
           {
             "type": 1,
             "content": {
-              "json": "## Email templates\r\n\r\nHere are the possible key words:\r\n\r\n|Word|Replaced by|\r\n|---|---|\r\n|`{ Header }`|In the module emails, is replaced by the HTML header| \r\n|`{ Footer }`|In the module emails, is replaced by the HTML footer| \r\n|`{ UserFirstName }`|Is replaced by the first non null values: user's firstname or user's display name|\r\n|`{ SupportEmail }`|Is replaced by the support email from the configuration file| \r\n|`{ SupportPhoneNumber }`|Is replaced by the support phone number from the configuration file| \r\n|`{ Activities }`|The detected activities in an HTML table|  "
+              "json": "## Email templates"
             },
             "conditionalVisibility": {
               "parameterName": "VisibleTab",
@@ -1122,6 +1358,25 @@
               "value": "templates"
             },
             "name": "TemplateTitle"
+          },
+          {
+            "type": 1,
+            "content": {
+              "json": "Here are the possible key words:\r\n\r\n|Word|Replaced by|\r\n|---|---|\r\n|`{ Header }`|In the module emails, is replaced by the HTML header| \r\n|`{ Footer }`|In the module emails, is replaced by the HTML footer| \r\n|`{ UserFirstName }`|Is replaced by the first non null values: user's firstname or user's display name|\r\n|`{ SupportEmail }`|Is replaced by the support email from the configuration file| \r\n|`{ SupportPhoneNumber }`|Is replaced by the support phone number from the configuration file| \r\n|`{ Activities }`|The detected activities in an HTML table|  \r\n|`{ VersionTable }`|The table with the info on the latest version of SEEN (only used in the new version notification email)|  "
+            },
+            "conditionalVisibilities": [
+              {
+                "parameterName": "VisibleTab",
+                "comparison": "isEqualTo",
+                "value": "templates"
+              },
+              {
+                "parameterName": "ShowHelp",
+                "comparison": "isEqualTo",
+                "value": "true"
+              }
+            ],
+            "name": "TemplateHelp"
           },
           {
             "type": 9,
@@ -1173,7 +1428,7 @@
                   "type": 1,
                   "isGlobal": true,
                   "query": "[concat('externaldata ( Config:string ) [\"', parameters('storageUrl') ,'/seen/templates/footer.html',  parameters('storageSas') ,'\"] with(format=\"RAW\")')]",
-                  "typeSettings": {
+                "typeSettings": {
                     "multiLineText": true,
                     "editorLanguage": "text",
                     "multiLineHeight": 15
@@ -1198,33 +1453,96 @@
             "name": "GetTemplates - Copy"
           },
           {
-            "type": 9,
+            "type": 12,
             "content": {
-              "version": "KqlParameterItem/1.0",
-              "parameters": [
+              "version": "NotebookGroup/1.0",
+              "groupType": "editable",
+              "loadType": "always",
+              "items": [
                 {
-                  "id": "8abd6c13-dc18-4d14-871b-535d321eed34",
-                  "version": "KqlParameterItem/1.0",
-                  "name": "template_mfa",
-                  "label": "Email MFA",
-                  "type": 1,
-                  "isGlobal": true,
-                  "query": "[concat('externaldata ( Config:string ) [\"', parameters('storageUrl') ,'/seen/templates/mfa.html',  parameters('storageSas') ,'\"] with(format=\"RAW\")')]",
-                  "typeSettings": {
-                    "multiLineText": true,
-                    "editorLanguage": "text",
-                    "multiLineHeight": 15
+                  "type": 9,
+                  "content": {
+                    "version": "KqlParameterItem/1.0",
+                    "parameters": [
+                      {
+                        "id": "8abd6c13-dc18-4d14-871b-535d321eed34",
+                        "version": "KqlParameterItem/1.0",
+                        "name": "template_mfa",
+                        "label": "Email MFA",
+                        "type": 1,
+                        "isGlobal": true,
+                        "query": "[concat('externaldata ( Config:string ) [\"', parameters('storageUrl') ,'/seen/templates/mfa.html',  parameters('storageSas') ,'\"] with(format=\"RAW\")')]",
+                        "typeSettings": {
+                          "multiLineText": true,
+                          "editorLanguage": "text",
+                          "multiLineHeight": 15
+                        },
+                        "timeContext": {
+                          "durationMs": 86400000
+                        },
+                        "queryType": 0,
+                        "resourceType": "microsoft.operationalinsights/workspaces"
+                      },
+                      {
+                        "id": "8c07ded4-5d62-448e-b137-ebb93cb5b22c",
+                        "version": "KqlParameterItem/1.0",
+                        "name": "template_mfa_test",
+                        "type": 1,
+                        "isGlobal": true,
+                        "query": "let header = base64_decode_tostring(\"{template_header:base64}\");\r\nlet footer = base64_decode_tostring(\"{template_footer:base64}\");\r\nlet base = base64_decode_tostring(\"{template_mfa:base64}\");\r\nlet activities = \"<table><thead><tr><th>Time</th><th>Activity</th></tr></thead><tbody><tr><td>📆 2000-01-02 03:04:05</td><td>TEST - Something happened</td></tr></tbody></table>\";\r\nlet body = replace_string(replace_string(replace_string(replace_string(replace_string(replace_string(base,strcat(\"{\",\"SupportEmail}\"),\"{CurrentConfig:$.contact.supportEmail}\"),strcat(\"{\",\"SupportPhoneNumber}\"),\"{CurrentConfig:$.contact.supportPhone}\"),strcat(\"{\",\"UserFirstName}\"),\"Test User\"),strcat(\"{\",\"Activities}\"),activities),strcat(\"{\",\"Footer}\"),footer),strcat(\"{\",\"Header}\"),header);\r\nprint body=body",
+                        "isHiddenWhenLocked": true,
+                        "timeContext": {
+                          "durationMs": 86400000
+                        },
+                        "queryType": 0,
+                        "resourceType": "microsoft.operationalinsights/workspaces"
+                      }
+                    ],
+                    "style": "above",
+                    "queryType": 0,
+                    "resourceType": "microsoft.operationalinsights/workspaces"
                   },
-                  "timeContext": {
-                    "durationMs": 86400000
+                  "name": "GetTemplatesMFA"
+                },
+                {
+                  "type": 11,
+                  "content": {
+                    "version": "LinkItem/1.0",
+                    "style": "toolbar",
+                    "links": [
+                      {
+                        "id": "3dbf5bfd-2b70-451c-966c-bd16ef03f26f",
+                        "cellValue": "",
+                        "linkTarget": "ArmAction",
+                        "linkLabel": "Test MFA email",
+                        "subTarget": "Visible",
+                        "postText": "Send a test message to {CurrentConfig:$.testEmail}",
+                        "style": "link",
+                        "icon": "Mail",
+                        "linkIsContextBlade": true,
+                        "armActionContext": {
+                          "path": "[concat(parameters('EmailNotificationResourceId'), '/triggers/manual/run')]",
+                          "headers": [],
+                          "params": [
+                            {
+                              "key": "api-version",
+                              "value": "2016-06-01"
+                            }
+                          ],
+                          "body": "{\r\n  \"body\":\"{template_mfa_test:escapejson}\",\r\n  \"importance\":\"high\",\r\n  \"mailFrom\":\"{CurrentConfig:$.mailFrom}\",\r\n  \"replyTo\":\"{CurrentConfig:$.mailFrom}\",\r\n  \"saveToSentItems\":false,\r\n  \"subject\":\"{CurrentConfig:$.modules.mfa.subject}\",\r\n  \"to\":\"{CurrentConfig:$.testEmail}\",\r\n  \"tracking\":\"testtemplate\"\r\n}",
+                          "httpMethod": "POST",
+                          "title": "Sending a test email to {CurrentConfig:$.testEmail}",
+                          "description": "## You are about to send a test Email\n\n- From: **{CurrentConfig:$.mailFrom}**   \n- To: **{CurrentConfig:$.testEmail}**\n- Subject: **{CurrentConfig:$.modules.mfa.subject}**\n\nIt will be using the templates defined in this workbook.",
+                          "actionName": "Sending a test email to {CurrentConfig:$.testEmail}",
+                          "runLabel": "Send email"
+                        }
+                      }
+                    ]
                   },
-                  "queryType": 0,
-                  "resourceType": "microsoft.operationalinsights/workspaces"
+                  "name": "MFATemplateAction"
                 }
               ],
-              "style": "above",
-              "queryType": 0,
-              "resourceType": "microsoft.operationalinsights/workspaces"
+              "exportParameters": true
             },
             "conditionalVisibility": {
               "parameterName": "VisibleTab",
@@ -1232,36 +1550,94 @@
               "value": "templates"
             },
             "customWidth": "50",
-            "name": "GetTemplates - Copy - Copy"
+            "name": "MFATemplateGroup"
           },
           {
-            "type": 9,
+            "type": 12,
             "content": {
-              "version": "KqlParameterItem/1.0",
-              "parameters": [
+              "version": "NotebookGroup/1.0",
+              "groupType": "editable",
+              "items": [
                 {
-                  "id": "6b830aca-894a-4332-8cd3-bf17ff3ef417",
-                  "version": "KqlParameterItem/1.0",
-                  "name": "template_tap",
-                  "label": "Email TAP",
-                  "type": 1,
-                  "isGlobal": true,
-                  "query": "[concat('externaldata ( Config:string ) [\"', parameters('storageUrl') ,'/seen/templates/tap.html',  parameters('storageSas') ,'\"] with(format=\"RAW\")')]",
-                  "typeSettings": {
-                    "multiLineText": true,
-                    "editorLanguage": "text",
-                    "multiLineHeight": 15
+                  "type": 9,
+                  "content": {
+                    "version": "KqlParameterItem/1.0",
+                    "parameters": [
+                      {
+                        "id": "6b830aca-894a-4332-8cd3-bf17ff3ef417",
+                        "version": "KqlParameterItem/1.0",
+                        "name": "template_tap",
+                        "label": "Email TAP",
+                        "type": 1,
+                        "isGlobal": true,
+                        "query": "[concat('externaldata ( Config:string ) [\"', parameters('storageUrl') ,'/seen/templates/tap.html',  parameters('storageSas') ,'\"] with(format=\"RAW\")')]",
+                        "typeSettings": {
+                          "multiLineText": true,
+                          "editorLanguage": "text",
+                          "multiLineHeight": 15
+                        },
+                        "timeContext": {
+                          "durationMs": 86400000
+                        },
+                        "queryType": 0,
+                        "resourceType": "microsoft.operationalinsights/workspaces"
+                      },
+                      {
+                        "id": "9dae8345-e6b9-45ee-b2b0-bc2dab32b436",
+                        "version": "KqlParameterItem/1.0",
+                        "name": "template_tap_test",
+                        "type": 1,
+                        "query": "let header = base64_decode_tostring(\"{template_header:base64}\");\r\nlet footer = base64_decode_tostring(\"{template_footer:base64}\");\r\nlet base = base64_decode_tostring(\"{template_tap:base64}\");\r\nlet activities = \"<table><thead><tr><th>Time</th><th>Activity</th></tr></thead><tbody><tr><td>📆 2000-01-02 03:04:05</td><td>TEST - Something happened</td></tr></tbody></table>\";\r\nlet body = replace_string(replace_string(replace_string(replace_string(replace_string(replace_string(base,strcat(\"{\",\"SupportEmail}\"),\"{CurrentConfig:$.contact.supportEmail}\"),strcat(\"{\",\"SupportPhoneNumber}\"),\"{CurrentConfig:$.contact.supportPhone}\"),strcat(\"{\",\"UserFirstName}\"),\"Test User\"),strcat(\"{\",\"Activities}\"),activities),strcat(\"{\",\"Footer}\"),footer),strcat(\"{\",\"Header}\"),header);\r\nprint body = body",
+                        "isHiddenWhenLocked": true,
+                        "queryType": 0,
+                        "resourceType": "microsoft.operationalinsights/workspaces"
+                      }
+                    ],
+                    "style": "above",
+                    "queryType": 0,
+                    "resourceType": "microsoft.operationalinsights/workspaces"
                   },
-                  "timeContext": {
-                    "durationMs": 86400000
+                  "name": "GetTemplatesTAP"
+                },
+                {
+                  "type": 11,
+                  "content": {
+                    "version": "LinkItem/1.0",
+                    "style": "toolbar",
+                    "links": [
+                      {
+                        "id": "331214ca-b62f-4110-973e-b394efddce02",
+                        "cellValue": "",
+                        "linkTarget": "ArmAction",
+                        "linkLabel": "Test TAP email",
+                        "subTarget": "Visible",
+                        "postText": "Send a test message to {CurrentConfig:$.testEmail}",
+                        "style": "link",
+                        "icon": "Mail",
+                        "linkIsContextBlade": true,
+                        "armActionContext": {
+                          "path": "[concat(parameters('EmailNotificationResourceId'), '/triggers/manual/run')]",
+                          "headers": [],
+                          "params": [
+                            {
+                              "key": "api-version",
+                              "value": "2016-06-01"
+                            }
+                          ],
+                          "body": "{\r\n  \"body\":\"{template_tap_test:escapejson}\",\r\n  \"importance\":\"high\",\r\n  \"mailFrom\":\"{CurrentConfig:$.mailFrom}\",\r\n  \"replyTo\":\"{CurrentConfig:$.mailFrom}\",\r\n  \"saveToSentItems\":false,\r\n  \"subject\":\"{CurrentConfig:$.modules.tap.subject}\",\r\n  \"to\":\"{CurrentConfig:$.testEmail}\",\r\n  \"tracking\":\"testtemplate\"\r\n}",
+                          "httpMethod": "POST",
+                          "title": "Sending a test email to {CurrentConfig:$.testEmail}",
+                          "description": "## You are about to send a test Email\n\n- From: **{CurrentConfig:$.mailFrom}**   \n- To: **{CurrentConfig:$.testEmail}**\n- Subject: **{CurrentConfig:$.modules.tap.subject}**\n\nIt will be using the templates defined in this workbook.",
+                          "actionName": "Sending a test email to {CurrentConfig:$.testEmail}",
+                          "runLabel": "Send email"
+                        }
+                      }
+                    ]
                   },
-                  "queryType": 0,
-                  "resourceType": "microsoft.operationalinsights/workspaces"
+                  "name": "TAPTemplateAction"
                 }
               ],
-              "style": "above",
-              "queryType": 0,
-              "resourceType": "microsoft.operationalinsights/workspaces"
+              "exportParameters": true
             },
             "conditionalVisibility": {
               "parameterName": "VisibleTab",
@@ -1269,7 +1645,207 @@
               "value": "templates"
             },
             "customWidth": "50",
-            "name": "GetTemplates - Copy - Copy - Copy"
+            "name": "TAPTemplateGroup"
+          },
+          {
+            "type": 12,
+            "content": {
+              "version": "NotebookGroup/1.0",
+              "groupType": "editable",
+              "loadType": "always",
+              "items": [
+                {
+                  "type": 9,
+                  "content": {
+                    "version": "KqlParameterItem/1.0",
+                    "parameters": [
+                      {
+                        "id": "8abd6c13-dc18-4d14-871b-535d321eed34",
+                        "version": "KqlParameterItem/1.0",
+                        "name": "template_travel",
+                        "label": "Email Travel",
+                        "type": 1,
+                        "isGlobal": true,
+                        "query": "[concat('externaldata ( Config:string ) [\"', parameters('storageUrl') ,'/seen/templates/travel.html',  parameters('storageSas') ,'\"] with(format=\"RAW\")')]",
+                        "typeSettings": {
+                          "multiLineText": true,
+                          "editorLanguage": "text",
+                          "multiLineHeight": 15
+                        },
+                        "timeContext": {
+                          "durationMs": 86400000
+                        },
+                        "queryType": 0,
+                        "resourceType": "microsoft.operationalinsights/workspaces"
+                      },
+                      {
+                        "id": "8c07ded4-5d62-448e-b137-ebb93cb5b22c",
+                        "version": "KqlParameterItem/1.0",
+                        "name": "template_travel_test",
+                        "type": 1,
+                        "isGlobal": true,
+                        "query": "let header = base64_decode_tostring(\"{template_header:base64}\");\r\nlet footer = base64_decode_tostring(\"{template_footer:base64}\");\r\nlet base = base64_decode_tostring(\"{template_travel:base64}\");\r\nlet activities = \"<table><thead><tr><th>Time</th><th>Activity</th></tr></thead><tbody><tr><td>📆 2000-01-02 03:04:05</td><td>TEST - Something happened</td></tr></tbody></table>\";\r\nlet body = replace_string(replace_string(replace_string(replace_string(replace_string(replace_string(base,strcat(\"{\",\"SupportEmail}\"),\"{CurrentConfig:$.contact.supportEmail}\"),strcat(\"{\",\"SupportPhoneNumber}\"),\"{CurrentConfig:$.contact.supportPhone}\"),strcat(\"{\",\"UserFirstName}\"),\"Test User\"),strcat(\"{\",\"Activities}\"),activities),strcat(\"{\",\"Footer}\"),footer),strcat(\"{\",\"Header}\"),header);\r\nprint body=body",
+                        "isHiddenWhenLocked": true,
+                        "timeContext": {
+                          "durationMs": 86400000
+                        },
+                        "queryType": 0,
+                        "resourceType": "microsoft.operationalinsights/workspaces"
+                      }
+                    ],
+                    "style": "above",
+                    "queryType": 0,
+                    "resourceType": "microsoft.operationalinsights/workspaces"
+                  },
+                  "name": "GetTemplatesTravel"
+                },
+                {
+                  "type": 11,
+                  "content": {
+                    "version": "LinkItem/1.0",
+                    "style": "toolbar",
+                    "links": [
+                      {
+                        "id": "3dbf5bfd-2b70-451c-966c-bd16ef03f26f",
+                        "cellValue": "",
+                        "linkTarget": "ArmAction",
+                        "linkLabel": "Test Travel email",
+                        "subTarget": "Visible",
+                        "postText": "Send a test message to {CurrentConfig:$.testEmail}",
+                        "style": "link",
+                        "icon": "Mail",
+                        "linkIsContextBlade": true,
+                        "armActionContext": {
+                          "path": "[concat(parameters('EmailNotificationResourceId'), '/triggers/manual/run')]",
+                          "headers": [],
+                          "params": [
+                            {
+                              "key": "api-version",
+                              "value": "2016-06-01"
+                            }
+                          ],
+                          "body": "{\r\n  \"body\":\"{template_mfa_test:escapejson}\",\r\n  \"importance\":\"high\",\r\n  \"mailFrom\":\"{CurrentConfig:$.mailFrom}\",\r\n  \"replyTo\":\"{CurrentConfig:$.mailFrom}\",\r\n  \"saveToSentItems\":false,\r\n  \"subject\":\"{CurrentConfig:$.modules.travel.subject}\",\r\n  \"to\":\"{CurrentConfig:$.testEmail}\",\r\n  \"tracking\":\"testtemplate\"\r\n}",
+                          "httpMethod": "POST",
+                          "title": "Sending a test email to {CurrentConfig:$.testEmail}",
+                          "description": "## You are about to send a test Email\n\n- From: **{CurrentConfig:$.mailFrom}**   \n- To: **{CurrentConfig:$.testEmail}**\n- Subject: **{CurrentConfig:$.modules.travel.subject}**\n\nIt will be using the templates defined in this workbook.",
+                          "actionName": "Sending a test email to {CurrentConfig:$.testEmail}",
+                          "runLabel": "Send email"
+                        }
+                      }
+                    ]
+                  },
+                  "name": "TravelTemplateAction"
+                }
+              ],
+              "exportParameters": true
+            },
+            "conditionalVisibility": {
+              "parameterName": "VisibleTab",
+              "comparison": "isEqualTo",
+              "value": "templates"
+            },
+            "customWidth": "50",
+            "name": "TravelTemplateGroup"
+          },
+          {
+            "type": 12,
+            "content": {
+              "version": "NotebookGroup/1.0",
+              "groupType": "editable",
+              "loadType": "always",
+              "items": [
+                {
+                  "type": 9,
+                  "content": {
+                    "version": "KqlParameterItem/1.0",
+                    "parameters": [
+                      {
+                        "id": "8abd6c13-dc18-4d14-871b-535d321eed34",
+                        "version": "KqlParameterItem/1.0",
+                        "name": "template_version",
+                        "label": "Version management",
+                        "type": 1,
+                        "isGlobal": true,
+                        "query": "[concat('externaldata ( Config:string ) [\"', parameters('storageUrl') ,'/seen/templates/version.html',  parameters('storageSas') ,'\"] with(format=\"RAW\")')]",
+                        "typeSettings": {
+                          "multiLineText": true,
+                          "editorLanguage": "text",
+                          "multiLineHeight": 15
+                        },
+                        "timeContext": {
+                          "durationMs": 86400000
+                        },
+                        "queryType": 0,
+                        "resourceType": "microsoft.operationalinsights/workspaces"
+                      },
+                      {
+                        "id": "8c07ded4-5d62-448e-b137-ebb93cb5b22c",
+                        "version": "KqlParameterItem/1.0",
+                        "name": "template_version_test",
+                        "type": 1,
+                        "isGlobal": true,
+                        "query": "let header = base64_decode_tostring(\"{template_header:base64}\");\r\nlet footer = base64_decode_tostring(\"{template_footer:base64}\");\r\nlet base = base64_decode_tostring(\"{template_travel:base64}\");\r\nlet activities = \"<table><thead><tr><th>Time</th><th>Activity</th></tr></thead><tbody><tr><td>📆 2000-01-02 03:04:05</td><td>TEST - Something happened</td></tr></tbody></table>\";\r\nlet body = replace_string(replace_string(replace_string(replace_string(replace_string(replace_string(base,strcat(\"{\",\"SupportEmail}\"),\"{CurrentConfig:$.contact.supportEmail}\"),strcat(\"{\",\"SupportPhoneNumber}\"),\"{CurrentConfig:$.contact.supportPhone}\"),strcat(\"{\",\"UserFirstName}\"),\"Test User\"),strcat(\"{\",\"Activities}\"),activities),strcat(\"{\",\"Footer}\"),footer),strcat(\"{\",\"Header}\"),header);\r\nprint body=body",
+                        "isHiddenWhenLocked": true,
+                        "timeContext": {
+                          "durationMs": 86400000
+                        },
+                        "queryType": 0,
+                        "resourceType": "microsoft.operationalinsights/workspaces"
+                      }
+                    ],
+                    "style": "above",
+                    "queryType": 0,
+                    "resourceType": "microsoft.operationalinsights/workspaces"
+                  },
+                  "name": "GetTemplatesVersion"
+                },
+                {
+                  "type": 11,
+                  "content": {
+                    "version": "LinkItem/1.0",
+                    "style": "toolbar",
+                    "links": [
+                      {
+                        "id": "3dbf5bfd-2b70-451c-966c-bd16ef03f26f",
+                        "cellValue": "",
+                        "linkTarget": "ArmAction",
+                        "linkLabel": "Test Version email",
+                        "subTarget": "Visible",
+                        "postText": "Send a test message to {CurrentConfig:$.testEmail}",
+                        "style": "link",
+                        "icon": "Mail",
+                        "linkIsContextBlade": true,
+                        "armActionContext": {
+                          "path": "[concat(parameters('EmailNotificationResourceId'), '/triggers/manual/run')]",
+                          "headers": [],
+                          "params": [
+                            {
+                              "key": "api-version",
+                              "value": "2016-06-01"
+                            }
+                          ],
+                          "body": "{\r\n  \"body\":\"{template_travel_test:escapejson}\",\r\n  \"importance\":\"high\",\r\n  \"mailFrom\":\"{CurrentConfig:$.mailFrom}\",\r\n  \"replyTo\":\"{CurrentConfig:$.mailFrom}\",\r\n  \"saveToSentItems\":false,\r\n  \"subject\":\"{CurrentConfig:$.versionManagement.subject}\",\r\n  \"to\":\"{CurrentConfig:$.versionManagement.adminEmail}\",\r\n  \"tracking\":\"testtemplate\"\r\n}",
+                          "httpMethod": "POST",
+                          "title": "Sending a test email to {CurrentConfig:$.testEmail}",
+                          "description": "## You are about to send a test Email\n\n- From: **{CurrentConfig:$.mailFrom}**   \n- To: **{CurrentConfig:$.versionManagement.adminEmail}**\n- Subject: **{CurrentConfig:$.versionManagement.subject}**\n\nIt will be using the templates defined in this workbook.",
+                          "actionName": "Sending a test email to {CurrentConfig:$.testEmail}",
+                          "runLabel": "Send email"
+                        }
+                      }
+                    ]
+                  },
+                  "name": "VersionTemplateAction"
+                }
+              ],
+              "exportParameters": true
+            },
+            "conditionalVisibility": {
+              "parameterName": "VisibleTab",
+              "comparison": "isEqualTo",
+              "value": "templates"
+            },
+            "customWidth": "50",
+            "name": "VersionTemplateGroup"
           },
           {
             "type": 11,
@@ -1293,7 +1869,7 @@
                         "value": "2016-06-01"
                       }
                     ],
-                    "body": "{\r\n  \"module\":\"templates\",\r\n  \"templates\": {\r\n    \"header\":\"{template_header:base64}\",\r\n    \"footer\":\"{template_footer:base64}\",\r\n    \"mfa\":\"{template_mfa:base64}\",\r\n    \"tap\":\"{template_tap:base64}\"\r\n  }\r\n}",
+                    "body": "{\r\n  \"module\":\"templates\",\r\n  \"templates\": {\r\n    \"header\":\"{template_header:base64}\",\r\n    \"footer\":\"{template_footer:base64}\",\r\n    \"mfa\":\"{template_mfa:base64}\",\r\n    \"tap\":\"{template_tap:base64}\",\r\n    \"version\":\"{template_version:base64}\",\r\n    \"travel\":\"{template_travel:base64}\"\r\n  }\r\n}",
                     "httpMethod": "POST",
                     "title": "Updating HTML templates",
                     "description": "### Updating templates\n\nYou are about to update ALL templates for the solution.\n\nPlease double check your entries.",

@@ -38,6 +38,14 @@
             "defaultValue": "SEEN-TemporaryAccessPass",
             "type": "String"
         },
+        "TravelPlaybookName": {
+            "defaultValue": "SEEN-Travel",
+            "type": "String"
+        },
+        "TestEmailPlaybookName": {
+            "defaultValue": "SEEN-TestEmail",
+            "type": "String"
+        },                
         "DeployFromBranch": {
             "defaultValue": "main",
             "type": "String"
@@ -51,6 +59,7 @@
         "workbookTemplate" : "[concat('https://raw.githubusercontent.com/piaudonn/SecurityNotifications/', parameters('DeployFromBranch'), '/shared/workbook.json')]",
         "mfaTemplate" : "[concat('https://raw.githubusercontent.com/piaudonn/SecurityNotifications/', parameters('DeployFromBranch'), '/modules/MFAMethods/mfamethods.json')]",
         "tapTemplate" : "[concat('https://raw.githubusercontent.com/piaudonn/SecurityNotifications/', parameters('DeployFromBranch'), '/modules/TAP/tap.json')]",
+        "travelTemplate" : "[concat('https://raw.githubusercontent.com/piaudonn/SecurityNotifications/', parameters('DeployFromBranch'), '/modules/Travel/travel.json')]",
         "workbookId" : "7bea244d-869b-45a8-996a-2472c0d7bc5f",
         "workbookType": "workbook"
     },
@@ -99,7 +108,8 @@
             "type": "Microsoft.Resources/deployments",
             "dependsOn": [
                 "[resourceId('Microsoft.Resources/deployments', 'StorageTemplate')]",
-                "[resourceId('Microsoft.Resources/deployments', 'WebConnectionTemplate')]"
+                "[resourceId('Microsoft.Resources/deployments', 'WebConnectionTemplate')]",
+                "[resourceId('Microsoft.Resources/deployments', 'EmailTemplate')]"
             ],
             "properties": {
                 "mode": "incremental",
@@ -116,6 +126,9 @@
                     },
                     "TablesConnectionResourceID": {
                         "value": "[reference('WebConnectionTemplate').outputs.TableConnectionResourceID.value]"
+                    },
+                    "EmailNotificationResourceId": {
+                        "value": "[reference('EmailTemplate').outputs.resourceID.value]"
                     },
                     "StorageAccountName": {
                         "value": "[reference('StorageTemplate').outputs.storageAccountName.value]"
@@ -180,6 +193,43 @@
         },
         {
             "apiVersion": "2019-10-01",
+            "name": "TravelTemplate",
+            "type": "Microsoft.Resources/deployments",
+            "dependsOn": [
+                "[resourceId('Microsoft.Resources/deployments', 'StorageTemplate')]",
+                "[resourceId('Microsoft.Resources/deployments', 'WebConnectionTemplate')]",
+                "[resourceId('Microsoft.Resources/deployments', 'ConfigTemplate')]"
+            ],
+            "properties": {
+                "mode": "incremental",
+                "templateLink": {
+                    "uri": "[variables('travelTemplate')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "PlaybookName": {
+                        "value": "[parameters('TravelPlaybookName')]"
+                    },
+                    "TablesConnectionResourceId": {
+                        "value": "[reference('WebConnectionTemplate').outputs.TableConnectionResourceID.value]"
+                    },
+                    "ConfigResourceId": {
+                        "value": "[reference('ConfigTemplate').outputs.resourceID.value]"
+                    },
+                    "EmailNotificationResourceId": {
+                        "value": "[reference('EmailTemplate').outputs.resourceID.value]"
+                    },
+                    "StorageAccountName": {
+                        "value": "[reference('StorageTemplate').outputs.storageAccountName.value]"
+                    },
+                    "LogAnalyticsWorkspaceId": {
+                        "value": "[reference(parameters('LogAnalyticsResourceId'), '2021-06-01', 'Full').properties.customerId]"
+                    }
+                }
+            }
+        },
+        {
+            "apiVersion": "2019-10-01",
             "name": "TAPTemplate",
             "type": "Microsoft.Resources/deployments",
             "dependsOn": [
@@ -222,7 +272,8 @@
             "dependsOn": [
                 "[resourceId('Microsoft.Resources/deployments', 'StorageTemplate')]",
                 "[resourceId('Microsoft.Resources/deployments', 'WebConnectionTemplate')]",
-                "[resourceId('Microsoft.Resources/deployments', 'ConfigTemplate')]"
+                "[resourceId('Microsoft.Resources/deployments', 'ConfigTemplate')]",
+                "[resourceId('Microsoft.Resources/deployments', 'EmailTemplate')]"
             ],
             "properties": {
                 "mode": "incremental",
@@ -251,6 +302,9 @@
                     },
                     "ConfigLAId": {
                         "value": "[reference('ConfigTemplate').outputs.resourceID.value]"
+                    },
+                    "EmailNotificationResourceId": {
+                        "value": "[reference('EmailTemplate').outputs.resourceID.value]"
                     }
                 }
             }

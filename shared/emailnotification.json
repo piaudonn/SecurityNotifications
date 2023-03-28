@@ -11,7 +11,7 @@
             "type": "String"
         },
         "ModuleVersion": {
-            "defaultValue": "0.1",
+            "defaultValue": "1.0",
             "type": "String"
         }
     },
@@ -37,11 +37,11 @@
                     "contentVersion": "1.0.0.0",
                     "parameters": {
                         "ProjectName": {
-                            "defaultValue": "SEEN",
+                            "defaultValue": "[parameters('ProjectName')]",
                             "type": "String"
                         },
                         "ModuleVersion": {
-                            "defaultValue": "1.0",
+                            "defaultValue": "[parameters('ModuleVersion')]",
                             "type": "String"
                         }
                     },
