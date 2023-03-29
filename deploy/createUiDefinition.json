@@ -220,11 +220,43 @@
                         "visible": "[if(equals(steps('deploymentTypeStep').deploymentType, 'advanced'), true, false)]"
                     },
                     {
+                        "name": "laTextBlock1",
+                        "type": "Microsoft.Common.TextBlock",
+                        "visible": true,
+                        "options": {
+                            "text": "Log Analytics Workspace"
+                        }
+                    },
+                    {
+                        "name": "logAnalyticsSelector",
+                        "type": "Microsoft.Solutions.ResourceSelector",
+                        "label": "Select Log Analytics Workspace",
+                        "resourceType": "microsoft.operationalinsights/workspaces",
+                        "options": {
+                          "filter": {
+                          }
+                        }
+                      }
+                ]
+            },
+            {
+                "name": "seenStorage",
+                "label": "Storage Setup",
+                "elements": [
+                    {
                         "name": "storageTextBlock1",
                         "type": "Microsoft.Common.TextBlock",
                         "visible": true,
                         "options": {
-                            "text": "We recommend using a dedicated storage account for SEEN.  If you choose to use an existing storage account, it must be in the same resource group."
+                            "text": "SEEN uses a storage account to store email templates and track previous runs of SEEN modules."
+                        }
+                    },
+                    {
+                        "name": "storageTextBlock2",
+                        "type": "Microsoft.Common.TextBlock",
+                        "visible": true,
+                        "options": {
+                            "text": "We recommend using a dedicated storage account for SEEN.  If you choose to use an existing storage account, it must be in the same resource group as your SEEN deployment."
                         }
                     },
                     {
@@ -251,32 +283,14 @@
                             }
                         ],
                         "visible": true
-                    },
-                    {
-                        "name": "laTextBlock1",
-                        "type": "Microsoft.Common.TextBlock",
-                        "visible": true,
-                        "options": {
-                            "text": "Log Analytics Workspace"
-                        }
-                    },
-                    {
-                        "name": "logAnalyticsSelector",
-                        "type": "Microsoft.Solutions.ResourceSelector",
-                        "label": "Select Log Analytics Workspace",
-                        "resourceType": "microsoft.operationalinsights/workspaces",
-                        "options": {
-                          "filter": {
-                          }
-                        }
-                      }
+                    }
                 ]
             }
         ],
         "outputs": {
-            "StorageAccountName": "[steps('seenModules').storageAccount.singleStorage.name]",
-            "StorageAccountType": "[steps('seenModules').storageAccount.singleStorage.type]",
-            "StorageAccountKind": "[steps('seenModules').storageAccount.singleStorage.kind]",
+            "StorageAccountName": "[steps('seenStorage').storageAccount.singleStorage.name]",
+            "StorageAccountType": "[steps('seenStorage').storageAccount.singleStorage.type]",
+            "StorageAccountKind": "[steps('seenStorage').storageAccount.singleStorage.kind]",
             "LogAnalyticsResourceId": "[steps('seenModules').logAnalyticsSelector.id]",
             "ConfigPlaybookName": "[coalesce(steps('seenModules').advancedSetup.ConfigPlaybookName,'SEEN-Config')]",
             "EmailPlaybookName": "[coalesce(steps('seenModules').advancedSetup.EmailPlaybookName,'SEEN-SendEmail')]",
