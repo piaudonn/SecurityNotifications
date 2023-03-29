@@ -150,6 +150,9 @@
                 "parameters": {
                     "PlaybookName": {
                         "value": "[parameters('EmailPlaybookName')]"
+                    },
+                    "LogAnalyticsResourceId": {
+                        "value": "[parameters('LogAnalyticsResourceId')]"
                     }
                 }
             }
