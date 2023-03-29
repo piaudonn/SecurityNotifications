@@ -182,6 +182,31 @@
                                 "visible": true
                             },
                             {
+                                "name": "enableDiagnostics",
+                                "type": "Microsoft.Common.DropDown",
+                                "label": "Enable Diagnostic Logging",
+                                "placeholder": "",
+                                "defaultValue": "True",
+                                "toolTip": "",
+                                "multiselect": false,
+                                "selectAll": false,
+                                "multiLine": false,
+                                "constraints": {
+                                  "allowedValues": [
+                                    {
+                                      "label": "True",
+                                      "value": true
+                                    },
+                                    {
+                                      "label": "False",
+                                      "value": false
+                                    }
+                                  ],
+                                  "required": true
+                                },
+                                "visible": true
+                            },
+                            {
                                 "name": "DeploymentBranch",
                                 "type": "Microsoft.Common.TextBox",
                                 "label": "Deploy from a specific GitHub Branch",
@@ -251,6 +276,7 @@
             "TravelPlaybookName": "[coalesce(steps('seenModules').advancedSetup.TravelPlaybookName,'SEEN-Travel')]",
             "TAPPlaybookName": "[coalesce(steps('seenModules').advancedSetup.TAPPlaybookName,'SEEN-TemporaryAccessPass')]",
             "WorkbookName": "[coalesce(steps('seenModules').advancedSetup.WorkbookName,'SEEN-Manage and monitor')]",
+            "EnableDiagnostics": "[coalesce(steps('seenModules').advancedSetup.enableDiagnostics, true)]",
             "DeployFromBranch": "[coalesce(steps('seenModules').advancedSetup.DeploymentBranch,'main')]",
             "location": "[location()]"
         }

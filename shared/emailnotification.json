@@ -17,6 +17,10 @@
         "LogAnalyticsResourceId": {
             "defaultValue": "",
             "type": "String"
+        },
+        "EnableDiagnostics": {
+            "defaultValue": true,
+            "type": "bool"
         }
     },
     "variables": {},
@@ -181,6 +185,7 @@
             }
         },
         {
+            "condition": "[parameters('EnableDiagnostics')]",
             "type": "Microsoft.Logic/workflows/providers/diagnosticSettings",
             "apiVersion": "2017-05-01-preview",
             "name": "[concat(parameters('PlaybookName'), '/', 'Microsoft.Insights/send-to-la')]",
