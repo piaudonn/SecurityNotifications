@@ -13,6 +13,14 @@
         "ModuleVersion": {
             "defaultValue": "1.0",
             "type": "String"
+        },
+        "LogAnalyticsResourceId": {
+            "defaultValue": "",
+            "type": "String"
+        },
+        "EnableDiagnostics": {
+            "defaultValue": true,
+            "type": "bool"
         }
     },
     "variables": {},
@@ -174,6 +182,26 @@
                     "outputs": {}
                 },
                 "parameters": {}
+            }
+        },
+        {
+            "condition": "[parameters('EnableDiagnostics')]",
+            "type": "Microsoft.Logic/workflows/providers/diagnosticSettings",
+            "apiVersion": "2017-05-01-preview",
+            "name": "[concat(parameters('PlaybookName'), '/', 'Microsoft.Insights/send-to-la')]",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Logic/workflows', parameters('PlaybookName'))]"
+            ],
+            "properties": {
+                "workspaceId": "[parameters('LogAnalyticsResourceId')]",
+                "metrics": [],
+                "logs": [
+                    {
+                        "category": "WorkflowRuntime",
+                        "enabled": true
+                    }
+                ]
             }
         }
     ],

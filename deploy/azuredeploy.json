@@ -45,7 +45,11 @@
         "TestEmailPlaybookName": {
             "defaultValue": "SEEN-TestEmail",
             "type": "String"
-        },                
+        },
+        "EnableDiagnostics": {
+            "defaultValue": true,
+            "type": "bool"
+        },
         "DeployFromBranch": {
             "defaultValue": "main",
             "type": "String"
@@ -150,6 +154,12 @@
                 "parameters": {
                     "PlaybookName": {
                         "value": "[parameters('EmailPlaybookName')]"
+                    },
+                    "LogAnalyticsResourceId": {
+                        "value": "[parameters('LogAnalyticsResourceId')]"
+                    },
+                    "EnableDiagnostics": {
+                        "value": "[parameters('EnableDiagnostics')]"
                     }
                 }
             }
