@@ -220,6 +220,14 @@
                         "visible": "[if(equals(steps('deploymentTypeStep').deploymentType, 'advanced'), true, false)]"
                     },
                     {
+                        "name": "storageTextBlock1",
+                        "type": "Microsoft.Common.TextBlock",
+                        "visible": true,
+                        "options": {
+                            "text": "We recommend using a dedicated storage account for SEEN.  If you choose to use an existing storage account, it must be in the same resource group."
+                        }
+                    },
+                    {
                         "name": "storageAccount",
                         "type": "Microsoft.Common.Section",
                         "label": "Storage Account Name",
