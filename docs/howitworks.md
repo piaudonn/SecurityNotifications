@@ -39,7 +39,7 @@ The other logic apps also need access to some aspect of the solution:
 
 ## Solution management
 
-Once the solution is installed, the entire management is done through the SEEN workbook.
+Once the solution is installed, the entire management is done through the [SEEN workbook](workbook.md).
 
 
 ---
