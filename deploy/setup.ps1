@@ -11,9 +11,9 @@
 param(
     $TenantId,
     $AzureSubscriptionId,
-    $StorageAccountResourceGroupName,
     $WorkspaceResourceGroupName,
     $SEENResourceGroupName,
+    $StorageAccountResourceGroupName = $SEENResourceGroupName,
     $ConfigLogicAppName = "SEEN-Config",
     $SendEmailLogicAppName = "SEEN-SendEmail",
     $MFAMethodsLogicAppName = "SEEN-MFAMethods",
@@ -48,7 +48,7 @@ function Set-APIPermissions ($MSIName, $AppId, $PermissionName) {
         Write-Host "❌ Principal not found." -ForegroundColor Red
         return 
     }
-    Start-Sleep -Milliseconds 500 # Wait in case the MSI identity creation tool some time
+    #Start-Sleep -Milliseconds 500 # Wait in case the MSI identity creation tool some time
     $GraphServicePrincipal = Get-MgServicePrincipal -Filter "appId eq '$AppId'"
     $AppRole = $GraphServicePrincipal.AppRoles | Where-Object {$_.Value -eq $PermissionName -and $_.AllowedMemberTypes -contains "Application"}
     try

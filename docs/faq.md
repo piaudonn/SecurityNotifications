@@ -1,4 +1,15 @@
-## Restrict Mail.Send permission
+## Frequently Asked Questions
+
+### Sentinel requirements
+
+The solution does not require Microsoft Sentinel, only to send Azure AD logs (`SigninLogs` and `AuditLog`) to Log Analtics workspace.
+The solution is deployed and used the same way whether Microsoft Sentinel is present in the environment or not. There is no interaction.
+
+### Log Analytics workspace retention
+
+The calls to the workspace are usually only looking at the last 15 minutes. However, they capped the query to one day of data. So, as ong as you have **one day** of retention, the detection will work.  
+
+### Restrict Mail.Send permission
 
 When an identity is granted the application permission `Mail.Send` on the Microsoft Graph API, it can send emails on behalf any users in the organization. It is recommended to restrict this permission by configuring an [Application Access Policy](https://learn.microsoft.com/en-us/graph/auth-limit-mailbox-access) in Exchange Online. To restrict the managed identity permission to send emails only from the account you want, follow these steps:
 
@@ -22,6 +33,6 @@ New-ApplicationAccessPolicy `
     -Description "Restrict SEEN managed identity"
 ```
 
-## Detecting atypical travels
+### Detecting atypical travels
 
 This notification relies on having Azure AD Identity Protection with Azure AD Premium P2 licences. If you enabled this module but do not have this level of license, the module will not trigger an notification.
