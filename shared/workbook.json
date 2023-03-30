@@ -299,6 +299,11 @@
                 ]
               }
             },
+            "conditionalVisibility": {
+              "parameterName": "VisibleTab",
+              "comparison": "isEqualTo",
+              "value": "config"
+            },
             "name": "ListModulesArm"
           },
           {
