@@ -22,6 +22,13 @@
         "description": "The id of resource instance to which the workbook will be associated"
       }
     },
+    "SEENLogicAppsPath": {
+      "type": "string",
+      "defaultValue": "/subscriptions/<subscription>/resourceGroups/<rgname>/providers/Microsoft.Logic/workflows/",
+      "metadata": {
+        "description": "The ARM path of logic apps to display them"
+      }
+    },
     "storageUrl": {
       "type": "string",
       "defaultValue": "URL",
@@ -188,76 +195,12 @@
             "type": 3,
             "content": {
               "version": "KqlItem/1.0",
-              "query": "Resources\r\n| where type == \"microsoft.logic/workflows\"\r\n| where properties.definition.parameters.ProjectName.defaultValue == \"SEEN\"\r\n| extend Version = properties.definition.parameters.ModuleVersion.defaultValue\r\n| extend State = properties.state\r\n| extend Action = iif( State==\"Enabled\", \"disable\", \"enable\")",
+              "query": "[concat('{\"version\":\"ARMEndpoint/1.0\",\"data\":null,\"headers\":[],\"method\":\"GET\",\"path\":\", [parameters('SEENLogicAppsPath')] ,'\",\"urlParams\":[{\"key\":\"api-version\",\"value\":\"2019-05-01\"}],\"batchDisabled\":false,\"transformers\":[{\"type\":\"jsonpath\",\"settings\":{\"tablePath\":\"$.value[*]\",\"columns\":[{\"path\":\"$.id\",\"columnid\":\"LogicApp\"},{\"path\":\"$.properties.definition.parameters.ModuleVersion.defaultValue\",\"columnid\":\"Version\"},{\"path\":\"$.properties.state\",\"columnid\":\"State\"},{\"path\":\"$.properties.state\",\"columnid\":\"Start\",\"columnType\":\"string\",\"substringRegexMatch\":\".*\",\"substringReplace\":\"Start\"},{\"path\":\"$.properties.state\",\"columnid\":\"Stop\",\"columnType\":\"string\",\"substringRegexMatch\":\".*\",\"substringReplace\":\"Stop\"},{\"path\":\"$.name\",\"columnid\":\"Name\",\"columnType\":\"string\"}]}}]}')]",
               "size": 1,
               "title": "Enable the modules you want to use",
-              "queryType": 1,
-              "resourceType": "microsoft.resourcegraph/resources",
-              "crossComponentResources": [
-                "value::all"
-              ],
+              "queryType": 12,
               "gridSettings": {
                 "formatters": [
-                  {
-                    "columnMatch": "name",
-                    "formatter": 5
-                  },
-                  {
-                    "columnMatch": "type",
-                    "formatter": 5
-                  },
-                  {
-                    "columnMatch": "tenantId",
-                    "formatter": 5
-                  },
-                  {
-                    "columnMatch": "kind",
-                    "formatter": 5
-                  },
-                  {
-                    "columnMatch": "location",
-                    "formatter": 5
-                  },
-                  {
-                    "columnMatch": "subscriptionId",
-                    "formatter": 5
-                  },
-                  {
-                    "columnMatch": "managedBy",
-                    "formatter": 5
-                  },
-                  {
-                    "columnMatch": "sku",
-                    "formatter": 5
-                  },
-                  {
-                    "columnMatch": "plan",
-                    "formatter": 5
-                  },
-                  {
-                    "columnMatch": "properties",
-                    "formatter": 5
-                  },
-                  {
-                    "columnMatch": "tags",
-                    "formatter": 5
-                  },
-                  {
-                    "columnMatch": "identity",
-                    "formatter": 5
-                  },
-                  {
-                    "columnMatch": "zones",
-                    "formatter": 5
-                  },
-                  {
-                    "columnMatch": "extendedLocation",
-                    "formatter": 5
-                  },
-                  {
-                    "columnMatch": "Version",
-                    "formatter": 1
-                  },
                   {
                     "columnMatch": "State",
                     "formatter": 18,
@@ -265,56 +208,37 @@
                       "thresholdsOptions": "icons",
                       "thresholdsGrid": [
                         {
-                          "operator": "contains",
-                          "thresholdValue": "Disabled",
-                          "representation": "disabled",
-                          "text": "{0}{1}"
+                          "operator": "==",
+                          "thresholdValue": "Enabled",
+                          "representation": "success",
+                          "text": "Started"
                         },
                         {
                           "operator": "Default",
                           "thresholdValue": null,
-                          "representation": "success",
-                          "text": "{0}{1}"
+                          "representation": "disabled",
+                          "text": "Stopped"
                         }
-                      ],
-                      "armActionContext": {
-                        "path": "[[\"id\"]/disable",
-                        "headers": [],
-                        "params": [
-                          {
-                            "key": "api-version",
-                            "value": "2016-10-01"
-                          }
-                        ],
-                        "httpMethod": "POST",
-                        "description": "# Actions can potentially modify resources.\n## Please use caution and include a confirmation message in this description when authoring this command."
-                      }
+                      ]
                     }
                   },
                   {
-                    "columnMatch": "Action",
+                    "columnMatch": "Start",
                     "formatter": 18,
                     "formatOptions": {
-                      "linkColumn": "id",
                       "linkTarget": "ArmAction",
                       "linkIsContextBlade": true,
                       "thresholdsOptions": "icons",
                       "thresholdsGrid": [
                         {
-                          "operator": "==",
-                          "thresholdValue": "enable",
-                          "representation": "Start",
-                          "text": "Click here to enable"
-                        },
-                        {
                           "operator": "Default",
                           "thresholdValue": null,
-                          "representation": "Stop",
-                          "text": "Click here to disable"
+                          "representation": "Start",
+                          "text": "Start"
                         }
                       ],
                       "armActionContext": {
-                        "path": "[[\"id\"]/[\"Action\"]",
+                        "path": "[[\"LogicApp\"]/enable",
                         "headers": [],
                         "params": [
                           {
@@ -323,33 +247,59 @@
                           }
                         ],
                         "httpMethod": "POST",
-                        "title": "You are about to [\"Action\"] [\"name\"]",
-                        "description": "### Review the following actions before confirming\n\nYou want to **[\"Action\"]** the logic app **[\"name\"]**.\n\nNote that you will need to refresh the workbook to see the updated status.",
-                        "actionName": "[[\"Action\"] [\"name\"]",
-                        "runLabel": "Confirm"
-                      },
-                      "customColumnWidthSetting": "25ch"
+                        "title": "You are about to start [\"Name\"]",
+                        "description": "### Review the following actions before confirming\n\nYou want to **start** the logic app **[\"Name\"]**.\n\n\tNote that nothing will happen if the logic app is already enabled.\n\n🔃 You will need to refresh the workbook to see the updated status.",
+                        "actionName": "Start [\"Name\"]",
+                        "runLabel": "Enable the [\"Name\"] logic app"
+                      }
                     }
+                  },
+                  {
+                    "columnMatch": "Stop",
+                    "formatter": 18,
+                    "formatOptions": {
+                      "linkTarget": "ArmAction",
+                      "linkIsContextBlade": true,
+                      "thresholdsOptions": "icons",
+                      "thresholdsGrid": [
+                        {
+                          "operator": "Default",
+                          "thresholdValue": null,
+                          "representation": "Stop",
+                          "text": "{0}{1}"
+                        }
+                      ],
+                      "armActionContext": {
+                        "path": "[[\"LogicApp\"]/disable",
+                        "headers": [],
+                        "params": [
+                          {
+                            "key": "api-version",
+                            "value": "2016-10-01"
+                          }
+                        ],
+                        "httpMethod": "POST",
+                        "title": "You are about to stop [\"Name\"]",
+                        "description": "### Review the following actions before confirming\n\nYou want to **stop** the logic app **[\"Name\"]**.\n\n\tNote that nothing will happen if the logic app is already enabled.\n\n🔃 You will need to refresh the workbook to see the updated status.",
+                        "actionName": "Stop [\"Name\"]",
+                        "runLabel": "Disable the [\"Name\"] logic app"
+                      }
+                    }
+                  },
+                  {
+                    "columnMatch": "Name",
+                    "formatter": 5
                   }
                 ],
                 "labelSettings": [
                   {
-                    "columnId": "id",
-                    "label": "Module"
-                  },
-                  {
-                    "columnId": "resourceGroup",
-                    "label": "Resource Group"
+                    "columnId": "LogicApp",
+                    "label": "Logic App"
                   }
                 ]
               }
             },
-            "conditionalVisibility": {
-              "parameterName": "VisibleTab",
-              "comparison": "isEqualTo",
-              "value": "config"
-            },
-            "name": "ListModules"
+            "name": "ListModulesArm"
           },
           {
             "type": 1,
