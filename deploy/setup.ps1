@@ -1,3 +1,5 @@
+# Documentation and license information available at SEEN - https://aka.ms/seen
+#
 # Required Permissions
 #  - Azure AD Global Administrator or an Azure AD Privileged Role Administrator to execute the Set-APIPermissions function
 #  - Resource Group Owner or User Access Administrator on the resource groups hosting the logic app and the storage account to execute the Set-RBACPermissions function
