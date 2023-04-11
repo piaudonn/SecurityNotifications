@@ -36,3 +36,7 @@ New-ApplicationAccessPolicy `
 ### Detecting atypical travels
 
 This notification relies on having Azure AD Identity Protection with Azure AD Premium P2 licences. If you enabled this module but do not have this level of license, the module will not trigger an notification.
+
+### Use Azure Communication Services
+
+As of today, the solution is only using an Office 365 mailbox to send the emails from. It is not configurable to use Azure Communication Services.
