@@ -1,3 +1,5 @@
+# Documentation and license information available at SEEN - https://aka.ms/seen
+#
 # Required Permissions
 #  - Azure AD Global Administrator or an Azure AD Privileged Role Administrator to execute the Set-APIPermissions function
 #  - Resource Group Owner or User Access Administrator on the resource groups hosting the logic app and the storage account to execute the Set-RBACPermissions function
@@ -11,9 +13,9 @@
 param(
     $TenantId,
     $AzureSubscriptionId,
-    $StorageAccountResourceGroupName,
     $WorkspaceResourceGroupName,
     $SEENResourceGroupName,
+    $StorageAccountResourceGroupName = $SEENResourceGroupName,
     $ConfigLogicAppName = "SEEN-Config",
     $SendEmailLogicAppName = "SEEN-SendEmail",
     $MFAMethodsLogicAppName = "SEEN-MFAMethods",
@@ -48,7 +50,7 @@ function Set-APIPermissions ($MSIName, $AppId, $PermissionName) {
         Write-Host "❌ Principal not found." -ForegroundColor Red
         return 
     }
-    Start-Sleep -Milliseconds 500 # Wait in case the MSI identity creation tool some time
+    #Start-Sleep -Milliseconds 500 # Wait in case the MSI identity creation tool some time
     $GraphServicePrincipal = Get-MgServicePrincipal -Filter "appId eq '$AppId'"
     $AppRole = $GraphServicePrincipal.AppRoles | Where-Object {$_.Value -eq $PermissionName -and $_.AllowedMemberTypes -contains "Application"}
     try

@@ -5,7 +5,7 @@
 **SEEN** allows you to send automatic email notifications to end-users when specific security events are detected on their Azure AD accounts. Events such as:
 - a Multi Factor Authentication method was added, updated or removed
 - a Temporary Access Pass ([TAP](https://learn.microsoft.com/en-us/azure/active-directory/authentication/howto-authentication-temporary-access-pass)) was created or used
-- a atypical tracel was detected by [Azure AD Identity Protection](https://learn.microsoft.com/en-us/azure/active-directory/identity-protection/overview-identity-protection)
+- an Atypical travel was detected by [Azure AD Identity Protection](https://learn.microsoft.com/en-us/azure/active-directory/identity-protection/overview-identity-protection)
 
 **SEEN** let you customize the emails sent to inform the users of these events and encourage them to reach out to your security team or support. 
 
