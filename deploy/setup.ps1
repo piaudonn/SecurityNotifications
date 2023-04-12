@@ -31,6 +31,7 @@ try
 {
     Login-AzAccount -Subscription $AzureSubscriptionId -Tenant $TenantId -ErrorAction Stop | Out-Null
     $Domain = (Get-AzTenant | Where-Object { $_.Id -eq "550a9b78-cb2e-43e0-9c5b-db194784b875" }).Domains[0]
+    Set-AzContext -SubscriptionId $AzureSubscriptionId -TenantId $TenantId | Out-Null
 }
 catch
 {
@@ -98,6 +99,23 @@ function Set-RBACPermissions ($MSIName, $Role, $ResourceGroup) {
 #endregion
 
 #region Permissions
+#Allow installer to trigger the config Logic App
+<#
+$AssignLogicAppOperator = New-AzRoleAssignment  `
+    -Scope "/subscriptions/$($AzureSubscriptionId)/resourceGroups/$($SEENResourceGroupName)/providers/Microsoft.Logic/workflows/$($ConfigLogicAppName)" `
+    -RoleDefinitionName "Logic App Operator" `
+    -ErrorAction SilentlyContinue `
+    -ErrorVariable AzErrorLogicAppOperator
+if ( $AssignLogicAppOperator )
+{
+    Write-Host "✅ Role added" -ForegroundColor Green
+} elseif ( $AzErrorLogicAppOperator[0].Exception.Message -like "*Conflict*" ) {
+    Write-Host "ℹ️ Role already assigned"
+} else {
+    Write-Host "❌ $($AzErrorLogicAppOperator[0].Exception.Message)" -ForegroundColor Red
+}
+#>
+
 #Config Logic App
 Set-RBACPermissions -MSIName $ConfigLogicAppName -Role "Storage Blob Data Contributor" -ResourceGroup $StorageAccountResourceGroupName
 Set-RBACPermissions -MSIName $ConfigLogicAppName -Role "Storage Table Data Contributor" -ResourceGroup $StorageAccountResourceGroupName
