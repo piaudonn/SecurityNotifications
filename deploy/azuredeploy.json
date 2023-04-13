@@ -301,6 +301,9 @@
                     "workbookSourceId": {
                         "value": "[parameters('LogAnalyticsResourceId')]"
                     },
+                    "SEENLogicAppsPath": {
+                        "value": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name ,'/providers/Microsoft.Logic/workflows/')]"
+                    },
                     "storageUrl": {
                         "value": "[reference('StorageTemplate').outputs.storageUrl.value]"
                     },
